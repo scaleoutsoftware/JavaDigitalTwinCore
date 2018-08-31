@@ -1,0 +1,37 @@
+plugins {
+    id 'java'
+}
+
+group 'com.scaleoutsoftware.digitaltwin'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    archives
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    manifest {
+        attributes ('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+}
+
