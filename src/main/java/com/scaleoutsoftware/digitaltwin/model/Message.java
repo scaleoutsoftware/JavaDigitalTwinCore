@@ -16,9 +16,11 @@
 package com.scaleoutsoftware.digitaltwin.model;
 
 public class Message {
+    private String _metadata;
     private byte[] _payload;
 
-    public Message (byte[] payload) {
+    public Message (String metadata, byte[] payload) {
+        _metadata = metadata;
         _payload = payload;
     }
 
@@ -28,5 +30,9 @@ public class Message {
      */
     public byte[] getPayload() {
         return _payload;
+    }
+
+    public String getMetadata() {
+        return _metadata;
     }
 }
