@@ -13,9 +13,17 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-package com.scaleoutsoftware.digitaltwin.model;
+package com.scaleoutsoftware.digitaltwin;
 
-public enum SendingResult {
-    Delivered,
-    NotDelivered
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class DigitalTwin {
+    protected String id;
+    protected String digitalTwinType;
+
+    public DigitalTwin() {
+    }
+
+    public abstract void init(String id, String digitalTwinType);
 }

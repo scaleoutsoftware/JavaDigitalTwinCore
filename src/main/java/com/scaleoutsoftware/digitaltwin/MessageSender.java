@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-package com.scaleoutsoftware.digitaltwin.model;
+package com.scaleoutsoftware.digitaltwin;
 
 public interface MessageSender {
     SendingResult sendMessage(String targetNamespace, String id, Message message);

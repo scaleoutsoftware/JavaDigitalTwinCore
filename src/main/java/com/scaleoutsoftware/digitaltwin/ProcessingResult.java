@@ -13,26 +13,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-package com.scaleoutsoftware.digitaltwin.model;
+package com.scaleoutsoftware.digitaltwin;
 
-public class Message {
-    private String _metadata;
-    private byte[] _payload;
-
-    public Message (String metadata, byte[] payload) {
-        _metadata = metadata;
-        _payload = payload;
-    }
-
-    /**
-     * use this to get at your message payload
-     * @return
-     */
-    public byte[] getPayload() {
-        return _payload;
-    }
-
-    public String getMetadata() {
-        return _metadata;
-    }
+public enum ProcessingResult {
+    UpdateDigitalTwin,
+    NoUpdate
 }

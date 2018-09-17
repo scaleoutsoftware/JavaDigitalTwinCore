@@ -13,10 +13,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-package com.scaleoutsoftware.digitaltwin.model;
+package com.scaleoutsoftware.digitaltwin;
 
-import java.io.Serializable;
-
-public interface MessageProcessor<V extends DigitalTwin> extends Serializable {
-    ProcessingResult processMessage(V stateObject, MessageList messageList, Message incoming) throws Exception;
+public enum SendingResult {
+    Delivered,
+    NotDelivered
 }
