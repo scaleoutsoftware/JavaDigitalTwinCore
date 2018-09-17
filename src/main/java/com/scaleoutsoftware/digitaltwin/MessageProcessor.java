@@ -25,12 +25,9 @@ public abstract class MessageProcessor<T extends DigitalTwin, V> extends Message
     public abstract ProcessingResult processMessages(T stateObject, MessageList<V> messageList, Iterable<V> incomingMessages) throws Exception;
 
     @Override
-    protected ProcessingResult processMessages(T twin, MessageListFactory factory) throws Exception {
-        logger.info("in process message base");
+    public ProcessingResult processMessages(T twin, MessageListFactory factory) throws Exception {
         MessageList<V> ml = factory.getMessageList();
-        logger.info("ml recieved");
         Iterable<V> incoming = factory.getIncomingMessages();
-        logger.info("iterable recieved");
         return this.processMessages(twin, ml, incoming);
     }
 }
