@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DigitalTwin {
-    protected String id;
-    protected String digitalTwinType;
+    protected String Id;
+    protected String Model;
 
     public DigitalTwin() {
     }
