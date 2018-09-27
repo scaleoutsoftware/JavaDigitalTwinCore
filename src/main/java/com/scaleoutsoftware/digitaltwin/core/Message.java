@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-package com.scaleoutsoftware.digitaltwin;
+package com.scaleoutsoftware.digitaltwin.core;
 
 public class Message {
     private String _metadata;

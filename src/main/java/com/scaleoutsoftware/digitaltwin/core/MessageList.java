@@ -1,4 +1,4 @@
-package com.scaleoutsoftware.digitaltwin;
+package com.scaleoutsoftware.digitaltwin.core;
 
 import java.util.List;
 

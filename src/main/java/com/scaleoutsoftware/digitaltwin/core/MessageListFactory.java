@@ -1,4 +1,4 @@
-package com.scaleoutsoftware.digitaltwin;
+package com.scaleoutsoftware.digitaltwin.core;
 
 public interface MessageListFactory {
      <V> MessageList<V> getMessageList();

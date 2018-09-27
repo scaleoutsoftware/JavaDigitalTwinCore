@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-package com.scaleoutsoftware.digitaltwin;
+package com.scaleoutsoftware.digitaltwin.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +22,13 @@ import java.io.Serializable;
 
 public abstract class MessageProcessor<T extends DigitalTwin, V> extends MessageProcessorBase<T> implements Serializable {
     Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
-    public abstract ProcessingResult processMessages(T stateObject, MessageList<V> messageList, Iterable<V> incomingMessages) throws Exception;
+    public abstract ProcessingResult processMessages(ProcessingContext context, T stateObject, MessageList<V> messageList, Iterable<V> incomingMessages) throws Exception;
 
     @Override
-    public ProcessingResult processMessages(T twin, MessageListFactory factory) throws Exception {
+    public ProcessingResult processMessages(ProcessingContext context, T twin, MessageListFactory factory) throws Exception {
         MessageList<V> ml = factory.getMessageList();
         Iterable<V> incoming = factory.getIncomingMessages();
-        return this.processMessages(twin, ml, incoming);
+        return this.processMessages(context, twin, ml, incoming);
     }
 }
 

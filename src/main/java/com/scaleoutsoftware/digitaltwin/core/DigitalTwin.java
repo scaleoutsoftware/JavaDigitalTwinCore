@@ -13,8 +13,17 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-package com.scaleoutsoftware.digitaltwin;
+package com.scaleoutsoftware.digitaltwin.core;
 
-public interface MessageSender {
-    SendingResult sendMessage(String targetNamespace, String id, Message message);
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class DigitalTwin {
+    protected String Id;
+    protected String Model;
+
+    public void init(String id, String model) {
+        this.Id = id;
+        this.Model = model;
+    }
 }
