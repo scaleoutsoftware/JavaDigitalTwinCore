@@ -15,13 +15,9 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 
 public abstract class MessageProcessor<T extends DigitalTwin, V> extends MessageProcessorBase<T> implements Serializable {
-    Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
     public abstract ProcessingResult processMessages(ProcessingContext context, T stateObject, MessageList<V> messageList, Iterable<V> incomingMessages) throws Exception;
 
     @Override
