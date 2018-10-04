@@ -15,6 +15,15 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+/**
+ * Retrieves a long (typically a timestamp) for ordering in the MessageList.
+ * @param <V> the value of the object stored in the MessageList.
+ */
 public interface FieldSelector<V> {
+    /**
+     * Selects a long from the instance of the parameter value.
+     * @param value the long to return for ordering
+     * @return the long value for ordering
+     */
     long select(V value);
 }

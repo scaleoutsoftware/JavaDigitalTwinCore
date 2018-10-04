@@ -15,6 +15,9 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+/**
+ * Marks a message as Delivered or not Delivered
+ */
 public enum SendingResult {
     Delivered,
     NotDelivered

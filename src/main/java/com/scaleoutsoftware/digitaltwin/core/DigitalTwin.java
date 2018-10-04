@@ -15,13 +15,26 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * A "DigitalTwin" of a device. The implementation of the DigitalTwin should have a parameterless constructor for
+ * basic initialization.
+ */
 public abstract class DigitalTwin {
+    /**
+     * The identifier for this DigitalTwin
+     */
     protected String Id;
+    /**
+     * The model for this DigitalTwin
+     */
     protected String Model;
 
+
+    /**
+     * Initialization method to set the identifier and model for a DigitalTwin instance.
+     * @param id the id to use for this digital twin
+     * @param model the model to use for this digital twin
+     */
     public void init(String id, String model) {
         this.Id = id;
         this.Model = model;

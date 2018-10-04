@@ -17,6 +17,14 @@ package com.scaleoutsoftware.digitaltwin.core;
 
 import java.io.Serializable;
 
+/**
+ * Context object that allows the user to send a message to a DataSource.
+ */
 public abstract class ProcessingContext implements Serializable {
+    /**
+     * Sends a message to a data source
+     * @param payload the message (as a serialized JSON string)
+     * @return the sending result
+     */
     public abstract SendingResult sendToDataSource(byte[] payload);
 }

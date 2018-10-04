@@ -15,7 +15,21 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+/**
+ * Message list factory retrieves message lists for a MessageProcessor
+ */
 public interface MessageListFactory {
+     /**
+      * Retrieves a typed message list
+      * @param <V> the type of the messages inside the underlying list
+      * @return a typed message list
+      */
      <V> MessageList<V> getMessageList();
+
+     /**
+      * Returns all incoming messages
+      * @param <V> the type of incoming messages
+      * @return an iterable of incoming messages
+      */
      <V> Iterable<V> getIncomingMessages();
 }

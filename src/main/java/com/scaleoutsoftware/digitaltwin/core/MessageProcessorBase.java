@@ -15,6 +15,18 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+/**
+ * Base class for the MessageProcessor to help with typing.
+ * @param <T> the type of the DigitalTwin
+ */
 public abstract class MessageProcessorBase<T extends DigitalTwin> {
+    /**
+     * Helper method to ensure proper typing for the user methods.
+     * @param context the processing context
+     * @param twin the digital twin object
+     * @param messageListFactory the message list factory
+     * @return the implementing class's processing result
+     * @throws Exception if an exception occurs during processing
+     */
     public abstract ProcessingResult processMessages(ProcessingContext context, T twin, MessageListFactory messageListFactory) throws Exception;
 }
