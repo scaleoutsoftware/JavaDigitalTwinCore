@@ -27,12 +27,11 @@ public abstract class MessageProcessor<T extends DigitalTwin, V> extends Message
      * Processes a set of incoming messages and determines whether or not update the DigitalTwin.
      * @param context optional context for processing
      * @param stateObject the DigitalTwin state object
-     * @param messageList the saved messages that have been processed by this MessageProcessor
      * @param incomingMessages the incoming messages
      * @return processing results for updating the digital twin
      * @throws Exception if an exception occurs during processing
      */
-    public abstract ProcessingResult processMessages(ProcessingContext context, T stateObject, MessageList<V> messageList, Iterable<V> incomingMessages) throws Exception;
+    public abstract ProcessingResult processMessages(ProcessingContext context, T stateObject, Iterable<V> incomingMessages) throws Exception;
 
     /**
      * Helper method to ensure proper typing for the user methods
@@ -43,10 +42,9 @@ public abstract class MessageProcessor<T extends DigitalTwin, V> extends Message
      * @throws Exception if an exception occurs during processing
      */
     @Override
-    public ProcessingResult processMessages(ProcessingContext context, T twin, MessageListFactory factory) throws Exception {
-        MessageList<V> ml = factory.getMessageList();
+    public ProcessingResult processMessages(ProcessingContext context, T twin, MessageFactory factory) throws Exception {
         Iterable<V> incoming = factory.getIncomingMessages();
-        return this.processMessages(context, twin, ml, incoming);
+        return this.processMessages(context, twin, incoming);
     }
 }
 

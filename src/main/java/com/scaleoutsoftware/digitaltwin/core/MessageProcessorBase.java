@@ -28,5 +28,5 @@ public abstract class MessageProcessorBase<T extends DigitalTwin> {
      * @return the implementing class's processing result
      * @throws Exception if an exception occurs during processing
      */
-    public abstract ProcessingResult processMessages(ProcessingContext context, T twin, MessageListFactory messageListFactory) throws Exception;
+    public abstract ProcessingResult processMessages(ProcessingContext context, T twin, MessageFactory messageListFactory) throws Exception;
 }
