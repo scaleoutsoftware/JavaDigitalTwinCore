@@ -15,7 +15,7 @@ public class MyDigitalTwin extends DigitalTwin {
     private String myStringPropertyState;
     private int myIntegerPropertyState;
 
-    public WindTurbine() {}
+    public MyDigitalTwin() {}
 	
 	public String getStringPropertyState() { return myStringPropertyState; }
 	public int getIntegerPropertyState() { return myIntegerPropertyState; }
