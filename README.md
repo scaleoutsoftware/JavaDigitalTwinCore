@@ -2,7 +2,7 @@
 
 The Scaleout DigitalTwin Builder allows developers to simulate, communicate, and introspect on Edge devices with straight forward APIs built in Java.   
 
-##Quickstart 
+## Quickstart 
 
 The following steps will help you setup the DigitalTwin classes. The following classes should be JSON serializable. Once the quick start has been completed, you can use the deployment library (located in the installation directory of ScaleOut StateServer) to deploy the DigitalTwin and start monitoring the state of your Edge devices. 
 
@@ -10,6 +10,7 @@ Additionally, you can hook in Kafka and Azure IoT datasources for sending and re
 
 1) Define a class representation of your Edge Device - a DigitalTwin:
 
+```
 public class MyDigitalTwin extends DigitalTwin {
 	private final int MAX_INTEGER_STATE_THRESHOLD = 100;
     private String myStringPropertyState;
@@ -22,8 +23,11 @@ public class MyDigitalTwin extends DigitalTwin {
 	
 	public int getMaxIntegerStateThreshold() { return MAX_INTEGER_STATE_THRESHOLD; }
 } 
+```
 
 2) Define a message that your Edge devices will send to the DigitalTwin:
+
+```
 public class MyMessage {
 	private String myMessageType;
 	private String incomingStringStateChange;
@@ -34,10 +38,12 @@ public class MyMessage {
 	public String getIncomingStringStateChange() { return incomingStringStateChange; }
 	public int getIncomingIntegerStateChange() { return incomingIntegerStateChange; }
 }
-
+```
 
 3) Create a MessageProcessor which processes incoming messages from your Edge devices:
-ublic class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessage> {
+
+```
+Public class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessage> {
 
     @Override
     public ProcessingResult processMessages(ProcessingContext processingContext, 
@@ -52,9 +58,10 @@ ublic class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, My
 				...
 			}
 		}
+		return ProcessingResult.UpdateDigitalTwin;
 	}
 }
-
+```
 
 
 
