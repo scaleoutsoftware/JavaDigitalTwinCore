@@ -12,16 +12,16 @@ Additionally, you can hook in Kafka and Azure IoT datasources for sending and re
 
 ```
 public class MyDigitalTwin extends DigitalTwin {
-	private final int MAX_INTEGER_STATE_THRESHOLD = 100;
+    private final int MAX_INTEGER_STATE_THRESHOLD = 100;
     private String myStringPropertyState;
     private int myIntegerPropertyState;
 
     public MyDigitalTwin() {}
-	
-	public String getStringPropertyState() { return myStringPropertyState; }
-	public int getIntegerPropertyState() { return myIntegerPropertyState; }
-	
-	public int getMaxIntegerStateThreshold() { return MAX_INTEGER_STATE_THRESHOLD; }
+    
+    public String getStringPropertyState() { return myStringPropertyState; }
+    public int getIntegerPropertyState() { return myIntegerPropertyState; }
+    
+    public int getMaxIntegerStateThreshold() { return MAX_INTEGER_STATE_THRESHOLD; }
 } 
 ```
 
@@ -29,14 +29,14 @@ public class MyDigitalTwin extends DigitalTwin {
 
 ```
 public class MyMessage {
-	private String myMessageType;
-	private String incomingStringStateChange;
-	private int incomingIntegerStateChange;
-	
-	public MyMessage() {}
-	
-	public String getIncomingStringStateChange() { return incomingStringStateChange; }
-	public int getIncomingIntegerStateChange() { return incomingIntegerStateChange; }
+    private String myMessageType;
+    private String incomingStringStateChange;
+    private int incomingIntegerStateChange;
+    
+    public MyMessage() {}
+    
+    public String getIncomingStringStateChange() { return incomingStringStateChange; }
+    public int getIncomingIntegerStateChange() { return incomingIntegerStateChange; }
 }
 ```
 
@@ -47,19 +47,19 @@ Public class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, M
 
     @Override
     public ProcessingResult processMessages(ProcessingContext processingContext, 
-	                                        MyDigitalTwin digitalTwin, 
-	                                        Iterable<MyMessage> incomingMessages) throws Exception {
-		for(MyMessage message : incomingMessages) {
-			if(message.getIncomingIntegerStateChange() > digitalTwin.getMaxIntegerStateThreshold()) {
-				// if an incoming message exceeds a threshold, send a message back to the device
-				processingContext.send(...); // send a JSON serializable message
-			} else {
-				// update our state 
-				...
-			}
-		}
-		return ProcessingResult.UpdateDigitalTwin;
-	}
+                                            MyDigitalTwin digitalTwin, 
+                                            Iterable<MyMessage> incomingMessages) throws Exception {
+        for(MyMessage message : incomingMessages) {
+            if(message.getIncomingIntegerStateChange() > digitalTwin.getMaxIntegerStateThreshold()) {
+                // if an incoming message exceeds a threshold, send a message back to the device
+                processingContext.send(...); // send a JSON serializable message
+            } else {
+                // update our state 
+                ...
+            }
+        }
+        return ProcessingResult.UpdateDigitalTwin;
+    }
 }
 ```
 
