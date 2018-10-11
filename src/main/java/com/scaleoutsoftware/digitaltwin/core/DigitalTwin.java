@@ -20,15 +20,23 @@ package com.scaleoutsoftware.digitaltwin.core;
  * basic initialization.
  */
 public abstract class DigitalTwin {
+
+    private String Id;
+    private String Model;
+
     /**
      * The identifier for this DigitalTwin
      */
-    protected String Id;
+    public String getId() {
+        return Id;
+    }
+
     /**
      * The model for this DigitalTwin
      */
-    protected String Model;
-
+    public String getModel() {
+        return Model;
+    }
 
     /**
      * Initialization method to set the identifier and model for a DigitalTwin instance.
