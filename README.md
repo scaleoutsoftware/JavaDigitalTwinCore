@@ -2,7 +2,7 @@
 
 The Scaleout DigitalTwin Builder allows developers to simulate, communicate, and introspect on Edge devices with straight forward APIs built in Java.   
 
-#Quickstart 
+##Quickstart 
 
 The following steps will help you setup the DigitalTwin classes. The following classes should be JSON serializable. Once the quick start has been completed, you can use the deployment library (located in the installation directory of ScaleOut StateServer) to deploy the DigitalTwin and start monitoring the state of your Edge devices. 
 
