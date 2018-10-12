@@ -21,10 +21,23 @@ import java.io.Serializable;
  * Context object that allows the user to send a message to a DataSource.
  */
 public abstract class ProcessingContext implements Serializable {
+
     /**
      * Sends a message to a data source
      * @param payload the message (as a serialized JSON string)
      * @return the sending result
      */
     public abstract SendingResult sendToDataSource(byte[] payload);
+
+    /**
+     * Retrieve the unique Identier for a DigitalTwin (matches the Device/DigitalTwin ID)
+     * @return the digital twin id
+     */
+    public abstract String getDataSourceId();
+
+    /**
+     * Retrieve the model for a DigitalTwin (matches the model of a Device/DigitalTwin)
+     * @return the digital twin model
+     */
+    public abstract String getDataSourceModel();
 }

@@ -1,20 +1,29 @@
 # ScaleOut DigitalTwin Builder&trade; for ScaleOut StreamServer&trade;
 
-The Scaleout DigitalTwin Builder allows developers to simulate, communicate, and introspect on Edge devices with straight forward APIs built in Java.   
+The ScaleOut Digital Twin Builder&trade lets developers build digital twin models of data sources for stateful stream-processing using ScaleOut StreamServer&trade. These models enable applications to associate parameters and dynamic state for each data source that generates messages; this information provides additional context for introspecting on incoming messages. A digital twin model consists of a state object and a message processor, both defined using base classes provided by the API library. Additional APIs enable deployment of digital twin models to ScaleOut StreamServer for message processing.
+
+Instances of state objects are serialized using JSON and stored within ScaleOutStateServer’s in-memory data grid for fast access. Incoming messages from data sources are delivered to instances of digital twin models, each identified by a digital twin model name (string) and an instance identifier (string). During message processing, outbound messages can be sent back to data sources and/or to other instances of digital twins.
+
+For the concepts behind ScaleOut Digital Twin Builder, please read the ScaleOut Digital Twin Builder User Guide, which you can find in ScaleOut StreamServer's installation folder.
+
 
 ## Quickstart 
 
-The following steps will help you setup the DigitalTwin classes. The following classes should be JSON serializable. Once the quick start has been completed, you can use the deployment library (located in the installation directory of ScaleOut StateServer) to deploy the DigitalTwin and start monitoring the state of your Edge devices. 
+The following example illustrates the steps you should follow to define a digital twin model using the DigitalTwin and MessageProcessor classes. These classes need to be JSON serializable since the library uses JSON serialization for all user defined types. 
 
-Additionally, you can hook in Kafka and Azure IoT datasources for sending and recieving messages. The datasource library (also located in the installation directory) details how to setup a Kafka data source and our .NET library documentation explains how to configure the execution environment with Azure IoT.  
+Once these steps have been completed, you can use the deployment library (located in ScaleOut StreamServer’s installation directory) to deploy a digital twin within ScaleOut StreamServer and start handling incoming messages from its data sources.
+Additionally, you can connect ScaleOutStreamServer to Kafka and Azure IoT data sources to receive messages from data sources and send outbound messages back to these data sources. The data source library (also located in the installation directory) explains how to set up a connection to Kafka-based data sources, and our .NET library lets you set up connections to Azure IoT Hub.
 
-1) Define a class representation of your Edge Device - a DigitalTwin:
+ 
+
+1) Define a class which represents a state object for your digital twin model:
 
 ```
 public class MyDigitalTwin extends DigitalTwin {
     private final int MAX_INTEGER_STATE_THRESHOLD = 100;
     private String myStringPropertyState;
     private int myIntegerPropertyState;
+	private List<MyMessage> myMessageList; 
 
     public MyDigitalTwin() {}
     
@@ -22,25 +31,28 @@ public class MyDigitalTwin extends DigitalTwin {
     public int getIntegerPropertyState() { return myIntegerPropertyState; }
     
     public int getMaxIntegerStateThreshold() { return MAX_INTEGER_STATE_THRESHOLD; }
+	public void addMessage(MyMessage message); 
 } 
 ```
 
-2) Define a message that your Edge devices will send to the DigitalTwin:
+2) Define a message that your data sources will send to instances of this digital twin model (one instance for each data source) deployed within ScaleOut StreamServer. The message can be a simple Java object:
 
 ```
 public class MyMessage {
     private String myMessageType;
     private String incomingStringStateChange;
     private int incomingIntegerStateChange;
+	private long timestamp;
     
     public MyMessage() {}
     
     public String getIncomingStringStateChange() { return incomingStringStateChange; }
     public int getIncomingIntegerStateChange() { return incomingIntegerStateChange; }
+	public long getTimestamp() { return timestamp; }
 }
 ```
 
-3) Create a MessageProcessor which processes incoming messages from your Edge devices:
+3) Create a MessageProcessor which processes incoming messages from your data sources to instances of the digital twin model; note that each instance has its own state object, which is created when the first incoming message arrives from its data source:
 
 ```
 Public class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessage> {
@@ -52,10 +64,10 @@ Public class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, M
         for(MyMessage message : incomingMessages) {
             if(message.getIncomingIntegerStateChange() > digitalTwin.getMaxIntegerStateThreshold()) {
                 // if an incoming message exceeds a threshold, send a message back to the device
-                processingContext.send(...); // send a JSON serializable message
+                processingContext.sendToDataSource(...); // send a JSON serializable message
             } else {
                 // update our state 
-                ...
+                digitalTwin.addMessage(message);
             }
         }
         return ProcessingResult.UpdateDigitalTwin;
