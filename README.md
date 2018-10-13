@@ -19,7 +19,7 @@ Additionally, you can connect ScaleOutStreamServer to Kafka and Azure IoT data s
 1) Define a class which represents a state object for your digital twin model:
 
 ```
-public class MyDigitalTwin extends DigitalTwin {
+public class MyDigitalTwin extends DigitalTwinBase {
     private final int MAX_INTEGER_STATE_THRESHOLD = 100;
     private String myStringPropertyState;
     private int myIntegerPropertyState;

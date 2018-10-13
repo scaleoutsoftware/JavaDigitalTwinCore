@@ -19,7 +19,7 @@ package com.scaleoutsoftware.digitaltwin.core;
  * A "DigitalTwin" of a device. The implementation of the DigitalTwin should have a parameterless constructor for
  * basic initialization.
  */
-public abstract class DigitalTwin {
+public abstract class DigitalTwinBase {
 
     private String Id;
     private String Model;
