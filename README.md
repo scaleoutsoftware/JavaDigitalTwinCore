@@ -16,7 +16,7 @@ Additionally, you can connect ScaleOutStreamServer to Kafka and Azure IoT data s
 
  
 
-1) Define a class which represents a state object for your digital twin model:
+1) Define a class which represents a state object for your digital twin model. This class should reflect the state and behavior of the data source you need to model and inherit from the DigitalTwin abstract class. Note that each instance of a state object is created when the first incoming message arrives from its corresponding data source:
 
 ```
 public class MyDigitalTwin extends DigitalTwinBase {
@@ -52,7 +52,7 @@ public class MyMessage {
 }
 ```
 
-3) Create a MessageProcessor which processes incoming messages from your data sources to instances of the digital twin model; note that each instance has its own state object, which is created when the first incoming message arrives from its data source:
+3) Create a MessageProcessor to process incoming messages from each data source to the corresponding instance of a digital twin model. The message processor is defined as a subclass of the MessageProcessor abstract class. The processMessages method will be called by ScaleOut StreamServer to process incoming messages for each instance of a digital twin object.
 
 ```
 Public class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessage> {
