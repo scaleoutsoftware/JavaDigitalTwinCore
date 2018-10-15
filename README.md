@@ -8,9 +8,9 @@ For the concepts behind ScaleOut Digital Twin Builder, please read the ScaleOut 
 
 ## Quickstart 
 
-The following example illustrates the steps you should follow to define a digital twin model using the DigitalTwin and MessageProcessor classes. These classes need to be JSON serializable since the library uses JSON serialization for all user defined types. Once these steps have been completed, you can use the deployment library (located in ScaleOut StreamServer’s installation directory) to deploy a digital twin within ScaleOut StreamServer and start handling incoming messages from its data sources.
+The following example illustrates the steps you should follow to define a digital twin model using the DigitalTwin and MessageProcessor classes. These classes need to be JSON serializable since the library uses JSON serialization for all user defined types. Once these steps have been completed, you can use the deployment library (located in ScaleOut StreamServer’s installation directory as digitaltwin-deployment-0.5-BETA.jar) to deploy a digital twin within ScaleOut StreamServer and start handling incoming messages from its data sources.
 
-Additionally, you can connect ScaleOutStreamServer to Kafka and Azure IoT data sources to receive messages from data sources and send outbound messages back to these data sources. The data source library (also located in the installation directory) explains how to set up a connection to Kafka-based data sources, and our .NET library lets you set up connections to Azure IoT Hub.
+Additionally, you can connect ScaleOutStreamServer to Kafka and Azure IoT data sources to receive messages from data sources and send outbound messages back to these data sources. The data source library (also located in the installation directory as digitaltwin-datasource-0.5-BETA.jar) explains how to set up a connection to Kafka-based data sources, and our .NET library lets you set up connections to Azure IoT Hub.
  
 
 1) Define a class which represents a state object for your digital twin model. This class should reflect the state and behavior of the data source you need to model and inherit from the DigitalTwin abstract class. Note that each instance of a state object is created when the first incoming message arrives from its corresponding data source:
