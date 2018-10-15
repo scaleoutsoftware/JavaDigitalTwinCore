@@ -20,7 +20,7 @@ public class MyDigitalTwin extends DigitalTwinBase {
     private final int MAX_INTEGER_STATE_THRESHOLD = 100;
     private String myStringPropertyState;
     private int myIntegerPropertyState;
-	private List<MyMessage> myMessageList; 
+    private List<MyMessage> myMessageList; 
 
     public MyDigitalTwin() {}
     
@@ -28,7 +28,7 @@ public class MyDigitalTwin extends DigitalTwinBase {
     public int getIntegerPropertyState() { return myIntegerPropertyState; }
     
     public int getMaxIntegerStateThreshold() { return MAX_INTEGER_STATE_THRESHOLD; }
-	public void addMessage(MyMessage message); 
+    public void addMessage(MyMessage message); 
 } 
 ```
 
@@ -39,20 +39,20 @@ public class MyMessage {
     private String myMessageType;
     private String incomingStringStateChange;
     private int incomingIntegerStateChange;
-	private long timestamp;
+    private long timestamp;
     
     public MyMessage() {}
     
     public String getIncomingStringStateChange() { return incomingStringStateChange; }
     public int getIncomingIntegerStateChange() { return incomingIntegerStateChange; }
-	public long getTimestamp() { return timestamp; }
+    public long getTimestamp() { return timestamp; }
 }
 ```
 
 3) Create a MessageProcessor to process incoming messages from each data source to the corresponding instance of a digital twin model. The message processor is defined as a subclass of the MessageProcessor abstract class. The processMessages method will be called by ScaleOut StreamServer to process incoming messages for each instance of a digital twin object.
 
 ```
-Public class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessage> {
+Public class MyMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessage> {
 
     @Override
     public ProcessingResult processMessages(ProcessingContext processingContext, 
@@ -72,5 +72,19 @@ Public class HeartRateMessageProcessor extends MessageProcessor<MyDigitalTwin, M
 }
 ```
 
+To deploy the DigitalTwin model to ScaleOut StreamServer, you can use the deployment API: 
 
+```
+ExecutionEnvironment environment = new ExecutionEnvironmentBuilder()
+                    .addDependencyJar("/path/to/dependencies.jar")
+                    .addDigitalTwin("DT_MODEL", new MyMessageProcessor(), MyDigitalTwin.class, MyMessage.class)
+                    .build();
+```
 
+To add Kafka as a data source for DigitalTwin messages, you can use the datasource API: 
+
+```
+KafkaEndpoint kafkaEndpoint = new KafkaEndpointBuilder(new File("/path/to/server.properties"))
+                    .addTopic("DT_MODEL", "datasource_to_dt_topic", "dt_to_datasource_topic")
+                    .build();
+```
