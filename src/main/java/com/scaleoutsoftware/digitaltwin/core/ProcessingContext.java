@@ -30,14 +30,14 @@ public abstract class ProcessingContext implements Serializable {
     public abstract SendingResult sendToDataSource(byte[] payload);
 
     /**
-     * Retrieve the unique Identier for a DigitalTwin (matches the Device/DigitalTwin ID)
+     * Retrieve the unique Identier for a DataSource (matches the Device/Datasource/DigitalTwin ID)
      * @return the digital twin id
      */
     public abstract String getDataSourceId();
 
     /**
-     * Retrieve the model for a DigitalTwin (matches the model of a Device/DigitalTwin)
+     * Retrieve the model for a DigitalTwin (matches the model of a Device/Datasource/DigitalTwin)
      * @return the digital twin model
      */
-    public abstract String getDataSourceModel();
+    public abstract String getDigitalTwinModel();
 }
