@@ -72,6 +72,8 @@ Public class MyMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessag
 }
 ```
 
+
+
 To deploy the DigitalTwin model to ScaleOut StreamServer, you can use the deployment API: 
 
 ```
@@ -79,6 +81,23 @@ ExecutionEnvironment environment = new ExecutionEnvironmentBuilder()
                     .addDependencyJar("/path/to/dependencies.jar")
                     .addDigitalTwin("DT_MODEL", new MyMessageProcessor(), MyDigitalTwin.class, MyMessage.class)
                     .build();
+```
+
+
+After the DigitalTwin model is loaded into ScaleOut StreamServer, you can use our dispatch or datasources APIs (both are located in the ScaleOut StreamServer installation directory as digitaltwin-dispatch-0.5-BETA.jar and digitaltwin-datasource-0.5-BETA.jar) to send messages to DigitalTwins: 
+
+To send messages from a Java application, you can use the dispatch API:
+
+```
+SendingResult result = MessageDispatcher.send("DT_MODEL", "digital_twin_id", listOfJsonMessages);
+switch (result) {
+	case Delivered:
+		System.out.println("Event was delivered.");
+		break;
+	case NotDelivered:
+		System.out.println("Event was not delivered.");
+		break;
+}
 ```
 
 To use Kafka as a data source for DigitalTwin messages, you can use the datasource API: 
