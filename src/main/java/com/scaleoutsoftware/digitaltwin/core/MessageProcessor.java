@@ -22,7 +22,7 @@ import java.io.Serializable;
  * @param <T> the type of the DigitalTwin
  * @param <V> the value of messages processed by the DigitalTwin
  */
-public abstract class MessageProcessor<T extends DigitalTwin, V> extends MessageProcessorBase<T> implements Serializable {
+public abstract class MessageProcessor<T extends DigitalTwinBase, V> extends MessageProcessorBase<T> implements Serializable {
     /**
      * Processes a set of incoming messages and determines whether or not update the DigitalTwin.
      * @param context optional context for processing

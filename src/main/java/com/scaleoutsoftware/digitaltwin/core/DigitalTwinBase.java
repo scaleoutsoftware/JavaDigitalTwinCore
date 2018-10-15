@@ -25,14 +25,16 @@ public abstract class DigitalTwinBase {
     private String Model;
 
     /**
-     * The identifier for this DigitalTwin
+     * The identifier of this DigitalTwin.
+     * @return the identifier of this digital twin
      */
     public String getId() {
         return Id;
     }
 
     /**
-     * The model for this DigitalTwin
+     * The model for this DigitalTwin.
+     * @return the model for this DigitalTwin
      */
     public String getModel() {
         return Model;

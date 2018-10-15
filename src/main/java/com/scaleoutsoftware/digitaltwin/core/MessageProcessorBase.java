@@ -19,7 +19,7 @@ package com.scaleoutsoftware.digitaltwin.core;
  * Base class for the MessageProcessor to help with typing.
  * @param <T> the type of the DigitalTwin
  */
-public abstract class MessageProcessorBase<T extends DigitalTwin> {
+public abstract class MessageProcessorBase<T extends DigitalTwinBase> {
     /**
      * Helper method to ensure proper typing for the user methods.
      * @param context the processing context
