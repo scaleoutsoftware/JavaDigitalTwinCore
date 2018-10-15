@@ -81,7 +81,7 @@ ExecutionEnvironment environment = new ExecutionEnvironmentBuilder()
                     .build();
 ```
 
-To add Kafka as a data source for DigitalTwin messages, you can use the datasource API: 
+To use Kafka as a data source for DigitalTwin messages, you can use the datasource API: 
 
 ```
 KafkaEndpoint kafkaEndpoint = new KafkaEndpointBuilder(new File("/path/to/server.properties"))
