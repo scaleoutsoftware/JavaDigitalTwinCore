@@ -143,7 +143,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // create the ExecutionEnvironment
         ExecutionEnvironment environment = new ExecutionEnvironmentBuilder()
-                .addDependencyJar("./myfirstdigitaltwin.jar")
                 .addDigitalTwin("MyDigitalTwin", new MyMessageProcessor(), MyDigitalTwin.class, MyMessage.class)
                 .build();
     }
@@ -151,6 +150,32 @@ public class Main {
 ```
 
 At this stage we've created an entry point for the application and we've built the execution environment where the DigitalTwinModel will live and process messages. Now, let's send a JSON encoded message to the DigitalTwin:
+
+```
+import com.scaleoutsoftware.digitaltwin.core.SendingResult;
+import com.scaleoutsoftware.digitaltwin.datasource.AppEndpoint;
+import com.scaleoutsoftware.digitaltwin.deployment.ExecutionEnvironment;
+import com.scaleoutsoftware.digitaltwin.deployment.ExecutionEnvironmentBuilder;
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // create the ExecutionEnvironment
+        ExecutionEnvironment environment = new ExecutionEnvironmentBuilder()
+                .addDigitalTwin("MyDigitalTwin", new MyMessageProcessor(), MyDigitalTwin.class, MyMessage.class)
+                .build();
+        SendingResult result = AppEndpoint.send("MyDigitalTwin", "MyDigitalTwinId", "{\"myMessageType\":\"MyType\",\"incomingStringStateChange\":\"MyStringChange\",\"incomingIntegerStateChange\":50,\"timestamp\":1426325213}");
+        switch (result) {
+            case Handled:
+                System.out.println("Event was handled.");
+                break;
+            case NotHandled:
+                System.out.println("Event was not handled.");
+                break;
+        }
+    }
+}
+``` 
+
+We need to encapsulate our classes and attach them to the execution environment. To do this, we'll package our classes and attach them to the execution environment by adding a dependency JAR:
 
 ```
 import com.scaleoutsoftware.digitaltwin.core.SendingResult;
@@ -175,7 +200,7 @@ public class Main {
         }
     }
 }
-```  
+```
 
 To use Kafka as a data source for DigitalTwin messages, you can use the KafkaEndpoint in the datasource API: 
 
