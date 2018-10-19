@@ -23,6 +23,7 @@ public abstract class DigitalTwinBase {
 
     private String Id;
     private String Model;
+    private boolean Initialized = false;
 
     /**
      * The identifier of this DigitalTwin.
@@ -45,8 +46,14 @@ public abstract class DigitalTwinBase {
      * @param id the id to use for this digital twin
      * @param model the model to use for this digital twin
      */
-    public void init(String id, String model) {
-        this.Id = id;
-        this.Model = model;
+    public void init(String id, String model) throws IllegalStateException {
+        if(     Initialized &&
+                (this.Id.compareTo(id) != 0 || this.Model.compareTo(model) != 0)) {
+            throw new IllegalStateException("Attempted to call init with different Id and Model after object was initialized");
+        } else {
+            this.Id = id;
+            this.Model = model;
+            Initialized = true;
+        }
     }
 }

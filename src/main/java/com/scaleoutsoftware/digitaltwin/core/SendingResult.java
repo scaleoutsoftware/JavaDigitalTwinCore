@@ -19,6 +19,13 @@ package com.scaleoutsoftware.digitaltwin.core;
  * Marks a message as Delivered or not Delivered
  */
 public enum SendingResult {
-    Delivered,
-    NotDelivered
+    /**
+     * Handled indicates that a message was successfully sent and processed
+     */
+    Handled,
+    /**
+     * NotHandled indicates that a message was delivered but not processed. This can occur if an exception occurs
+     * in the message processor.
+     */
+    NotHandled
 }
