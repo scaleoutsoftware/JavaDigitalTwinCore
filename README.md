@@ -29,9 +29,9 @@ public class MyDigitalTwin extends DigitalTwinBase {
     
     public String getStringPropertyState() { return myStringPropertyState; }
     public int getIntegerPropertyState() { return myIntegerPropertyState; }
-	
-	public void setStringPropertyState(String change) { myStringPropertyState = change; }
-	public void setIntegerPropertyState(int change) { myIntegerPropertyState = change; }
+    
+    public void setStringPropertyState(String change) { myStringPropertyState = change; }
+    public void setIntegerPropertyState(int change) { myIntegerPropertyState = change; }
     
     public int getMaxIntegerStateThreshold() { return MAX_INTEGER_STATE_THRESHOLD; }
     public void addMessage(MyMessage message) { myMessageList.add(message); } 
@@ -72,29 +72,30 @@ public class MyMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessag
     public ProcessingResult processMessages(ProcessingContext processingContext, 
                                             MyDigitalTwin myDigitalTwin, 
                                             Iterable<MyMessage> incomingMessages) throws Exception {
-		int messageCount = 0;
-		int integerStateTotal = 0;
+        int messageCount = 0;
+        int integerStateTotal = 0;
         for(MyMessage message : incomingMessages) {
             if(message.getIncomingIntegerStateChange() > myDigitalTwin.getMaxIntegerStateThreshold()) {
-                // if an incoming message exceeds a threshold, send a message back to the device
-                processingContext.sendToDataSource(...); // send a JSON serializable message
-				// track the message that caused an alert
-				myDigitalTwin.addMessage(message);
+                // if an incoming message exceeds a threshold, save the message in the DigitalTwin
+                myDigitalTwin.addMessage(message);
+				// optionally send a JSON encoded message back to the datasource
+                // processingContext.sendToDataSource(...); // send a JSON serializable message
+                
             }
-			// calculate an average
-			integerStateTotal += message.getIncomingIntegerStateChange();
-			messageCount++;
+            // calculate an average
+            integerStateTotal += message.getIncomingIntegerStateChange();
+            messageCount++;
         }
-		int current = myDigitalTwin.getIntegerPropertyState(); 
-		int incAvg = (integerStateTotal/messageCount);
-		int change = 0;
-		if(current != 0)
-			change = (current + incAvg)/2;
-		else 
-			change = incAvg;
+        int current = myDigitalTwin.getIntegerPropertyState(); 
+        int incAvg = (integerStateTotal/messageCount);
+        int change = 0;
+        if(current != 0)
+            change = (current + incAvg)/2;
+        else 
+            change = incAvg;
 
-		// update our state 	
-		myDigitalTwin.setIntegerPropertyState(change);
+        // update our state     
+        myDigitalTwin.setIntegerPropertyState(change);
         return ProcessingResult.UpdateDigitalTwin;
     }
 }
@@ -108,31 +109,43 @@ As a prerequisite, we will need Java installed and the JAVA_HOME environment var
 
 Let's begin by creating a Java project and setting up our classpath. We will need to add the following JARs to our classpath:
 
-For Gradle on Linux (while '//usr//local//soss//' is the default installation directory, if you're using a custom installation directory -- you will need to use that path instead): 
+For Gradle on Linux, copy the following into your build.gradle (while '//usr//local//soss//' is the default installation directory, if you're using a custom installation directory, you will need to use that path instead): 
+
 ``` 
 compile fileTree(dir: '//usr//local//soss//java_api\\', include: '*.jar')
 compile fileTree(dir: '//usr//local//soss//java_api\\lib', include: '*.jar')
 ```
 
-For Gradle on Windows (while 'C:\\Program Files\\ScaleOut_Software\\StateServer\\' is the default installation directory, if you're using a custom installation directory -- you will need to use that path instead): 
+For Gradle on Windows, copy the following into your build.gradle (while 'C:\\Program Files\\ScaleOut_Software\\StateServer\\' is the default installation directory, if you're using a custom installation directory, you will need to use that path instead):
+ 
 ``` 
 compile fileTree(dir: 'C:\\Program Files\\ScaleOut_Software\\StateServer\\JavaAPI\\', include: '*.jar')
 compile fileTree(dir: 'C:\\Program Files\\ScaleOut_Software\\StateServer\\JavaAPI\\lib', include: '*.jar')
 ```
 
 Setting the Classpath directly:
+
 ```
 classpath="/usr/local/soss/java_api/*.jar:/usr/local/soss/java_api/lib/*jar:..."
 ```
 
+With Maven, you can create a local repository and put the JARs from the following paths into the repository: 
+
+```
+/usr/local/soss/java_api
+/usr/local/soss/java_api/lib
+```
+
+
 Now that our classpath is configured, we can setup our project and build our first DigitalTwin. Let's start by creating a new package such as the following:
+
 ```
 com.digitaltwin.quickstart
 ```
 
-Now inside that project, let's create three classes called "MyDigitalTwin.java", "MyMesssage.java", and "MyMessageProcessor.java". Once the files are created, let's copy and paste the code from the above example into the three classes.
+Now inside that package, let's create three classes called "MyDigitalTwin.java", "MyMesssage.java", and "MyMessageProcessor.java". Once the files are created, let's copy and paste the code from the above example into the three classes.
 
-Finally, we want to deploy the DigitalTwinModel and send a message to an individual DigitalTwin. Let's create a new class in the package called "Main.java". Inside this class, we will setup the DigitalTwin environment and send our first message. Let's start by setting up the environment -- copy the following into "Main.java": 
+Finally, we want to deploy the DigitalTwinModel and send a message to an individual DigitalTwin. Let's create a new class in the package called "Main.java". Inside this class, we will setup the DigitalTwin execution environment and send our first message. Let's start by setting up the environment, copy the following into "Main.java": 
 
 ```
 import com.scaleoutsoftware.digitaltwin.core.SendingResult;
@@ -149,7 +162,7 @@ public class Main {
 }
 ```
 
-At this stage we've created an entry point for the application and we've built the execution environment where the DigitalTwinModel will live and process messages. Now, let's send a JSON encoded message to the DigitalTwin:
+At this stage we've created an entry point for the application and we've built the execution environment where the DigitalTwinModel will live. We've told the execution environment about our MessageProcessor, DigitalTwin, and Message classes. Now, let's send a JSON encoded message to an ID which will trigger StreamServer to create an instance of a DigitalTwin for our DigitalTwinModel and then process the incoming message. Replace the contents of Main.java with the following:
 
 ```
 import com.scaleoutsoftware.digitaltwin.core.SendingResult;
@@ -162,7 +175,8 @@ public class Main {
         ExecutionEnvironment environment = new ExecutionEnvironmentBuilder()
                 .addDigitalTwin("MyDigitalTwin", new MyMessageProcessor(), MyDigitalTwin.class, MyMessage.class)
                 .build();
-        SendingResult result = AppEndpoint.send("MyDigitalTwin", "MyDigitalTwinId", "{\"myMessageType\":\"MyType\",\"incomingStringStateChange\":\"MyStringChange\",\"incomingIntegerStateChange\":50,\"timestamp\":1426325213}");
+        // send a message to the id "Twin_ID_23"
+        SendingResult result = AppEndpoint.send("MyDigitalTwin", "Twin_ID_23", "{\"myMessageType\":\"MyType\",\"incomingStringStateChange\":\"MyStringChange\",\"incomingIntegerStateChange\":50,\"timestamp\":1426325213}");
         switch (result) {
             case Handled:
                 System.out.println("Event was handled.");
@@ -175,7 +189,7 @@ public class Main {
 }
 ``` 
 
-We need to encapsulate our classes and attach them to the execution environment. To do this, we'll package our classes and attach them to the execution environment by adding a dependency JAR:
+We need to give StreamServer the classes we've just created so that the environment can transparently create new DigitalTwins from our DigitalTwinModel. Before we tell StreamServer, we'll want to create a JAR with all of our newly created classes. Once the JAR is created, we can add them as a dependency to the execution environment. To do this, replace the contents of Main.java with the following:
 
 ```
 import com.scaleoutsoftware.digitaltwin.core.SendingResult;
@@ -186,23 +200,28 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // create the ExecutionEnvironment
         ExecutionEnvironment environment = new ExecutionEnvironmentBuilder()
-                .addDependencyJar("./myfirstdigitaltwin.jar")
+		        // replace this line with the JAR you created
+                .addDependencyJar("/path/to/myfirstdigitaltwin.jar")
                 .addDigitalTwin("MyDigitalTwin", new MyMessageProcessor(), MyDigitalTwin.class, MyMessage.class)
                 .build();
-        SendingResult result = AppEndpoint.send("MyDigitalTwin", "MyDigitalTwinId", "{\"myMessageType\":\"MyType\",\"incomingStringStateChange\":\"MyStringChange\",\"incomingIntegerStateChange\":50,\"timestamp\":1426325213}");
+        SendingResult result = AppEndpoint.send("MyDigitalTwin", "Twin_ID_23", "{\"myMessageType\":\"MyType\",\"incomingStringStateChange\":\"MyStringChange\",\"incomingIntegerStateChange\":50,\"timestamp\":1426325213}");
         switch (result) {
             case Handled:
-                System.out.println("Event was handled.");
+                System.out.println("StreamServer created a new instance of our DigitalTwin and the message was handled.");
                 break;
             case NotHandled:
-                System.out.println("Event was not handled.");
+                System.out.println("Message was not handled and no DigitalTwin was created.");
                 break;
         }
     }
 }
 ```
 
-To use Kafka as a data source for DigitalTwin messages, you can use the KafkaEndpoint in the datasource API: 
+Now we can run this program and watch as the entire execution pipeline takes place. The console output will show the message we printed, "StreamServer created a new instance of our DigitalTwin and the message was handled." Additionally, we can open the ScaleOut Object Browser and see the instance of the DigitalTwin that StreamServer instantiated for us as well as the change that the incoming message applied.
+
+Additionally, advanced users may want to use Kafka as an datasource for sending and recieving messages to a DigitalTwinModel. To support all versions of Kafka StreamServer does not ship with Kafka libraries. So, as a prerequisite we will need to place the Kafka libraries on each ScaleOut StateServer host. To do this, copy the JARs from the Kafka installations 'lib' directory and paste them into the 'java_api/lib/Kafka' directory (on Windows paste these JARs into 'JavaAPI/lib/Kafka'). 
+
+Inside your app, you can use Kafka as a data source for DigitalTwin messages by using the KafkaEndpoint class in the datasource API: 
 
 ```
 KafkaEndpoint kafkaEndpoint = new KafkaEndpointBuilder(new File("/path/to/server.properties"))
