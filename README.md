@@ -112,8 +112,11 @@ Let's begin by creating a Java project and setting up our classpath. We will nee
 For Gradle -- add the ScaleOut repository to your build.gradle:
 
 ``` 
-maven {
-    url "https://repo.scaleoutsoftware.com/repository/external"
+repositories {
+    mavenCentral()
+    maven {
+        url "https://repo.scaleoutsoftware.com/repository/external"
+    }
 }
 ```
 
