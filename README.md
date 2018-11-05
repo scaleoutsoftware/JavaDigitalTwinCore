@@ -78,7 +78,7 @@ public class MyMessageProcessor extends MessageProcessor<MyDigitalTwin, MyMessag
             if(message.getIncomingIntegerStateChange() > myDigitalTwin.getMaxIntegerStateThreshold()) {
                 // if an incoming message exceeds a threshold, save the message in the DigitalTwin
                 myDigitalTwin.addMessage(message);
-				// optionally send a JSON encoded message back to the datasource
+                // optionally send a JSON encoded message back to the datasource
                 // processingContext.sendToDataSource(...); // send a JSON serializable message
                 
             }
@@ -109,18 +109,54 @@ As a prerequisite, we will need Java installed and the JAVA_HOME environment var
 
 Let's begin by creating a Java project and setting up our classpath. We will need to add the following JARs to our classpath:
 
-For Gradle on Linux, copy the following into your build.gradle (while '//usr//local//soss//' is the default installation directory, if you're using a custom installation directory, you will need to use that path instead): 
+For Gradle -- add the ScaleOut repository to your build.gradle:
 
 ``` 
-compile fileTree(dir: '//usr//local//soss//java_api\\', include: '*.jar')
-compile fileTree(dir: '//usr//local//soss//java_api\\lib', include: '*.jar')
+maven {
+    url "https://repo.scaleoutsoftware.com/repository/external"
+}
 ```
 
-For Gradle on Windows, copy the following into your build.gradle (while 'C:\\Program Files\\ScaleOut_Software\\StateServer\\' is the default installation directory, if you're using a custom installation directory, you will need to use that path instead):
+Once the repository is added to your build.gradle, add the Digital Twin APIs as dependencies:
  
 ``` 
-compile fileTree(dir: 'C:\\Program Files\\ScaleOut_Software\\StateServer\\JavaAPI\\', include: '*.jar')
-compile fileTree(dir: 'C:\\Program Files\\ScaleOut_Software\\StateServer\\JavaAPI\\lib', include: '*.jar')
+compile group: 'com.scaleoutsoftware.digitaltwin', name: "core", version: '0.5-BETA'
+compile group: 'com.scaleoutsoftware.digitaltwin', name: "deployment", version: '0.5-BETA'
+compile group: 'com.scaleoutsoftware.digitaltwin', name: "datasource", version: '0.5-BETA'
+```
+
+For Maven, add the ScaleOut repository to your pom.xml: 
+
+```
+<repository>
+    <id>ScaleOut API Repository</id>
+    <url>https://repo.scaleoutsoftware.com/repository/external</url>
+</repository>
+```
+
+Once the repository is added to your pom.xml, add the DigitalTwin APIs as dependencies:
+
+``` 
+<dependencies>
+	<!-- ... -->
+	<!-- your dependencies -->
+	<!-- ... -->
+    <dependency>
+      <groupId>com.scaleoutsoftware.digitaltwin</groupId>
+      <artifactId>core</artifactId>
+      <version>0.5-BETA</version>
+    </dependency>
+    <dependency>
+      <groupId>com.scaleoutsoftware.digitaltwin</groupId>
+      <artifactId>deployment</artifactId>
+      <version>0.5-BETA</version>
+    </dependency>
+    <dependency>
+      <groupId>com.scaleoutsoftware.digitaltwin</groupId>
+      <artifactId>datasource</artifactId>
+      <version>0.5-BETA</version>
+    </dependency>
+</dependencies>
 ```
 
 Setting the Classpath directly:
@@ -128,14 +164,6 @@ Setting the Classpath directly:
 ```
 classpath="/usr/local/soss/java_api/*.jar:/usr/local/soss/java_api/lib/*jar:..."
 ```
-
-With Maven, you can create a local repository and put the JARs from the following paths into the repository: 
-
-```
-/usr/local/soss/java_api
-/usr/local/soss/java_api/lib
-```
-
 
 Now that our classpath is configured, we can setup our project and build our first DigitalTwin. Let's start by creating a new package such as the following:
 
@@ -200,7 +228,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // create the ExecutionEnvironment
         ExecutionEnvironment environment = new ExecutionEnvironmentBuilder()
-		        // replace this line with the JAR you created
+                // replace this line with the JAR you created
                 .addDependencyJar("/path/to/myfirstdigitaltwin.jar")
                 .addDigitalTwin("MyDigitalTwin", new MyMessageProcessor(), MyDigitalTwin.class, MyMessage.class)
                 .build();
