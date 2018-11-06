@@ -109,7 +109,7 @@ As a prerequisite, we will need Java installed and the JAVA_HOME environment var
 
 Let's begin by creating a Java project and setting up our classpath. We will need to add the following JARs to our classpath:
 
-For Gradle -- add the ScaleOut repository to your build.gradle:
+For Gradle, add the ScaleOut repository to your build.gradle:
 
 ``` 
 repositories {
