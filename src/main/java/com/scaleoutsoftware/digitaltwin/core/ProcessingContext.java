@@ -16,6 +16,8 @@
 package com.scaleoutsoftware.digitaltwin.core;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Context object that allows the user to send a message to a DataSource.
@@ -30,14 +32,74 @@ public abstract class ProcessingContext implements Serializable {
     public abstract SendingResult sendToDataSource(byte[] payload);
 
     /**
-     * Retrieve the unique Identier for a DataSource (matches the Device/Datasource/DigitalTwin ID)
+     * <p>
+     *     This method sends a serialized JSON message to a real-time digital twin
+     * </p>
+     *
+     * <p>
+     *     Note, the message contents must be serialized so that the registered message type
+     *     of the digital twin model will be sufficient to deserialize the message.
+     * </p>
+     * @param model the model of the digital twin
+     * @param id the id of the digital twin
+     * @param payload the serialized JSON message
+     * @return the sending result
+     */
+    public abstract SendingResult sendToDigitalTwin(String model, String id, byte[] payload);
+
+    /**
+     * <p>
+     *     This method sends a JSON message to a real-time digital twin
+     * </p>
+     *
+     * <p>
+     *     Note, the message contents must be serialized so that the registered message type
+     *     of the digital twin model will be sufficient to deserialize the message.
+     * </p>
+     *
+     * @param model the model of the digital twin
+     * @param id the id of the digital twin
+     * @param payload the JSON message
+     * @return the sending result
+     */
+    public abstract SendingResult sendToDigitalTwin(String model, String id, String payload);
+
+    /**
+     * <p>
+     *     This method sends a list of serialized JSON message to a real-time digital twin
+     * </p>
+     *
+     * <p>
+     *     Note, the message contents must be serialized so that the registered message type
+     *     of the digital twin model will be sufficient to deserialize the message.
+     * </p>
+     *
+     * @param model the model of the digital twin
+     * @param id the id of the digital twin
+     * @param payload the JSON message
+     * @return the sending result
+     */
+    public abstract SendingResult sendToDigitalTwin(String model, String id, List<byte[]> payload);
+
+    /**
+     * Retrieve the unique Identifier for a DataSource (matches the Device/Datasource/Real-time twin ID)
      * @return the digital twin id
      */
     public abstract String getDataSourceId();
 
     /**
-     * Retrieve the model for a DigitalTwin (matches the model of a Device/Datasource/DigitalTwin)
+     * Retrieve the model for a DigitalTwin (matches the model of a Device/Datasource/real-time twin)
      * @return the digital twin model
      */
     public abstract String getDigitalTwinModel();
+
+    /**
+     * Logs a message to the real-time digital twin cloud service.
+     *
+     * Note: the only supported severity levels are: INFO, WARN, and SEVERE
+     *
+     * @param severity the severity of the log message
+     * @param message the message to log
+     */
+    public abstract void logMessage(Level severity, String message);
 }

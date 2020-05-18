@@ -16,7 +16,7 @@
 package com.scaleoutsoftware.digitaltwin.core;
 
 /**
- * A "DigitalTwin" of a device. The implementation of the DigitalTwin should have a parameterless constructor for
+ * A real-time digital twin of a data source. The implementation of the real-time DigitalTwin should have a parameterless constructor for
  * basic initialization.
  */
 public abstract class DigitalTwinBase {

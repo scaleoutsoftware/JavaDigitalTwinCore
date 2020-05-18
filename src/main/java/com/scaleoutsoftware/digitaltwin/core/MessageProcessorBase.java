@@ -23,7 +23,7 @@ public abstract class MessageProcessorBase<T extends DigitalTwinBase> {
     /**
      * Helper method to ensure proper typing for the user methods.
      * @param context the processing context
-     * @param twin the digital twin object
+     * @param twin the real-time digital twin instance
      * @param messageListFactory the message list factory
      * @return the implementing class's processing result
      * @throws Exception if an exception occurs during processing

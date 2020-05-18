@@ -15,7 +15,7 @@
 */
 
 /**
- * ScaleOut DigitalTwin Builder™ for ScaleOut StreamServer™.
+ * Real-time digital twin model API
  */
 package com.scaleoutsoftware.digitaltwin.core;
 

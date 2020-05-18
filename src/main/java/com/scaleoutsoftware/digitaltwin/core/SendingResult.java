@@ -24,6 +24,10 @@ public enum SendingResult {
      */
     Handled,
     /**
+     * Enqueued indicates that a message was successfully formed and then sent to an internal messaging service
+     */
+    Enqueued,
+    /**
      * NotHandled indicates that a message was delivered but not processed. This can occur if an exception occurs
      * in the message processor.
      */

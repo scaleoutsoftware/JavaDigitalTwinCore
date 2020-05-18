@@ -18,23 +18,23 @@ package com.scaleoutsoftware.digitaltwin.core;
 import java.io.Serializable;
 
 /**
- * Processes messages for a DigitalTwin
- * @param <T> the type of the DigitalTwin
- * @param <V> the value of messages processed by the DigitalTwin
+ * Processes messages for a real-time digital twin
+ * @param <T> the real type of the DigitalTwinBase
+ * @param <V> the type of messages processed by the real-time digital twin
  */
 public abstract class MessageProcessor<T extends DigitalTwinBase, V> extends MessageProcessorBase<T> implements Serializable {
     /**
-     * Processes a set of incoming messages and determines whether or not update the DigitalTwin.
+     * Processes a set of incoming messages and determines whether or not to update the real-time digital twin.
      * @param context optional context for processing
-     * @param stateObject the DigitalTwin state object
+     * @param stateObject the state object
      * @param incomingMessages the incoming messages
-     * @return processing results for updating the digital twin
+     * @return processing results for updating the state object
      * @throws Exception if an exception occurs during processing
      */
     public abstract ProcessingResult processMessages(ProcessingContext context, T stateObject, Iterable<V> incomingMessages) throws Exception;
 
     /**
-     * Helper method to ensure proper typing for the user methods
+     * Helper method to ensure proper typing for user methods.
      * @param context the processing context
      * @param twin the digital twin object
      * @param factory the message list factory
