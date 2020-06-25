@@ -1,14 +1,19 @@
 plugins {
     id 'java'
+    id 'maven'
 }
 
 group 'com.scaleoutsoftware.digitaltwin'
-version '1.1.0'
+version '1.2.4'
 
 sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 configurations {
@@ -20,18 +25,35 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-artifacts {
-    archives javadocJar
-}
-
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-}
-
 jar {
     manifest {
         attributes ('Implementation-Title': project.name,
                 'Implementation-Version': project.version)
     }
 }
+
+artifacts {
+    archives javadocJar
+}
+
+task createPom  {
+    pom {
+        project {
+            groupId 'com.scaleoutsoftware.digitaltwin'
+            artifactId 'core'
+            version '1.2.4'
+
+            inceptionYear '2020'
+        }
+    }.writeTo("pom.xml")
+}
+
+task copyRuntime(type: GradleBuild) {
+    tasks = ['createPom']
+}
+
+
+build.finalizedBy copyRuntime
+
+
 
