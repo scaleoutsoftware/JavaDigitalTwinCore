@@ -28,8 +28,8 @@ public enum SendingResult {
      */
     Enqueued,
     /**
-     * NotHandled indicates that a message was delivered but not processed. This can occur if an exception occurs
-     * in the message processor.
+     * NotHandled indicates that the message was not handled. This can occur if an exception occurs
+     * in the message processor or if internal messaging service reached capacity.
      */
     NotHandled
 }
