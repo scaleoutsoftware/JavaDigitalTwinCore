@@ -18,50 +18,57 @@ package com.scaleoutsoftware.digitaltwin.core;
 import java.io.Serializable;
 
 public class AlertProviderConfiguration implements Serializable {
-    private final String URL;
-    private final String IntegrationKey;
-    private final String RoutingKey;
-    private final String Name;
-    private final String EntityId;
+    private final String alertProviderType;
+    private final String url;
+    private final String integrationKey;
+    private final String routingKey;
+    private final String name;
+    private final String entityId;
 
-    private AlertProviderConfiguration() {URL = IntegrationKey = RoutingKey = Name = EntityId = null;}
+    private AlertProviderConfiguration() {alertProviderType = url = integrationKey = routingKey = name = entityId = null;}
 
-    public AlertProviderConfiguration(String url, String integrationKey, String routingKey, String name, String entityId) {
-        URL             = url;
-        IntegrationKey  = integrationKey;
-        RoutingKey      = routingKey;
-        Name            = name;
-        EntityId        = entityId;
+    public AlertProviderConfiguration(String alertProviderType, String url, String integrationKey, String routingKey, String name, String entityId) {
+        this.alertProviderType  = alertProviderType;
+        this.url                = url;
+        this.integrationKey     = integrationKey;
+        this.routingKey         = routingKey;
+        this.name               = name;
+        this.entityId           = entityId;
+    }
+
+    public String getAlertProviderType() {
+        return alertProviderType;
     }
 
     public String getURL() {
-        return URL;
+        return url;
     }
 
     public String getIntegrationKey() {
-        return IntegrationKey;
+        return integrationKey;
     }
 
     public String getRoutingKey() {
-        return RoutingKey;
+        return routingKey;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public String getEntityId() {
-        return EntityId;
+        return entityId;
     }
 
     @Override
     public String toString() {
         return "AlertProviderConfiguration{" +
-                "URL='" + URL + '\'' +
-                ", IntegrationKey='" + IntegrationKey + '\'' +
-                ", RoutingKey='" + RoutingKey + '\'' +
-                ", Name='" + Name + '\'' +
-                ", EntityId='" + EntityId + '\'' +
+                "alertProviderType=" + alertProviderType + '\'' +
+                ", URL='" + url + '\'' +
+                ", IntegrationKey='" + integrationKey + '\'' +
+                ", RoutingKey='" + routingKey + '\'' +
+                ", Name='" + name + '\'' +
+                ", EntityId='" + entityId + '\'' +
                 '}';
     }
 }
