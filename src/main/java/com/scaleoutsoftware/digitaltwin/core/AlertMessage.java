@@ -54,4 +54,14 @@ public class AlertMessage {
     public HashMap<String, String> getOptionalTwinInstanceProperties() {
         return _optionalTwinInstanceProperties;
     }
+
+    @Override
+    public String toString() {
+        return "AlertMessage{" +
+                "_title='" + _title + '\'' +
+                ", _severity='" + _severity + '\'' +
+                ", _message='" + _message + '\'' +
+                ", _optionalTwinInstanceProperties=" + _optionalTwinInstanceProperties +
+                '}';
+    }
 }
