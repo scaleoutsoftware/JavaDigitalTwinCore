@@ -15,18 +15,22 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+import java.util.List;
+
 /**
  * The ModelSchema class is used as a Java object representation of the model.json schema file used for deploying a
  * digital twin model to the real-time digital twin cloud service.
  */
 public class ModelSchema {
-    private final String modelType;
-    private final String messageProcessorType;
-    private final String messageType;
-    private final String assemblyName;
+    private final String                            modelType;
+    private final String                            messageProcessorType;
+    private final String                            messageType;
+    private final String                            assemblyName;
+    private final List<AlertProviderConfiguration>  alertProviders;
 
     private ModelSchema() {
         modelType = messageProcessorType = messageType = assemblyName = "default constructor";
+        alertProviders = null;
     }
 
     public ModelSchema(
@@ -47,6 +51,29 @@ public class ModelSchema {
         messageProcessorType    = mpClass;
         messageType             = msgClass;
         assemblyName            = "NOT_USED_BY_JAVA_MODELS";
+        alertProviders          = null;
+    }
+
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            List<AlertProviderConfiguration> alertingProviders) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType               = dtClass;
+        messageProcessorType    = mpClass;
+        messageType             = msgClass;
+        assemblyName            = "NOT_USED_BY_JAVA_MODELS";
+        alertProviders          = alertingProviders;
     }
 
     public String getModelType() {
@@ -64,4 +91,7 @@ public class ModelSchema {
     public String getAssemblyName() {
         return assemblyName;
     }
+
+    public List<AlertProviderConfiguration> getAlertProviders() {return alertProviders; }
+
 }
