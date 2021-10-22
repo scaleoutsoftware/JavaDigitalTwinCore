@@ -26,10 +26,11 @@ public class ModelSchema {
     private final String                            messageProcessorType;
     private final String                            messageType;
     private final String                            assemblyName;
+    private final String                            azureDigitalTwinModelName;
     private final List<AlertProviderConfiguration>  alertProviders;
 
     private ModelSchema() {
-        modelType = messageProcessorType = messageType = assemblyName = "default constructor";
+        modelType = messageProcessorType = messageType = assemblyName = azureDigitalTwinModelName = "default constructor";
         alertProviders = null;
     }
 
@@ -47,11 +48,12 @@ public class ModelSchema {
                     (msgClass == null ? "null mpClass" : msgClass)
                     ));
         }
-        modelType               = dtClass;
-        messageProcessorType    = mpClass;
-        messageType             = msgClass;
-        assemblyName            = "NOT_USED_BY_JAVA_MODELS";
-        alertProviders          = null;
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        alertProviders              = null;
+        azureDigitalTwinModelName   = null;
     }
 
     public ModelSchema(
@@ -69,11 +71,36 @@ public class ModelSchema {
                     (msgClass == null ? "null mpClass" : msgClass)
             ));
         }
-        modelType               = dtClass;
-        messageProcessorType    = mpClass;
-        messageType             = msgClass;
-        assemblyName            = "NOT_USED_BY_JAVA_MODELS";
-        alertProviders          = alertingProviders;
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        azureDigitalTwinModelName   = null;
+        alertProviders              = alertingProviders;
+    }
+
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String adtModelName,
+            List<AlertProviderConfiguration> alertingProviders) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        azureDigitalTwinModelName   = adtModelName;
+        alertProviders              = alertingProviders;
     }
 
     public String getModelType() {
@@ -93,5 +120,9 @@ public class ModelSchema {
     }
 
     public List<AlertProviderConfiguration> getAlertProviders() {return alertProviders; }
+
+    public String getAzureDigitalTwinModelName() {
+        return azureDigitalTwinModelName;
+    }
 
 }
