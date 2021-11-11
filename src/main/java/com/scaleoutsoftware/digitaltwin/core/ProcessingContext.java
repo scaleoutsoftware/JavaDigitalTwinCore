@@ -106,6 +106,13 @@ public abstract class ProcessingContext implements Serializable {
     public abstract SendingResult sendAlert(String alertingProviderName, AlertMessage alert);
 
     /**
+     * Returns a list of registered and active persistence providers.
+     * @return a list of registered and active persistence providers.
+     */
+    public abstract List<PersistenceProvider> getPersistenceProviders();
+
+
+    /**
      * Retrieve the unique Identifier for a DataSource (matches the Device/Datasource/Real-time twin ID)
      * @return the digital twin id
      */
