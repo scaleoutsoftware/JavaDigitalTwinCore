@@ -1,3 +1,18 @@
+/*
+ Copyright (c) 2021 by ScaleOut Software, Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
 package com.scaleoutsoftware.digitaltwin.core;
 
 import java.util.List;
@@ -5,6 +20,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public interface PersistenceProvider {
+
+    /**
+     * Returns true if this PersistenceProvider is active, false otherwise.
+     * @return true if this PersistenceProvider is active, false otherwise.
+     */
+    public abstract boolean isActive();
+
     /**
      * Retrieves this persistence providers type. Currently supported provider types: AzureDigitalTwins.
      * @return the persistence provider type.
@@ -24,33 +46,49 @@ public interface PersistenceProvider {
      */
     public List<String> getContainerList();
 
-    /**
-     * Retrieves a future that when complete will return a containers schema, or null if the container does not exist.
-     * @param containerName the container name.
-     * @return the schema (as a string) for this container.
-     */
-    public CompletableFuture<String> getContainerSchemaAsync(String containerName);
+//    /**
+//     * Retrieves a future that when complete will return a containers schema, or null if the container does not exist.
+//     * @param containerName the container name.
+//     * @return the schema (as a string) for this container.
+//     */
+//    public CompletableFuture<String> getContainerSchemaAsync(String containerName);
+//
+//    /**
+//     * Retrieves a containers schema, or null if the container does not exist.
+//     * @param containerName the containers name.
+//     * @return the schema (as a string) for this container.
+//     */
+//    public String getContainerSchema(String containerName);
 
     /**
-     * Retrieves a containers schema, or null if the container does not exist.
-     * @param containerName the containers name.
-     * @return the schema (as a string) for this container.
-     */
-    public String getContainerSchema(String containerName);
-
-    /**
-     * Retrieves a future that when complete will return the instances of a container, or an empty list if no instances exist.
+     * Retrieves a future that when complete will return the instance IDs stored in a container, or an empty list if no instances exist.
      * @param containerName the container name.
      * @return a future that will return a list of instances.
      */
-    public CompletableFuture<List<String>> getInstanceListAsync(String containerName);
+    public CompletableFuture<List<String>> getInstanceIdsAsync(String containerName);
 
     /**
-     * Retrieves the instances of a container, or an empty list if no instances exist.
+     * Retrieves the instance IDs stored in a container, or an empty list if no instances exist.
      * @param containerName the container name.
      * @return a list of instances.
      */
-    public List<String> getInstanceList(String containerName);
+    public List<String> getInstanceIds(String containerName);
+
+    /**
+     * Retrieves a future that when complete will return an instance or null if it doesn't exist.
+     * @param containerName the container name.
+     * @param instanceId the instance identifier.
+     * @return a future that will return an instance or null.
+     */
+    public CompletableFuture<String> getInstanceAsync(String containerName, String instanceId);
+
+    /**
+     * Retrieves an instance or null if it doesn't exist.
+     * @param containerName the container name
+     * @param instanceId the instance identifier
+     * @return the instance or null.
+     */
+    public String getInstance(String containerName, String instanceId);
 
     /**
      * Retrieves a future that will return a map of property names to property, or an empty map.
@@ -79,10 +117,10 @@ public interface PersistenceProvider {
 
     /**
      * Updates a property for the provided instance id in the provided container specified by the property name and property value.
-     * @param containerName
-     * @param instanceId
-     * @param propertyName
-     * @param propertyValue
+     * @param containerName the container name.
+     * @param instanceId the instance id.
+     * @param propertyName the property name.
+     * @param propertyValue the property value.
      */
     public void updateProperty(String containerName, String instanceId, String propertyName, Object propertyValue);
 
