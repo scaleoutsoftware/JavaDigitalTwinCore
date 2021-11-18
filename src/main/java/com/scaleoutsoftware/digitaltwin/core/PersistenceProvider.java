@@ -33,18 +33,18 @@ public interface PersistenceProvider {
      */
     public PersistenceProviderType getProviderType();
 
-    /**
-     * Retrieves a future that when complete will return a list of available containers, or an empty list if no containers
-     * are available.
-     * @return a future that will return a list of container names.
-     */
-    public CompletableFuture<List<String>> getContainerListAsync();
-
-    /**
-     * Retrieves a list of available containers, or an empty list if no containers are available.
-     * @return a list of available containers.
-     */
-    public List<String> getContainerList();
+//    /**
+//     * Retrieves a future that when complete will return a list of available containers, or an empty list if no containers
+//     * are available.
+//     * @return a future that will return a list of container names.
+//     */
+//    public CompletableFuture<List<String>> getContainerListAsync();
+//
+//    /**
+//     * Retrieves a list of available containers, or an empty list if no containers are available.
+//     * @return a list of available containers.
+//     */
+//    public List<String> getContainerList();
 
 //    /**
 //     * Retrieves a future that when complete will return a containers schema, or null if the container does not exist.
@@ -95,14 +95,14 @@ public interface PersistenceProvider {
      * @param containerName the container name.
      * @return a future that will return a map of property names to property types.
      */
-    public CompletableFuture<Map<String,String>> getPropertyListAsync(String containerName);
+    public CompletableFuture<Map<String,String>> getPropertyMapAsync(String containerName);
 
     /**
      * Retrieves a map of property names to property types, or an empty map.
      * @param containerName the container name.
      * @return a map of property names to property types.
      */
-    public Map<String,String> getPropertyList(String containerName);
+    public Map<String,String> getPropertyMap(String containerName);
 
     /**
      * Retrieves a future that will complete exceptionally or return void if the instance's property was successfully updated.

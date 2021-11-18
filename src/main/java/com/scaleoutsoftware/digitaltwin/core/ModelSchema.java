@@ -30,7 +30,7 @@ public class ModelSchema {
     private final List<AlertProviderConfiguration>  alertProviders;
 
     private ModelSchema() {
-        modelType = messageProcessorType = messageType = assemblyName = azureDigitalTwinModelName = "default constructor";
+        modelType = messageProcessorType = messageType = assemblyName = azureDigitalTwinModelName = null;
         alertProviders = null;
     }
 
