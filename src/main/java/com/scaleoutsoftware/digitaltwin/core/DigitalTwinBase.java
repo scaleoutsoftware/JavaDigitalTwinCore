@@ -21,9 +21,8 @@ package com.scaleoutsoftware.digitaltwin.core;
  */
 public abstract class DigitalTwinBase {
 
-    private String Id;
-    private String Model;
-    private boolean Initialized = false;
+    public String Id;
+    public String Model;
 
     /**
      * The identifier of this DigitalTwin.
@@ -47,13 +46,7 @@ public abstract class DigitalTwinBase {
      * @param model the model to use for this digital twin
      */
     public void init(String id, String model) throws IllegalStateException {
-        if(     Initialized &&
-                (this.Id.compareTo(id) != 0 || this.Model.compareTo(model) != 0)) {
-            throw new IllegalStateException("Attempted to call init with different Id and Model after object was initialized");
-        } else {
-            this.Id = id;
-            this.Model = model;
-            Initialized = true;
-        }
+        this.Id = id;
+        this.Model = model;
     }
 }
