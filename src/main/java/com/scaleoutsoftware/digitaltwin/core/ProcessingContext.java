@@ -135,12 +135,16 @@ public abstract class ProcessingContext implements Serializable {
      */
     public abstract void logMessage(Level severity, String message);
 
+
+
+
     /**
      * Starts a new timer for the digital twin
      * @param timerName the timer name
      * @param interval the timer interval
      * @param timerType the timer type
      * @param timerHandler the time handler callback
+     * @param <T> the type of the digital twin
      * @return returns {@link TimerActionResult#Success} if the timer was started, {@link TimerActionResult#FailedTooManyTimers}
      * if too many timers exist, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
      */
