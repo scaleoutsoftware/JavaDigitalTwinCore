@@ -16,6 +16,7 @@
 package com.scaleoutsoftware.digitaltwin.core;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -133,4 +134,25 @@ public abstract class ProcessingContext implements Serializable {
      * @param message the message to log
      */
     public abstract void logMessage(Level severity, String message);
+
+    /**
+     * Starts a new timer for the digital twin
+     * @param timerName the timer name
+     * @param interval the timer interval
+     * @param timerType the timer type
+     * @param timerHandler the time handler callback
+     * @return returns {@link TimerActionResult#Success} if the timer was started, {@link TimerActionResult#FailedTooManyTimers}
+     * if too many timers exist, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
+     */
+    public abstract <T extends DigitalTwinBase> TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler);
+
+    /**
+     * Stops the specified timer.
+     * @param timerName the timer name.
+     * @return returns {@link TimerActionResult#Success} if the timer was stopped, {@link TimerActionResult#FailedNoSuchTimer}
+     * if no timer exists with that name, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
+     */
+    public abstract TimerActionResult stopTimer(String timerName);
+
+
 }
