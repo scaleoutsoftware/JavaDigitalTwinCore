@@ -15,14 +15,18 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+import java.util.HashMap;
+
 /**
  * A real-time digital twin of a data source. The implementation of the real-time DigitalTwin should have a parameterless constructor for
  * basic initialization.
  */
 public abstract class DigitalTwinBase {
 
-    public String Id;
-    public String Model;
+    /* capitalized to match .NET serialization */
+    public String Id = "";
+    public String Model = "";
+    public HashMap<String,TimerMetadata<?>> TimerHandlers = new HashMap<>();
 
     /**
      * The identifier of this DigitalTwin.
