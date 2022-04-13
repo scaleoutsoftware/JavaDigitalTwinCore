@@ -17,10 +17,11 @@ package com.scaleoutsoftware.digitaltwin.core;
 
 public interface TimerHandler<T extends DigitalTwinBase> {
     /**
-     *
-     * @param instance
-     * @param ctx
-     * @return
+     * Callback to handle a timer message.
+     * @param instance the digital twin instance.
+     * @param ctx the processing context.
+     * @return {@link ProcessingResult#UpdateDigitalTwin} to update the digital twin instance or
+     * {@link ProcessingResult#NoUpdate} to leave the instance state as is.
      */
     public ProcessingResult onTimedMessage(String timerName, T instance, ProcessingContext ctx);
 }
