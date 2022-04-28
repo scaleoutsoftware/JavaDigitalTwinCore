@@ -26,7 +26,7 @@ public abstract class DigitalTwinBase {
     /* capitalized to match .NET serialization */
     public String Id = "";
     public String Model = "";
-    public HashMap<String,TimerMetadata<?>> TimerHandlers = new HashMap<>();
+    public HashMap<String,TimerMetadata> TimerHandlers = new HashMap<>();
 
     /**
      * The identifier of this DigitalTwin.
