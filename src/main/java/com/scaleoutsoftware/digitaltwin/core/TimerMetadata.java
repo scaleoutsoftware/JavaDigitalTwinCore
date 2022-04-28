@@ -15,34 +15,35 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 
 public class TimerMetadata<T extends DigitalTwinBase> {
-    private TimerHandler<T>     _timerHandler;
-    private TimerType           _timerType;
-    private Duration            _timerInterval;
-    private int                 _timerId;
+    public String      timerHandler;
+    public TimerType   timerType;
+    public Duration    timerInterval;
+    public int         timerId;
 
     public TimerMetadata(TimerHandler<T> handler, TimerType timerType, Duration timerInterval, int timerIdx) {
-        _timerHandler   = handler;
-        _timerType      = timerType;
-        _timerInterval  = timerInterval;
-        _timerId        = timerIdx;
+        this.timerHandler   = handler.getClass().getName();
+        this.timerType      = timerType;
+        this.timerInterval  = timerInterval;
+        this.timerId        = timerIdx;
     }
 
-    public TimerHandler<T> getTimerHandler() {
-        return _timerHandler;
+    public String getTimerHandlerClass() {
+        return timerHandler;
     }
 
     public TimerType getTimerType() {
-        return _timerType;
+        return timerType;
     }
 
     public Duration getTimerInterval() {
-        return _timerInterval;
+        return timerInterval;
     }
 
     public int getTimerId() {
-        return _timerId;
+        return timerId;
     }
 }
