@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * An interface that can be used for persisting/retrieving the state of real-time digital twins.
+ */
 public interface PersistenceProvider {
 
     /**

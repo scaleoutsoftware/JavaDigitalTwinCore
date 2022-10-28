@@ -19,6 +19,12 @@ package com.scaleoutsoftware.digitaltwin.core;
  * The result from a message processor which indicates to update the state object or to ignore
  */
 public enum ProcessingResult {
+    /**
+     * Update the digital twin.
+     */
     UpdateDigitalTwin,
+    /**
+     * Do not update the digital twin.
+     */
     NoUpdate
 }

@@ -34,6 +34,12 @@ public class ModelSchema {
         alertProviders = null;
     }
 
+    /**
+     * Creates a model schema from a digital twin class, a message processor class, and a message class.
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     */
     public ModelSchema(
             String dtClass,
             String mpClass,
@@ -56,6 +62,14 @@ public class ModelSchema {
         azureDigitalTwinModelName   = null;
     }
 
+    /**
+     * Creates a model schema from a digital twin class, a message processor class, a message class, and
+     * alert provider configurations.
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     * @param alertingProviders the alerting provider configurations.
+     */
     public ModelSchema(
             String dtClass,
             String mpClass,
@@ -78,7 +92,15 @@ public class ModelSchema {
         azureDigitalTwinModelName   = null;
         alertProviders              = alertingProviders;
     }
-
+    /**
+     * Creates a model schema from a digital twin class, a message processor class, a message class, and
+     * alert provider configurations.
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     * @param adtModelName the Azure Digital Twin model name.
+     * @param alertingProviders the alerting provider configurations.
+     */
     public ModelSchema(
             String dtClass,
             String mpClass,
@@ -103,24 +125,48 @@ public class ModelSchema {
         alertProviders              = alertingProviders;
     }
 
+    /**
+     * Retrieve the digital twin model type (a {@link DigitalTwinBase} implementation).
+     * @return the model type.
+     */
     public String getModelType() {
         return modelType;
     }
 
+    /**
+     * Retrieve the message type (JSON serializable message implementation).
+     * @return the message type.
+     */
     public String getMessageType() {
         return messageType;
     }
 
+    /**
+     * Retrieve the message processor type (a {@link MessageProcessor} implementation).
+     * @return the message processor type.
+     */
     public String getMessageProcessorType() {
         return messageProcessorType;
     }
 
+    /**
+     * NOT USED BY JAVA MODEL SCHEMA
+     * @return NOT USED BY JAVA MODEL SCHEMA
+     */
     public String getAssemblyName() {
         return assemblyName;
     }
 
+    /**
+     * Retrieve the alert provider configurations.
+     * @return the alert provider configurations.
+     */
     public List<AlertProviderConfiguration> getAlertProviders() {return alertProviders; }
 
+    /**
+     * Retrieve the Azure Digital Twin model name.
+     * @return the Azure Digital Twin model name.
+     */
     public String getAzureDigitalTwinModelName() {
         return azureDigitalTwinModelName;
     }

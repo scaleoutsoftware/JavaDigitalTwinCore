@@ -16,19 +16,29 @@
 package com.scaleoutsoftware.digitaltwin.core;
 
 public enum TimerActionResult {
-    /// <summary>The operation completed successfully.</summary>
+    /**
+     * The operation completed successfully.
+     */
     Success(0),
 
-    /// <summary>Failed to start a new timer due to reaching the limit for a number of active timers.</summary>
+    /**
+     * Failed to start a new timer due to reaching the limit for a number of active timers.
+     */
     FailedTooManyTimers(1),
 
-    /// <summary>Failed to stop the existing timer, the timer is no longer active.</summary>
+    /**
+     * Failed to stop the existing timer, the timer is no longer active.
+     */
     FailedNoSuchTimer(2),
 
-    /// <summary>Failed to start the timer, the timer with the specified name already exists.</summary>
+    /**
+     * Failed to start the timer, the timer with the specified name already exists.
+     */
     FailedTimerAlreadyExists(3),
 
-    /// <summary>Failed to start/stop timer due to an internal error.</summary>
+    /**
+     * Failed to start/stop timer due to an internal error.
+     */
     FailedInternalError(4);
 
     private final int _value;
@@ -36,6 +46,15 @@ public enum TimerActionResult {
         _value = val;
     }
 
+    /**
+     * Convert an ordinal into a {@link TimerActionResult}.
+     *
+     * 0 = {@link TimerActionResult#Success}, 1 = {@link TimerActionResult#FailedTooManyTimers},
+     * 2 = {@link TimerActionResult#FailedNoSuchTimer}, 3 = {@link TimerActionResult#FailedInternalError}
+     * @param val the ordinal value.
+     * @return the associated {@link TimerActionResult} or throws an IllegalArgumentException for an unexpected
+     * ordinal value.
+     */
     public static TimerActionResult fromOrdinal(int val) {
         switch (val) {
             case 0:

@@ -15,6 +15,9 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+/**
+ * A message sent to a digital twin instance's message processor.
+ */
 public class DigitalTwinTimerMessage {
 
     private String      _modelName;
@@ -23,6 +26,14 @@ public class DigitalTwinTimerMessage {
     private String      _timerName;
     private TimerType   _timerType;
 
+    /**
+     * Construct a digital twin timer message.
+     * @param modelName the digital twin model name.
+     * @param twinId the digital twin instance ID
+     * @param timerId the timer ID
+     * @param timerName the timer name
+     * @param timerType the timer type
+     */
     public DigitalTwinTimerMessage(String modelName, String twinId, int timerId, String timerName, TimerType timerType) {
         _modelName  = modelName;
         _twinId     = twinId;
@@ -31,22 +42,42 @@ public class DigitalTwinTimerMessage {
         _timerType  = timerType;
     }
 
+    /**
+     * Retrieve the digital twin model name.
+     * @return the digital twin model name.
+     */
     public String getModelName() {
         return _modelName;
     }
 
+    /**
+     * Retrieve the digital twin ID.
+     * @return the digital twin ID.
+     */
     public String getTwinId() {
         return _twinId;
     }
 
+    /**
+     * Retrieve the timer ID.
+     * @return the timer ID.
+     */
     public int getTimerId() {
         return _timerId;
     }
 
+    /**
+     * Retrieve the timer name.
+     * @return the timer name.
+     */
     public String getTimerName() {
         return _timerName;
     }
 
+    /**
+     * Retrieve the {@link TimerType}.
+     * @return the {@link TimerType}
+     */
     public TimerType getTimerType() {
         return _timerType;
     }

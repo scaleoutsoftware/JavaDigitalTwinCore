@@ -17,6 +17,9 @@ package com.scaleoutsoftware.digitaltwin.core;
 
 import java.io.Serializable;
 
+/**
+ * Configuration for an alert provider.
+ */
 public class AlertProviderConfiguration implements Serializable {
     private final String alertProviderType;
     private final String url;
@@ -27,6 +30,15 @@ public class AlertProviderConfiguration implements Serializable {
 
     private AlertProviderConfiguration() {alertProviderType = url = integrationKey = routingKey = name = entityId = null;}
 
+    /**
+     * Construct an alert provider configuration.
+     * @param alertProviderType the alert provider type.
+     * @param url the alert provider URL where alerts should be posted.
+     * @param integrationKey the integration key.
+     * @param routingKey the routing key.
+     * @param name the name of the alert provider.
+     * @param entityId the entity Id.
+     */
     public AlertProviderConfiguration(String alertProviderType, String url, String integrationKey, String routingKey, String name, String entityId) {
         this.alertProviderType  = alertProviderType;
         this.url                = url;
@@ -36,26 +48,50 @@ public class AlertProviderConfiguration implements Serializable {
         this.entityId           = entityId;
     }
 
+    /**
+     * Retrieve the alert provider type for this configuration.
+     * @return the alert provider type.
+     */
     public String getAlertProviderType() {
         return alertProviderType;
     }
 
+    /**
+     * Retrieve the URL for this alert provider configuration.
+     * @return the URL for this alert provider configuration.
+     */
     public String getURL() {
         return url;
     }
 
+    /**
+     * Retrieve the integration key for this alert provider configuration.
+     * @return the integration key for this alert provider configuration.
+     */
     public String getIntegrationKey() {
         return integrationKey;
     }
 
+    /**
+     * Retrieve the routing key for this alert provider configuration.
+     * @return the routing key for this alert provider configuration.
+     */
     public String getRoutingKey() {
         return routingKey;
     }
 
+    /**
+     * Retrieve the name of this alert provider configuration.
+     * @return the name of this alert provider configuration.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Retrieve the entity ID for this alert provider configuration.
+     * @return the entity ID for this alert provider configuration.
+     */
     public String getEntityId() {
         return entityId;
     }
