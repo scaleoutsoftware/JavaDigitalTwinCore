@@ -15,6 +15,10 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+/**
+ * Callback to a handle a timer message for a {@link DigitalTwinBase}.
+ * @param <T> the type of the {@link DigitalTwinBase}.
+ */
 public interface TimerHandler<T extends DigitalTwinBase> {
 
     /**

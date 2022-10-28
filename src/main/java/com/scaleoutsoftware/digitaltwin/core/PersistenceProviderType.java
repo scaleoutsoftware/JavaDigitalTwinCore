@@ -15,6 +15,12 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+/**
+ * Available {@link PersistenceProvider} types.
+ */
 public enum PersistenceProviderType {
+    /**
+     * Enum for the Azure Digital Twin service.
+     */
     AzureDigitalTwinsService
 }

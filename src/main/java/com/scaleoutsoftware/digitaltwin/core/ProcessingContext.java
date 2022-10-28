@@ -112,7 +112,6 @@ public abstract class ProcessingContext implements Serializable {
      */
     public abstract List<PersistenceProvider> getPersistenceProviders();
 
-
     /**
      * Retrieve the unique Identifier for a DataSource (matches the Device/Datasource/Real-time twin ID)
      * @return the digital twin id
@@ -134,9 +133,6 @@ public abstract class ProcessingContext implements Serializable {
      * @param message the message to log
      */
     public abstract void logMessage(Level severity, String message);
-
-
-
 
     /**
      * Starts a new timer for the digital twin

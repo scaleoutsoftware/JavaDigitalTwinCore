@@ -15,7 +15,16 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+/**
+ * Enum representation of the available timer types
+ */
 public enum TimerType {
+    /**
+     * This timer should reoccur on a schedule.
+     */
     Recurring,
+    /**
+     * This timer should trigger one time.
+     */
     OneTime
 }

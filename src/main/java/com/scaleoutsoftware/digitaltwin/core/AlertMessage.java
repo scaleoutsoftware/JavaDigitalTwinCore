@@ -17,6 +17,9 @@ package com.scaleoutsoftware.digitaltwin.core;
 
 import java.util.HashMap;
 
+/**
+ * A message that should be sent to a configured alert provider.
+ */
 public class AlertMessage {
     private final String                    _title;
     private final String                    _severity;
@@ -25,6 +28,12 @@ public class AlertMessage {
 
     private AlertMessage() {_title = _severity = _message = null; _optionalTwinInstanceProperties = null;}
 
+    /**
+     * Construct an alert message with a title, severity, and custom message.
+     * @param title the title for the alert message.
+     * @param severity the severity for this alert.
+     * @param message the custom message for this alert.
+     */
     public AlertMessage(String title, String severity, String message) {
         _title                              = title;
         _severity                           = severity;
@@ -32,6 +41,13 @@ public class AlertMessage {
         _optionalTwinInstanceProperties     = null;
     }
 
+    /**
+     * Construct an alert message with a title, severity, and custom message.
+     * @param title the title for the alert message.
+     * @param severity the severity for this alert.
+     * @param message the custom message for this alert.
+     * @param optProps the optional properties that should be sent to the alerting provider.
+     */
     public AlertMessage(String title, String severity, String message, HashMap<String,String> optProps) {
         _title                              = title;
         _severity                           = severity;
@@ -39,18 +55,34 @@ public class AlertMessage {
         _optionalTwinInstanceProperties     = optProps;
     }
 
+    /**
+     * Retrieve the title for this alert message.
+     * @return the title of this alert message.
+     */
     public String getTitle() {
         return _title;
     }
 
+    /**
+     * Retrieve the severity for this alert message.
+     * @return the severity for this alert message.
+     */
     public String getSeverity() {
         return _severity;
     }
 
+    /**
+     * Retrieve the message for this alert message.
+     * @return the message for this alert message.
+     */
     public String getMessage() {
         return _message;
     }
 
+    /**
+     * Retrieve the optional twin instance properties for this alert message.
+     * @return the optional twin instance properties for this alert message.
+     */
     public HashMap<String, String> getOptionalTwinInstanceProperties() {
         return _optionalTwinInstanceProperties;
     }
