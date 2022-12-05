@@ -154,5 +154,11 @@ public abstract class ProcessingContext implements Serializable {
      */
     public abstract TimerActionResult stopTimer(String timerName);
 
+    /**
+     * Retrieve the ModelSimulation.
+     * @return the ModelSimulation.
+     */
+    public abstract ModelSimulation getModelSimulation();
+
 
 }

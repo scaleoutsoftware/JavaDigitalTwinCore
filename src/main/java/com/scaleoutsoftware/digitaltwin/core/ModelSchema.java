@@ -24,13 +24,14 @@ import java.util.List;
 public class ModelSchema {
     private final String                            modelType;
     private final String                            messageProcessorType;
+    private final String                            modelProcessorType;
     private final String                            messageType;
     private final String                            assemblyName;
     private final String                            azureDigitalTwinModelName;
     private final List<AlertProviderConfiguration>  alertProviders;
 
     private ModelSchema() {
-        modelType = messageProcessorType = messageType = assemblyName = azureDigitalTwinModelName = null;
+        modelType = messageProcessorType = modelProcessorType = messageType = assemblyName = azureDigitalTwinModelName = null;
         alertProviders = null;
     }
 
@@ -56,6 +57,7 @@ public class ModelSchema {
         }
         modelType                   = dtClass;
         messageProcessorType        = mpClass;
+        modelProcessorType          = null;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         alertProviders              = null;
@@ -87,6 +89,7 @@ public class ModelSchema {
         }
         modelType                   = dtClass;
         messageProcessorType        = mpClass;
+        modelProcessorType          = null;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         azureDigitalTwinModelName   = null;
@@ -119,6 +122,42 @@ public class ModelSchema {
         }
         modelType                   = dtClass;
         messageProcessorType        = mpClass;
+        modelProcessorType          = null;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        azureDigitalTwinModelName   = adtModelName;
+        alertProviders              = alertingProviders;
+    }
+
+    /**
+     *
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     * @param modelProcessorClass the model processor class implementation.
+     * @param adtModelName the Azure Digital Twin model name.
+     * @param alertingProviders the alerting provider configurations.
+     */
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String modelProcessorClass,
+            String adtModelName,
+            List<AlertProviderConfiguration> alertingProviders) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        modelProcessorType          = modelProcessorClass;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         azureDigitalTwinModelName   = adtModelName;
@@ -147,6 +186,14 @@ public class ModelSchema {
      */
     public String getMessageProcessorType() {
         return messageProcessorType;
+    }
+
+    /**
+     * Retrieve the model processor type (a {@link ModelProcessor} implementation).
+     * @return the model processor type.
+     */
+    public String getModelProcessorType() {
+        return modelProcessorType;
     }
 
     /**

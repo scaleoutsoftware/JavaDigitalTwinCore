@@ -24,9 +24,30 @@ import java.util.HashMap;
 public abstract class DigitalTwinBase {
 
     /* capitalized to match .NET serialization */
+    /**
+     * The identifier for this twin instance
+     */
     public String Id = "";
+
+    /**
+     * The model this twin instance belongs to.
+     */
     public String Model = "";
+
+    /**
+     * The timer handlers for this twin instance.
+     */
     public HashMap<String,TimerMetadata> TimerHandlers = new HashMap<>();
+
+    public long NextSimulationTime = 0L;
+
+    public long getNextSimulationTimeMs() {
+        return NextSimulationTime;
+    }
+
+    public void setNextSimulationTime(long nextSimulationTime) {
+        NextSimulationTime = nextSimulationTime;
+    }
 
     /**
      * The identifier of this DigitalTwin.
