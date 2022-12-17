@@ -28,10 +28,12 @@ public class ModelSchema {
     private final String                            messageType;
     private final String                            assemblyName;
     private final String                            azureDigitalTwinModelName;
+    private final String                            persistenceProvider;
+    private final String                            sqlConnectionString;
     private final List<AlertProviderConfiguration>  alertProviders;
 
     private ModelSchema() {
-        modelType = messageProcessorType = modelProcessorType = messageType = assemblyName = azureDigitalTwinModelName = null;
+        modelType = messageProcessorType = modelProcessorType = messageType = assemblyName = azureDigitalTwinModelName = persistenceProvider = sqlConnectionString = null;
         alertProviders = null;
     }
 
@@ -62,6 +64,8 @@ public class ModelSchema {
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         alertProviders              = null;
         azureDigitalTwinModelName   = null;
+        sqlConnectionString         = null;
+        persistenceProvider         = null;
     }
 
     /**
@@ -93,6 +97,8 @@ public class ModelSchema {
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         azureDigitalTwinModelName   = null;
+        sqlConnectionString         = null;
+        persistenceProvider         = null;
         alertProviders              = alertingProviders;
     }
     /**
@@ -101,14 +107,16 @@ public class ModelSchema {
      * @param dtClass the digital twin class implementation.
      * @param mpClass the message processor class implementation.
      * @param msgClass a JSON serializable message class.
-     * @param adtModelName the Azure Digital Twin model name.
+     * @param persistenceConfiguration the Azure Digital Twin model name, or SQL connection string.
+     * @param persistenceType the persistence provider type.
      * @param alertingProviders the alerting provider configurations.
      */
     public ModelSchema(
             String dtClass,
             String mpClass,
             String msgClass,
-            String adtModelName,
+            String persistenceConfiguration,
+            PersistenceProviderType persistenceType,
             List<AlertProviderConfiguration> alertingProviders) {
         if( (dtClass    == null || dtClass.isEmpty()) ||
                 (mpClass    == null || mpClass.isEmpty()) ||
@@ -125,7 +133,22 @@ public class ModelSchema {
         modelProcessorType          = null;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
-        azureDigitalTwinModelName   = adtModelName;
+        persistenceProvider         = persistenceType.name();
+        switch (persistenceType) {
+            case AzureDigitalTwinsService:
+                azureDigitalTwinModelName   = persistenceConfiguration;
+                sqlConnectionString         = null;
+                break;
+            case SQLite:
+            case SQLServer:
+                sqlConnectionString         = persistenceConfiguration;
+                azureDigitalTwinModelName   = null;
+                break;
+            default:
+                sqlConnectionString         = null;
+                azureDigitalTwinModelName   = null;
+                break;
+        }
         alertProviders              = alertingProviders;
     }
 
@@ -135,7 +158,8 @@ public class ModelSchema {
      * @param mpClass the message processor class implementation.
      * @param msgClass a JSON serializable message class.
      * @param modelProcessorClass the model processor class implementation.
-     * @param adtModelName the Azure Digital Twin model name.
+     * @param persistenceConfiguration the Azure Digital Twin model name, or SQL connection string.
+     * @param persistenceType the persistence provider type.
      * @param alertingProviders the alerting provider configurations.
      */
     public ModelSchema(
@@ -143,7 +167,8 @@ public class ModelSchema {
             String mpClass,
             String msgClass,
             String modelProcessorClass,
-            String adtModelName,
+            String persistenceConfiguration,
+            PersistenceProviderType persistenceType,
             List<AlertProviderConfiguration> alertingProviders) {
         if( (dtClass    == null || dtClass.isEmpty()) ||
                 (mpClass    == null || mpClass.isEmpty()) ||
@@ -160,7 +185,21 @@ public class ModelSchema {
         modelProcessorType          = modelProcessorClass;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
-        azureDigitalTwinModelName   = adtModelName;
+        persistenceProvider         = persistenceType.name();
+        switch (persistenceType) {
+            case AzureDigitalTwinsService:
+                azureDigitalTwinModelName   = persistenceConfiguration;
+                sqlConnectionString         = null;
+                break;
+            case SQLite:
+            case SQLServer:
+                sqlConnectionString         = persistenceConfiguration;
+                azureDigitalTwinModelName   = null;
+                break;
+            default:
+                sqlConnectionString         = null;
+                azureDigitalTwinModelName   = null;
+        }
         alertProviders              = alertingProviders;
     }
 
@@ -218,4 +257,15 @@ public class ModelSchema {
         return azureDigitalTwinModelName;
     }
 
+    /**
+     * Retrieve the SQL Connection String.
+     * @return the SQL connection string.
+     */
+    public String getSqlConnectionString() { return sqlConnectionString; }
+
+    /**
+     * Retrieve the persistence provider type.
+     * @return the persistence provider type.
+     */
+    public PersistenceProviderType getPersistenceProvider() { return PersistenceProviderType.fromString(persistenceProvider); }
 }

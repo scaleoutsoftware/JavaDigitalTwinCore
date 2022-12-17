@@ -36,33 +36,6 @@ public interface PersistenceProvider {
      */
     public PersistenceProviderType getProviderType();
 
-//    /**
-//     * Retrieves a future that when complete will return a list of available containers, or an empty list if no containers
-//     * are available.
-//     * @return a future that will return a list of container names.
-//     */
-//    public CompletableFuture<List<String>> getContainerListAsync();
-//
-//    /**
-//     * Retrieves a list of available containers, or an empty list if no containers are available.
-//     * @return a list of available containers.
-//     */
-//    public List<String> getContainerList();
-
-//    /**
-//     * Retrieves a future that when complete will return a containers schema, or null if the container does not exist.
-//     * @param containerName the container name.
-//     * @return the schema (as a string) for this container.
-//     */
-//    public CompletableFuture<String> getContainerSchemaAsync(String containerName);
-//
-//    /**
-//     * Retrieves a containers schema, or null if the container does not exist.
-//     * @param containerName the containers name.
-//     * @return the schema (as a string) for this container.
-//     */
-//    public String getContainerSchema(String containerName);
-
     /**
      * Retrieves a future that when complete will return the instance IDs stored in a container, or an empty list if no instances exist.
      * @param containerName the container name.

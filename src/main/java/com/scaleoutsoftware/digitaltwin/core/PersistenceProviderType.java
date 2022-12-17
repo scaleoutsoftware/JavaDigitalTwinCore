@@ -15,12 +15,38 @@
 */
 package com.scaleoutsoftware.digitaltwin.core;
 
+import java.io.Serializable;
+
 /**
  * Available {@link PersistenceProvider} types.
  */
-public enum PersistenceProviderType {
+public enum PersistenceProviderType implements Serializable {
     /**
      * Enum for the Azure Digital Twin service.
      */
-    AzureDigitalTwinsService
+    AzureDigitalTwinsService("AzureDigitalTwinsService"),
+    SQLite("SQLite"),
+    SQLServer("SQLServer");
+    private String _value;
+    PersistenceProviderType(String name) {
+        _value = name;
+    }
+
+    public static PersistenceProviderType fromString(String name) {
+        if(name != null && !name.isEmpty() && !name.isBlank()) {
+            switch(name) {
+                case "AzureDigitalTwinsService":
+                    return AzureDigitalTwinsService;
+                case "SQLite":
+                    return SQLite;
+                case "SQLServer":
+                    return SQLServer;
+                default:
+                    return null;
+
+            }
+        } else {
+            return null;
+        }
+    }
 }
