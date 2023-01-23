@@ -17,6 +17,7 @@ package com.scaleoutsoftware.digitaltwin.core;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -153,6 +154,14 @@ public abstract class ProcessingContext implements Serializable {
      * if no timer exists with that name, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
      */
     public abstract TimerActionResult stopTimer(String timerName);
+
+    /**
+     * Retrieves the current time. If the model (simulation or real-time) is running inside of a simulation then the
+     * simulation time will be returned.
+     *
+     * @return The current time (real time, or simulation if running under simulation).
+     */
+    public abstract Date getCurrentTime();
 
     /**
      * Retrieve the ModelSimulation.

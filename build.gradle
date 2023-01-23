@@ -6,7 +6,7 @@ plugins {
 group 'com.scaleoutsoftware.digitaltwin'
 version '2.2.1'
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_12
 
 repositories {
     mavenCentral()

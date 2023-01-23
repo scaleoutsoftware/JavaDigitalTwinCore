@@ -21,6 +21,7 @@ import java.time.Duration;
  * The ModelSimulation interface is used to interact with the current DigitalTwin simulation.
  */
 public interface ModelSimulation {
+
     /**
      * Retrieves the current simulation time increment.
      * @return the simulation time increment.
@@ -32,19 +33,20 @@ public interface ModelSimulation {
      *
      * Simulation processing will be delayed for the duration specified relative to the current simulation time.
      * @param duration the duration to delay.
-     * @return {@link SendingResult#Handled} if the delay was process or {@link SendingResult#NotHandled}
+     * @return {@link SendingResult#Handled} if the delay was processed or {@link SendingResult#NotHandled}
      * if the delay was not processed.
      */
     SendingResult delay(Duration duration);
 
     /**
-     * Send a list of JSON serialized messages to a DigitalTwin instance that will be processed by the DigitalTwin
+     * Asynchronously send a JSON serialized message to a DigitalTwin instance that will be processed by the DigitalTwin
      * models {@link MessageProcessor#processMessages(ProcessingContext, DigitalTwinBase, Iterable)} method.
-     * @param telemetryMessage the list of JSON serialized messages
+     * @param modelName the model to send the messages too.
+     * @param telemetryMessage a blob representing a JSON serialized messages.
      * @return {@link SendingResult#Handled} if the messages were processed, {@link SendingResult#Enqueued} if
      * the messages are in process of being handled, or {@link SendingResult#NotHandled} if the delay was not processed.
      */
-    SendingResult emitTelemetry(byte[] telemetryMessage);
+    SendingResult emitTelemetry(String modelName, byte[] telemetryMessage);
 
     /**
      * Create a new instance for simulation processing.
