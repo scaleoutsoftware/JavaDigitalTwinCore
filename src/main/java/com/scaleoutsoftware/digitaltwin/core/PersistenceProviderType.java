@@ -21,17 +21,32 @@ import java.io.Serializable;
  * Available {@link PersistenceProvider} types.
  */
 public enum PersistenceProviderType implements Serializable {
+
     /**
      * Enum for the Azure Digital Twin service.
      */
-    AzureDigitalTwinsService("AzureDigitalTwinsService"),
-    SQLite("SQLite"),
-    SQLServer("SQLServer");
-    private String _value;
-    PersistenceProviderType(String name) {
-        _value = name;
+    AzureDigitalTwinsService("AzureDigitalTwinsService", 1),
+    /**
+     * Enum for SQLite
+     */
+    SQLite("SQLite", 4),
+    /**
+     * Enum for SQLServer
+     */
+    SQLServer("SQLServer", 3);
+    private String _name;
+    private int _value;
+    PersistenceProviderType(String name, int ordinal) {
+        _name = name;
+        _value = ordinal;
     }
 
+    /**
+     * Return the PersistenceProviderType from a string value. We do not rely on Java's naming
+     * because the string values need to be cross-platform and the names may be different in each language.
+     * @param name the enums name.
+     * @return the associated PersistenceProviderType, or null if no association exists.
+     */
     public static PersistenceProviderType fromString(String name) {
         if(name != null && !name.isEmpty() && !name.isBlank()) {
             switch(name) {
@@ -43,10 +58,28 @@ public enum PersistenceProviderType implements Serializable {
                     return SQLServer;
                 default:
                     return null;
-
             }
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Return the PersistenceProviderType from an ordinal value. We do not rely on Java's ordering
+     * because the ordinal values need to be cross-platform, and the values may be ordered differently.
+     * @param ordinal the enums ordinal value.
+     * @return the associated PersistenceProviderType, or null if no association exists.
+     */
+    public static PersistenceProviderType fromOrdinal(int ordinal) {
+        switch(ordinal) {
+            case 1:
+                return AzureDigitalTwinsService;
+            case 3:
+                return SQLServer;
+            case 4:
+                return SQLite;
+            default:
+                return null;
         }
     }
 }

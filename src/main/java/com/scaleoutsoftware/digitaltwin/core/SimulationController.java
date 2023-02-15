@@ -18,20 +18,46 @@ package com.scaleoutsoftware.digitaltwin.core;
 import java.time.Duration;
 
 /**
- * The ModelSimulation interface is used to interact with the current DigitalTwin simulation.
+ * The SimulationController interface is used to interact with the  running DigitalTwin simulation.
  */
-public interface ModelSimulation {
+public interface SimulationController {
 
     /**
+     * <p>
      * Retrieves the current simulation time increment.
+     * </p>
      * @return the simulation time increment.
      */
     Duration getSimulationTimeIncrement();
 
     /**
+     * <p>
      * Delay simulation processing for this DigitalTwin instance for a duration of time.
+     * </p>
      *
+     * <p>
      * Simulation processing will be delayed for the duration specified relative to the current simulation time.
+     * </p>
+     *
+     * <p>
+     * Examples:
+     * </p>
+     *
+     * <p>
+     * at a current simulation time of 10, an interval of 20, and a delay of 40 -- the instance would
+     * skip one cycle of processing and be processed at simulation time 50.
+     * </p>
+     *
+     * <p>
+     * at a current simulation time of 10, an interval of 20, and a delay of 30 -- the instance would
+     * skip one cycle of processing and be processed at simulation time 50.
+     * </p>
+     *
+     * <p>
+     * at a current simulation time of 10, an interval of 20, and a delay of 50 -- the instance would
+     * skip two cycles of processing and be processed at simulation time 70.
+     * </p>
+     *
      * @param duration the duration to delay.
      * @return {@link SendingResult#Handled} if the delay was processed or {@link SendingResult#NotHandled}
      * if the delay was not processed.
@@ -39,8 +65,10 @@ public interface ModelSimulation {
     SendingResult delay(Duration duration);
 
     /**
+     * <p>
      * Asynchronously send a JSON serialized message to a DigitalTwin instance that will be processed by the DigitalTwin
      * models {@link MessageProcessor#processMessages(ProcessingContext, DigitalTwinBase, Iterable)} method.
+     * </p>
      * @param modelName the model to send the messages too.
      * @param telemetryMessage a blob representing a JSON serialized messages.
      * @return {@link SendingResult#Handled} if the messages were processed, {@link SendingResult#Enqueued} if
@@ -49,7 +77,7 @@ public interface ModelSimulation {
     SendingResult emitTelemetry(String modelName, byte[] telemetryMessage);
 
     /**
-     * Create a new instance for simulation processing.
+     * Create a new digital twin instance for simulation processing.
      * @param modelName the model name.
      * @param instanceId the instance id.
      * @return {@link SendingResult#Handled} if the instance was created, {@link SendingResult#Enqueued} if the instance
@@ -58,7 +86,7 @@ public interface ModelSimulation {
     SendingResult createInstance(String modelName, String instanceId);
 
     /**
-     * Delete a digital twin instance from simulation processing.
+     * Delete and remove a digital twin instance from simulation processing.
      * @param modelName the model name.
      * @param instanceId the instance id.
      * @return {@link SendingResult#Handled} if the instance was deleted, {@link SendingResult#Enqueued} if the instance
@@ -67,7 +95,7 @@ public interface ModelSimulation {
     SendingResult deleteInstance(String modelName, String instanceId);
 
     /**
-     * Deletes this digital twin instance.
+     * Delete and remove this digital twin instance from simulation processing.
      * @return this local request will always return {@link SendingResult#Handled}.
      */
     SendingResult deleteThisInstance();

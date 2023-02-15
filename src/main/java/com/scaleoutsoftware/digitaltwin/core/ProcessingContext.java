@@ -27,7 +27,15 @@ import java.util.logging.Level;
 public abstract class ProcessingContext implements Serializable {
 
     /**
-     * Sends a message to a data source
+     * <p>
+     * Sends a message to a data source. This will route messages through the connector back to the data source.
+     * </p>
+     *
+     * <p>
+     * if the datasource is simulation instance, then the message will be sent to the simulation model's implementation
+     * of the {@link MessageProcessor}.
+     * </p>
+     *
      * @param payload the message (as a serialized JSON string)
      * @return the sending result
      */
@@ -164,8 +172,8 @@ public abstract class ProcessingContext implements Serializable {
     public abstract Date getCurrentTime();
 
     /**
-     * Retrieve the ModelSimulation.
-     * @return the ModelSimulation.
+     * Retrieve the  running  {@link SimulationController} or null if no simulation is running.
+     * @return the {@link SimulationController} or null if no simulation is running.
      */
-    public abstract ModelSimulation getModelSimulation();
+    public abstract SimulationController getSimulationController();
 }

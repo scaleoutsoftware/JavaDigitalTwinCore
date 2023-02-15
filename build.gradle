@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.scaleoutsoftware.digitaltwin'
-version '2.2.1'
+version '2.3.0'
 
 sourceCompatibility = JavaVersion.VERSION_12
 
@@ -41,7 +41,7 @@ task createPom  {
         project {
             groupId 'com.scaleoutsoftware.digitaltwin'
             artifactId 'core'
-            version '2.2.1'
+            version '2.3.0'
 
             inceptionYear '2020'
         }
