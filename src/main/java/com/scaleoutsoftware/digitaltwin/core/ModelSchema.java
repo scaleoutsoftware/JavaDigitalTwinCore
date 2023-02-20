@@ -24,15 +24,20 @@ import java.util.List;
 public class ModelSchema {
     private final String                            modelType;
     private final String                            messageProcessorType;
-    private final String                            modelProcessorType;
+    private final String                            simulationProcessorType;
     private final String                            messageType;
     private final String                            assemblyName;
     private final String                            azureDigitalTwinModelName;
+    private final String                            persistenceProvider;
+    private final boolean                           enablePersistence;
+    private final boolean                           enableSimulationSupport;
     private final List<AlertProviderConfiguration>  alertProviders;
 
     private ModelSchema() {
-        modelType = messageProcessorType = modelProcessorType = messageType = assemblyName = azureDigitalTwinModelName = null;
-        alertProviders = null;
+        modelType = messageProcessorType = simulationProcessorType = messageType = assemblyName = azureDigitalTwinModelName = persistenceProvider = null;
+        enablePersistence       = false;
+        enableSimulationSupport = false;
+        alertProviders          = null;
     }
 
     /**
@@ -57,11 +62,14 @@ public class ModelSchema {
         }
         modelType                   = dtClass;
         messageProcessorType        = mpClass;
-        modelProcessorType          = null;
+        simulationProcessorType     = null;
+        enableSimulationSupport     = false;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         alertProviders              = null;
         azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        persistenceProvider         = null;
     }
 
     /**
@@ -89,10 +97,13 @@ public class ModelSchema {
         }
         modelType                   = dtClass;
         messageProcessorType        = mpClass;
-        modelProcessorType          = null;
+        simulationProcessorType     = null;
+        enableSimulationSupport     = false;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        persistenceProvider         = null;
         alertProviders              = alertingProviders;
     }
     /**
@@ -101,14 +112,16 @@ public class ModelSchema {
      * @param dtClass the digital twin class implementation.
      * @param mpClass the message processor class implementation.
      * @param msgClass a JSON serializable message class.
-     * @param adtModelName the Azure Digital Twin model name.
+     * @param adtName the Azure Digital Twin model name.
+     * @param persistenceType the persistence provider type.
      * @param alertingProviders the alerting provider configurations.
      */
     public ModelSchema(
             String dtClass,
             String mpClass,
             String msgClass,
-            String adtModelName,
+            String adtName,
+            PersistenceProviderType persistenceType,
             List<AlertProviderConfiguration> alertingProviders) {
         if( (dtClass    == null || dtClass.isEmpty()) ||
                 (mpClass    == null || mpClass.isEmpty()) ||
@@ -122,10 +135,26 @@ public class ModelSchema {
         }
         modelType                   = dtClass;
         messageProcessorType        = mpClass;
-        modelProcessorType          = null;
+        simulationProcessorType     = null;
+        enableSimulationSupport     = false;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
-        azureDigitalTwinModelName   = adtModelName;
+        persistenceProvider         = persistenceType.name();
+        switch (persistenceType) {
+            case AzureDigitalTwinsService:
+                azureDigitalTwinModelName   = adtName;
+                enablePersistence           = true;
+                break;
+            case SQLite:
+            case SQLServer:
+                enablePersistence           = true;
+                azureDigitalTwinModelName   = null;
+                break;
+            default:
+                azureDigitalTwinModelName   = null;
+                enablePersistence           = false;
+                break;
+        }
         alertProviders              = alertingProviders;
     }
 
@@ -134,16 +163,18 @@ public class ModelSchema {
      * @param dtClass the digital twin class implementation.
      * @param mpClass the message processor class implementation.
      * @param msgClass a JSON serializable message class.
-     * @param modelProcessorClass the model processor class implementation.
-     * @param adtModelName the Azure Digital Twin model name.
+     * @param simulationProcessorClass the simulation processor class implementation.
+     * @param adtName the Azure Digital Twin model name.
+     * @param persistenceType the persistence provider type.
      * @param alertingProviders the alerting provider configurations.
      */
     public ModelSchema(
             String dtClass,
             String mpClass,
             String msgClass,
-            String modelProcessorClass,
-            String adtModelName,
+            String simulationProcessorClass,
+            String adtName,
+            PersistenceProviderType persistenceType,
             List<AlertProviderConfiguration> alertingProviders) {
         if( (dtClass    == null || dtClass.isEmpty()) ||
                 (mpClass    == null || mpClass.isEmpty()) ||
@@ -157,10 +188,26 @@ public class ModelSchema {
         }
         modelType                   = dtClass;
         messageProcessorType        = mpClass;
-        modelProcessorType          = modelProcessorClass;
+        simulationProcessorType     = simulationProcessorClass;
+        enableSimulationSupport     = true;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
-        azureDigitalTwinModelName   = adtModelName;
+        persistenceProvider         = persistenceType.name();
+        switch (persistenceType) {
+            case AzureDigitalTwinsService:
+                azureDigitalTwinModelName   = adtName;
+                enablePersistence           = true;
+                break;
+            case SQLite:
+            case SQLServer:
+                enablePersistence           = true;
+                azureDigitalTwinModelName   = null;
+                break;
+            default:
+                azureDigitalTwinModelName   = null;
+                enablePersistence           = false;
+                break;
+        }
         alertProviders              = alertingProviders;
     }
 
@@ -189,11 +236,11 @@ public class ModelSchema {
     }
 
     /**
-     * Retrieve the model processor type (a {@link ModelProcessor} implementation).
-     * @return the model processor type.
+     * Retrieve the simulation processor type (a {@link SimulationProcessor} implementation).
+     * @return the simulation processor type.
      */
-    public String getModelProcessorType() {
-        return modelProcessorType;
+    public String getSimulationProcessorType() {
+        return simulationProcessorType;
     }
 
     /**
@@ -218,4 +265,21 @@ public class ModelSchema {
         return azureDigitalTwinModelName;
     }
 
+    /**
+     * Retrieve persistence status. True if persistence is enabled, false otherwise.
+     * @return True if persistence is enabled, false otherwise.
+     */
+    public boolean persistenceEnabled() { return enablePersistence; }
+
+    /**
+     * Retrieve simulation support enabled status. True if simulation support is enabled, false otherwise.
+     * @return True if simulation support is enabled, false otherwise.
+     */
+    public boolean simulationSupportEnabled() {return enableSimulationSupport;}
+
+    /**
+     * Retrieve the persistence provider type.
+     * @return the persistence provider type.
+     */
+    public PersistenceProviderType getPersistenceProvider() { return PersistenceProviderType.fromString(persistenceProvider); }
 }

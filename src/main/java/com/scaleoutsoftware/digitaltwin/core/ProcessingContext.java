@@ -17,6 +17,7 @@ package com.scaleoutsoftware.digitaltwin.core;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -26,7 +27,15 @@ import java.util.logging.Level;
 public abstract class ProcessingContext implements Serializable {
 
     /**
-     * Sends a message to a data source
+     * <p>
+     * Sends a message to a data source. This will route messages through the connector back to the data source.
+     * </p>
+     *
+     * <p>
+     * if the datasource is simulation instance, then the message will be sent to the simulation model's implementation
+     * of the {@link MessageProcessor}.
+     * </p>
+     *
      * @param payload the message (as a serialized JSON string)
      * @return the sending result
      */
@@ -107,10 +116,10 @@ public abstract class ProcessingContext implements Serializable {
     public abstract SendingResult sendAlert(String alertingProviderName, AlertMessage alert);
 
     /**
-     * Returns a list of registered and active persistence providers.
-     * @return a list of registered and active persistence providers.
+     * Returns the configured persistence provider or null if no persistence provider configuration can be found.
+     * @return a PersistenceProvider .
      */
-    public abstract List<PersistenceProvider> getPersistenceProviders();
+    public abstract PersistenceProvider getPersistenceProvider();
 
     /**
      * Retrieve the unique Identifier for a DataSource (matches the Device/Datasource/Real-time twin ID)
@@ -155,10 +164,16 @@ public abstract class ProcessingContext implements Serializable {
     public abstract TimerActionResult stopTimer(String timerName);
 
     /**
-     * Retrieve the ModelSimulation.
-     * @return the ModelSimulation.
+     * Retrieves the current time. If the model (simulation or real-time) is running inside of a simulation then the
+     * simulation time will be returned.
+     *
+     * @return The current time (real time, or simulation if running under simulation).
      */
-    public abstract ModelSimulation getModelSimulation();
+    public abstract Date getCurrentTime();
 
-
+    /**
+     * Retrieve the  running  {@link SimulationController} or null if no simulation is running.
+     * @return the {@link SimulationController} or null if no simulation is running.
+     */
+    public abstract SimulationController getSimulationController();
 }
