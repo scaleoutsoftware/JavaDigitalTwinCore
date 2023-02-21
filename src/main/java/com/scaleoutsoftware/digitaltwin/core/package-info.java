@@ -15,7 +15,7 @@
 */
 
 /**
- * Real-time digital twin model API
+ * Digital twin model API
  */
 package com.scaleoutsoftware.digitaltwin.core;
 
