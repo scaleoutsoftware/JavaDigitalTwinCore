@@ -80,10 +80,42 @@ public interface SimulationController {
      * Create a new digital twin instance for simulation processing.
      * @param modelName the model name.
      * @param instanceId the instance id.
+     * @param base the instance to create.
+     * @return {@link SendingResult#Handled} if the instance was created, {@link SendingResult#Enqueued} if the instance
+     * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
+     * * @param <T> the type of the digital twin to create.
+     */
+    <T extends DigitalTwinBase> SendingResult  createInstance(String modelName, String instanceId, T base);
+
+    /**
+     * Create a new digital twin instance for simulation processing from a persistence store.
+     *
+     * The twin instance will be loaded via model name and id from a persistence store.
+     *
+     * If no instance can be found, then an exception will be thrown and no instance will be created.
+     *
+     * @param model The model name.
+     * @param id the instance id.
      * @return {@link SendingResult#Handled} if the instance was created, {@link SendingResult#Enqueued} if the instance
      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
      */
-    SendingResult createInstance(String modelName, String instanceId);
+    SendingResult createInstanceFromPersistenceStore(String model, String id);
+
+    /**
+     * The twin instance will be loaded via model name and id from a persistence store.
+     *
+     * The twin instance will be loaded via model name and id from a persistence store.
+     *
+     * If no instance can be found, then the default parameter instance will be used.
+     *
+     * @param model the model name.
+     * @param id the instance id.
+     * @param def the default instance to create.
+     * @return {@link SendingResult#Handled} if the instance was created, {@link SendingResult#Enqueued} if the instance
+     *      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
+     * @param <T> the type of the digital twin to create.
+     */
+    <T extends DigitalTwinBase> SendingResult createInstanceFromPersistenceStore(String model, String id, T def);
 
     /**
      * Delete and remove a digital twin instance from simulation processing.
