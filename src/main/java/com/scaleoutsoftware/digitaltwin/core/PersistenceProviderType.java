@@ -33,7 +33,13 @@ public enum PersistenceProviderType implements Serializable {
     /**
      * Enum for SQLServer
      */
-    SQLServer("SQLServer", 3);
+    SQLServer("SQLServer", 3),
+
+    /**
+     *
+     */
+    Unconfigured("", 0);
+
     private String _name;
     private int _value;
     PersistenceProviderType(String name, int ordinal) {

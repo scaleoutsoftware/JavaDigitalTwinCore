@@ -77,13 +77,25 @@ public interface SimulationController {
     SendingResult emitTelemetry(String modelName, byte[] telemetryMessage);
 
     /**
+     * <p>
+     * Asynchronously send a JSON serializable message to a DigitalTwin instance that will be processed by the DigitalTwin
+     * models {@link MessageProcessor#processMessages(ProcessingContext, DigitalTwinBase, Iterable)} method.
+     * </p>
+     * @param modelName the model to send the messages too.
+     * @param jsonSerializableMessage an object message that is JSON serializable.
+     * @return {@link SendingResult#Handled} if the messages were processed, {@link SendingResult#Enqueued} if
+     * the messages are in process of being handled, or {@link SendingResult#NotHandled} if the delay was not processed.
+     */
+    SendingResult emitTelemetry(String modelName, Object jsonSerializableMessage);
+
+    /**
      * Create a new digital twin instance for simulation processing.
      * @param modelName the model name.
      * @param instanceId the instance id.
      * @param base the instance to create.
      * @return {@link SendingResult#Handled} if the instance was created, {@link SendingResult#Enqueued} if the instance
      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
-     * * @param <T> the type of the digital twin to create.
+     * @param <T> the type of the digital twin to create.
      */
     <T extends DigitalTwinBase> SendingResult  createInstance(String modelName, String instanceId, T base);
 
@@ -131,4 +143,10 @@ public interface SimulationController {
      * @return this local request will always return {@link SendingResult#Handled}.
      */
     SendingResult deleteThisInstance();
+
+    /**
+     * Stop the simulation.
+     * @return a {@link SimulationStatus#InstanceRequestedStop}.
+     */
+    SimulationStatus stopSimulation();
 }

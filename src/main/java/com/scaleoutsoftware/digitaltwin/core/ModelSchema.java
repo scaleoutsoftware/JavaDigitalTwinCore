@@ -106,6 +106,46 @@ public class ModelSchema {
         persistenceProvider         = null;
         alertProviders              = alertingProviders;
     }
+
+    /**
+     * Creates a model schema from a digital twin class, a message processor class, a message class, and
+     * alert provider configurations.
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     * @param spClass the simulation processor class implementation.
+     * @param alertingProviders the alerting provider configurations.
+     */
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String spClass,
+            List<AlertProviderConfiguration> alertingProviders) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty()) ||
+                (spClass    == null || spClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass),
+                    (spClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = null;
+        enableSimulationSupport     = false;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        persistenceProvider         = null;
+        alertProviders              = alertingProviders;
+    }
+
     /**
      * Creates a model schema from a digital twin class, a message processor class, a message class, and
      * alert provider configurations.

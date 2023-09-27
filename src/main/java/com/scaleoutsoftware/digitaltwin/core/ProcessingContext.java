@@ -43,6 +43,36 @@ public abstract class ProcessingContext implements Serializable {
 
     /**
      * <p>
+     * Sends a message to a data source. This will route messages through the connector back to the data source.
+     * </p>
+     *
+     * <p>
+     * if the datasource is simulation instance, then the message will be sent to the simulation model's implementation
+     * of the {@link MessageProcessor}.
+     * </p>
+     *
+     * @param jsonSerializableMessage a JSON serializable message.
+     * @return the sending result
+     */
+    public abstract SendingResult sendToDataSource(Object jsonSerializableMessage);
+
+    /**
+     * <p>
+     * Sends a list of messages to a data source. This will route messages through the connector back to the data source.
+     * </p>
+     *
+     * <p>
+     * if the datasource is simulation instance, then the message will be sent to the simulation model's implementation
+     * of the {@link MessageProcessor#processMessages(ProcessingContext, DigitalTwinBase, Iterable)}.
+     * </p>
+     *
+     * @param jsonSerializableMessages a list of JSON serializable messages.
+     * @return the sending result
+     */
+    public abstract SendingResult sendToDataSource(List<Object> jsonSerializableMessages);
+
+    /**
+     * <p>
      *     This method sends a serialized JSON message to a real-time digital twin
      * </p>
      *
@@ -56,6 +86,22 @@ public abstract class ProcessingContext implements Serializable {
      * @return the sending result
      */
     public abstract SendingResult sendToDigitalTwin(String model, String id, byte[] payload);
+
+    /**
+     * <p>
+     *     This method sends a serialized JSON message to a real-time digital twin
+     * </p>
+     *
+     * <p>
+     *     Note, the message contents must be serialized so that the registered message type
+     *     of the digital twin model will be sufficient to deserialize the message.
+     * </p>
+     * @param model the model of the digital twin
+     * @param id the id of the digital twin
+     * @param jsonSerializableMessage a JSON serializable message object
+     * @return the sending result
+     */
+    public abstract SendingResult sendToDigitalTwin(String model, String id, Object jsonSerializableMessage);
 
     /**
      * <p>

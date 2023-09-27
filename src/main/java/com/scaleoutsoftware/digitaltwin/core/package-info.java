@@ -15,7 +15,7 @@
 */
 
 /**
- * Digital twin model API
+ * Digital twin model API - Create a digital twin model.
  */
 package com.scaleoutsoftware.digitaltwin.core;
 
