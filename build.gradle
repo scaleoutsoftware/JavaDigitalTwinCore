@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.scaleoutsoftware.digitaltwin'
-version '2.3.0'
+version '3.0.1'
 
 sourceCompatibility = JavaVersion.VERSION_12
 
