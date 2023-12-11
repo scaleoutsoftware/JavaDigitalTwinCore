@@ -2,7 +2,7 @@
 
 The open source (Apache 2.0 licensed) project for the Core API:
 
-- [com.scaleout.digitaltwins.core](https://repo.scaleoutsoftware.com/#artifact/com.scaleoutsoftware.digitaltwin/core): Core datatypes required for building Digital Twin models.
+- [com.scaleout.digitaltwin.core](https://repo.scaleoutsoftware.com/#artifact/com.scaleoutsoftware.digitaltwin/core): Core datatypes required for building Digital Twin models.
 
 
 ## Documentation
