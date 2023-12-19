@@ -25,21 +25,21 @@ import java.time.Duration;
 public class TimerMetadata<T extends DigitalTwinBase> {
     final String      timerHandler;
     final TimerType   timerType;
-    final Duration    timerInterval;
+    final long        timerIntervalMs;
     final int         timerId;
 
     /**
      * Constructs a timer metadata.
      * @param handler the timer handler.
      * @param timerType the timer type.
-     * @param timerInterval the timer interval.
+     * @param timerIntervalMs the timer interval.
      * @param timerIdx the timer index.
      */
-    public TimerMetadata(TimerHandler<T> handler, TimerType timerType, Duration timerInterval, int timerIdx) {
-        this.timerHandler   = handler.getClass().getName();
-        this.timerType      = timerType;
-        this.timerInterval  = timerInterval;
-        this.timerId        = timerIdx;
+    public TimerMetadata(TimerHandler<T> handler, TimerType timerType, long timerIntervalMs, int timerIdx) {
+        this.timerHandler       = handler.getClass().getName();
+        this.timerType          = timerType;
+        this.timerIntervalMs    = timerIntervalMs;
+        this.timerId            = timerIdx;
     }
 
     /**
@@ -62,8 +62,8 @@ public class TimerMetadata<T extends DigitalTwinBase> {
      * Retrieves the timer interval.
      * @return the timer interval.
      */
-    public Duration getTimerInterval() {
-        return timerInterval;
+    public long getTimerIntervalMs() {
+        return timerIntervalMs;
     }
 
     /**
