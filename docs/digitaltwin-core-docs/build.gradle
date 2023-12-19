@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.scaleout.digitaltwin'
-version '3.0.3'
+version '3.0.4'
 
 repositories {
     mavenCentral()

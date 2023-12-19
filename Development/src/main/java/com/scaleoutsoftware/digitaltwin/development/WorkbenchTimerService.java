@@ -51,7 +51,7 @@ class WorkbenchTimerService {
 
         twinExecutionEngine.addTimer(model, id, timerName, timerType, interval, timerHandler);
 
-        TimerMetadata<T> metadata = new TimerMetadata<>(timerHandler, timerType, interval, timerId);
+        TimerMetadata<T> metadata = new TimerMetadata<>(timerHandler, timerType, interval.toMillis(), timerId);
         instance.TimerHandlers.put(timerName, metadata);
         return TimerActionResult.Success;
     }
