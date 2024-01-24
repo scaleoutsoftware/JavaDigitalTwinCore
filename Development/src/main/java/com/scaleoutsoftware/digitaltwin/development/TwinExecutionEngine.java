@@ -75,8 +75,10 @@ class TwinExecutionEngine implements Closeable {
     }
 
     void addTimer(String modelName, String id, String timerName, TimerType type, Duration interval, TimerHandler handler) {
-
         ConcurrentHashMap<String,TwinProxy> modelInstances = _modelInstances.get(modelName);
+        if(modelInstances == null) {
+            modelInstances = new ConcurrentHashMap<>();
+        }
         TwinProxy proxy = modelInstances.get(id);
         SimulationScheduler scheduler = _simulationSchedulers.get(modelName);
         if (scheduler != null) {
