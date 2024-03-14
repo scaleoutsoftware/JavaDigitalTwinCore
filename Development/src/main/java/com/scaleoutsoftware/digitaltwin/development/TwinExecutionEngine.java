@@ -79,7 +79,6 @@ class TwinExecutionEngine implements Closeable {
     }
 
     void addTimer(String modelName, String id, String timerName, TimerType type, Duration interval, TimerHandler handler) {
-
         ConcurrentHashMap<String,TwinProxy> modelInstances = _modelInstances.get(modelName);
         TwinProxy proxy = modelInstances.get(id);
         SimulationScheduler scheduler = _simulationSchedulers.get(modelName);
@@ -282,17 +281,18 @@ class TwinExecutionEngine implements Closeable {
     }
 
     public void createInstance(String modelName, String id, DigitalTwinBase instance) {
-        InitContext initContext = new WorkbenchInitContext(this, instance, modelName, id);
-        instance.init(initContext);
-        SimulationScheduler scheduler = _simulationSchedulers.get(modelName);
         TwinProxy proxy = new TwinProxy(instance);
-        if(scheduler != null) {
-            proxy.setProxyState(ProxyState.Active);
-            scheduler.addInstance(proxy);
-        }
         ConcurrentHashMap<String,TwinProxy> modelInstances = _modelInstances.get(modelName);
         if(modelInstances == null) {
             modelInstances = new ConcurrentHashMap<>();
+        }
+        modelInstances.put(id, proxy);
+        InitContext initContext = new WorkbenchInitContext(this, instance, modelName, id);
+        instance.init(initContext);
+        SimulationScheduler scheduler = _simulationSchedulers.get(modelName);
+        if(scheduler != null) {
+            proxy.setProxyState(ProxyState.Active);
+            scheduler.addInstance(proxy);
         }
         modelInstances.put(id, proxy);
         _modelInstances.put(modelName, modelInstances);
