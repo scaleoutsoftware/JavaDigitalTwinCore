@@ -34,6 +34,8 @@ class TwinExecutionEngine implements Closeable {
     private ConcurrentHashMap<String, Class<?>>                                             _messageProcessorValueTypes;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, TwinProxy>>                 _modelInstances;
     private ConcurrentHashMap<String, ConcurrentHashMap<String,AlertProviderConfiguration>> _alertProviders;
+    private ConcurrentHashMap<String, HashMap<String,byte[]>>                               _modelsSharedData;
+    private HashMap<String,byte[]>                                                          _globalSharedData;
     private Workbench                                                                       _workbench;
     private ConcurrentHashMap<String, SimulationScheduler>                                  _simulationSchedulers;
     private ConcurrentHashMap<String, WorkbenchTimerTask>                                   _realTimeTimers;
@@ -52,7 +54,9 @@ class TwinExecutionEngine implements Closeable {
         _simulationProcessors           = new ConcurrentHashMap<>();
         _messageProcessorValueTypes     = new ConcurrentHashMap<>();
         _modelInstances                 = new ConcurrentHashMap<>();
-        _alertProviders = new ConcurrentHashMap<>();
+        _modelsSharedData               = new ConcurrentHashMap<>();
+        _globalSharedData               = new HashMap<>();
+        _alertProviders                 = new ConcurrentHashMap<>();
         _simulationSchedulers           = new ConcurrentHashMap<>();
         _realTimeTimers                 = new ConcurrentHashMap<>();
         _gson                           = new Gson();
@@ -242,6 +246,18 @@ class TwinExecutionEngine implements Closeable {
         return status;
     }
 
+    HashMap<String, byte[]> getModelData(String model) {
+        HashMap<String, byte[]> sharedData = _modelsSharedData.get(model);
+        if(sharedData == null) sharedData = new HashMap<>();
+        _modelsSharedData.put(model, sharedData);
+        return sharedData;
+    }
+
+    HashMap<String, byte[]> getGlobalSharedData() {
+        return _globalSharedData;
+    }
+
+
     public void logMessage(String model, LogMessage message) {
         ConcurrentLinkedQueue<LogMessage> prev = _workbench.LOGGED_MESSAGES.get(model);
         if(prev == null) {
@@ -315,7 +331,10 @@ class TwinExecutionEngine implements Closeable {
                 instance = proxy.getInstance();
             }
             MessageProcessor mp = _messageProcessors.get(model);
-            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine);
+            HashMap<String, byte[]> sharedData = _modelsSharedData.get(model);
+            if(sharedData == null) sharedData = new HashMap<>();
+            _modelsSharedData.put(model, sharedData);
+            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData);
             context.reset(model, id, source, instance);
             ProcessingResult res = mp.processMessages(context, instance, new WorkbenchMessageListFactory(serializedList, _messageProcessorValueTypes.get(model)));
             if(context.forceSave()) res = ProcessingResult.UpdateDigitalTwin;
@@ -360,7 +379,10 @@ class TwinExecutionEngine implements Closeable {
                 instance = proxy.getInstance();
             }
             MessageProcessor mp = _messageProcessors.get(model);
-            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine);
+            HashMap<String, byte[]> sharedData = _modelsSharedData.get(model);
+            if(sharedData == null) sharedData = new HashMap<>();
+            _modelsSharedData.put(model, sharedData);
+            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData);
             context.reset(model, id, source, instance);
             ProcessingResult res = mp.processMessages(context, instance, new WorkbenchMessageListFactory(messages, _messageProcessorValueTypes.get(model)));
             if(context.forceSave()) res = ProcessingResult.UpdateDigitalTwin;

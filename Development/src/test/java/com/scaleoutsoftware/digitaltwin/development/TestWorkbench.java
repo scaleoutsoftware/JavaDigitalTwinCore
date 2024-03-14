@@ -93,6 +93,34 @@ public class TestWorkbench {
                         case "StopTimer":
                             processingContext.stopTimer("timer");
                             break;
+                        case "SharedData":
+                            SharedData sharedData = processingContext.getSharedModelData();
+                            CacheResult result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
+                            if(result.getStatus() == CacheOperationStatus.ObjectPut) {
+                                System.out.println("Successfully stored object in model storage.");
+                            }
+                            result = sharedData.get("Hello");
+                            if(result.getStatus() == CacheOperationStatus.ObjectRetrieved) {
+                                System.out.println("Successfully retrieved " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
+                            }
+                            result = sharedData.remove("Hello");
+                            if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
+                                System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
+                            }
+                            sharedData = processingContext.getSharedGlobalData();
+                            result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
+                            if(result.getStatus() == CacheOperationStatus.ObjectPut) {
+                                System.out.println("Successfully stored object in global storage.");
+                            }
+                            result = sharedData.get("Hello");
+                            if(result.getStatus() == CacheOperationStatus.ObjectRetrieved) {
+                                System.out.println("Successfully retrieved " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
+                            }
+                            result = sharedData.remove("Hello");
+                            if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
+                                System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -732,6 +760,18 @@ public class TestWorkbench {
             workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
             workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
             String schemaAsJson = workbench.generateModelSchema("");
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Test
+    public void TestWorkbenchSharedData() throws Exception {
+        try (Workbench workbench = new Workbench()) {
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
+            LinkedList<Object> messages = new LinkedList<>();
+            messages.add(new SimpleMessage("SharedData", 29));
+            workbench.send("Simple", "23", messages);
         } catch (Exception e) {
             throw e;
         }

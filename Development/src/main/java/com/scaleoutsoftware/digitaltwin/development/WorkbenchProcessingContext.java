@@ -31,11 +31,15 @@ class WorkbenchProcessingContext extends ProcessingContext {
     String                      _source;
     DigitalTwinBase             _twinInstance;
     SimulationController        _controller;
+    HashMap<String, byte[]>     _modelData;
+    HashMap<String, byte[]>     _globalData;
     boolean                     _forceSave;
 
-    WorkbenchProcessingContext(TwinExecutionEngine twinExecutionEngine) {
+    WorkbenchProcessingContext(TwinExecutionEngine twinExecutionEngine, HashMap<String, byte[]> modelSharedData, HashMap<String, byte[]> globalSharedData) {
         _twinExecutionEngine = twinExecutionEngine;
         _controller          = null;
+        _modelData           = modelSharedData;
+        _globalData          = globalSharedData;
     }
 
     WorkbenchProcessingContext(TwinExecutionEngine twinExecutionEngine, SimulationController controller) {
@@ -56,6 +60,8 @@ class WorkbenchProcessingContext extends ProcessingContext {
         _id             = id;
         _forceSave      = false;
         _source         = source;
+        _modelData      = _twinExecutionEngine.getModelData(model);
+        _globalData     = _twinExecutionEngine.getGlobalSharedData();
     }
 
     void resetInstance(DigitalTwinBase instance) {
@@ -209,5 +215,15 @@ class WorkbenchProcessingContext extends ProcessingContext {
     @Override
     public SimulationController getSimulationController() {
         return _controller;
+    }
+
+    @Override
+    public SharedData getSharedModelData() {
+        return new WorkbenchSharedData(_modelData);
+    }
+
+    @Override
+    public SharedData getSharedGlobalData() {
+        return new WorkbenchSharedData(_globalData);
     }
 }
