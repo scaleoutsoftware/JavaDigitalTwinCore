@@ -17,7 +17,7 @@ public interface SharedData {
      * Remove a key/value mapping from the cache.
      * @return a cache result.
      */
-    public CacheResult remove();
+    public CacheResult remove(String key);
 
     /**
      * Clear the shared data cache.
