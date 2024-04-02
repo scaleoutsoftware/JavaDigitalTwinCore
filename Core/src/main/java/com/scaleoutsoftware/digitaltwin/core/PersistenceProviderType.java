@@ -27,6 +27,10 @@ public enum PersistenceProviderType implements Serializable {
      */
     AzureDigitalTwinsService("AzureDigitalTwinsService", 1),
     /**
+     * Enum for DynamoDB
+     */
+    DynamoDb("DynamoDB", 5),
+    /**
      * Enum for SQLite
      */
     SQLite("SQLite", 4),
