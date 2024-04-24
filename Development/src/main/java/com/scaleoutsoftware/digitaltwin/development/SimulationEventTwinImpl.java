@@ -19,7 +19,9 @@ import com.scaleoutsoftware.digitaltwin.core.DigitalTwinBase;
 import com.scaleoutsoftware.digitaltwin.core.ProcessingContext;
 import com.scaleoutsoftware.digitaltwin.core.SimulationProcessor;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Objects;
 
 class SimulationEventTwinImpl extends SimulationEvent {
     SimulationProcessor _processor;
@@ -62,5 +64,18 @@ class SimulationEventTwinImpl extends SimulationEvent {
         DigitalTwinBase base = _proxy.getInstance();
         base.NextSimulationTime = _nextSimulationTime;
         _proxy.setInstance(base);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimulationEventTwinImpl that = (SimulationEventTwinImpl) o;
+        return this._proxy.getInstance().getId().compareTo(that._id) == 0 && this._proxy.getInstance().getModel().compareTo(that._model) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int)Constants.getHash(_id.getBytes(StandardCharsets.UTF_8));
     }
 }

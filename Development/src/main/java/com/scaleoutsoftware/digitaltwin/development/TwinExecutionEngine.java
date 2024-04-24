@@ -163,6 +163,16 @@ class TwinExecutionEngine implements Closeable {
         return ret;
     }
 
+    TwinProxy getTwinProxy(String model, String id) {
+        TwinProxy proxy = null;
+        ConcurrentHashMap<String,TwinProxy> instances = _modelInstances.get(model);
+        if(instances != null) {
+            proxy = instances.get(id);
+            return proxy;
+        }
+        return proxy;
+    }
+
     String generateModelSchema(String model) throws WorkbenchException {
         if(_digitalTwins.get(model) != null) {
             ModelSchema schema;
@@ -334,7 +344,12 @@ class TwinExecutionEngine implements Closeable {
             HashMap<String, byte[]> sharedData = _modelsSharedData.get(model);
             if(sharedData == null) sharedData = new HashMap<>();
             _modelsSharedData.put(model, sharedData);
-            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData);
+            SimulationController simulationController = null;
+            SimulationScheduler scheduler = _simulationSchedulers.get(model);
+            if(scheduler != null) {
+                simulationController = new WorkbenchSimulationController(this, scheduler);
+            }
+            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData, simulationController);
             context.reset(model, id, source, instance);
             ProcessingResult res = mp.processMessages(context, instance, new WorkbenchMessageListFactory(serializedList, _messageProcessorValueTypes.get(model)));
             if(context.forceSave()) res = ProcessingResult.UpdateDigitalTwin;
@@ -382,8 +397,16 @@ class TwinExecutionEngine implements Closeable {
             HashMap<String, byte[]> sharedData = _modelsSharedData.get(model);
             if(sharedData == null) sharedData = new HashMap<>();
             _modelsSharedData.put(model, sharedData);
-            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData);
+            WorkbenchSimulationController simulationController = null;
+            SimulationScheduler scheduler = _simulationSchedulers.get(model);
+            if(scheduler != null) {
+                simulationController = new WorkbenchSimulationController(this, scheduler);
+            }
+            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData, simulationController);
             context.reset(model, id, source, instance);
+            if(simulationController != null) {
+                simulationController.reset(model, id);
+            }
             ProcessingResult res = mp.processMessages(context, instance, new WorkbenchMessageListFactory(messages, _messageProcessorValueTypes.get(model)));
             if(context.forceSave()) res = ProcessingResult.UpdateDigitalTwin;
             switch(res) {

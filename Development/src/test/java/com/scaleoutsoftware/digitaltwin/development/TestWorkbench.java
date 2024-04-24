@@ -121,6 +121,12 @@ public class TestWorkbench {
                                 System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
                             }
                             break;
+                        case "WakeUp":
+                            SimulationController controller = processingContext.getSimulationController();
+                            instance._stringProp = "WakeUp";
+                            System.out.println("Calling run this twin...");
+                            controller.runThisTwin();
+                            break;
                         default:
                             break;
                     }
@@ -217,13 +223,20 @@ public class TestWorkbench {
     }
 
     public static class SimpleSimProcessor extends SimulationProcessor<SimpleDigitalTwin> implements Serializable {
-        private Gson _gson = new Gson();
-
-        private AtomicInteger timesInvoked = new AtomicInteger(0);
-        private boolean _useJson;
+        private Gson            _gson = new Gson();
+        private AtomicInteger   timesInvoked = new AtomicInteger(0);
+        private boolean         _useJson;
+        private String          _modelIdToMessage;
+        private String          _instanceIdToMessage;
 
         public SimpleSimProcessor(boolean json) {
             _useJson = json;
+        }
+
+        public SimpleSimProcessor(String modelIdToMessage, String instanceIdToMessage) {
+            _useJson                = false;
+            _modelIdToMessage       = modelIdToMessage;
+            _instanceIdToMessage    = instanceIdToMessage;
         }
 
         public int getTimesInvoked() {
@@ -256,6 +269,18 @@ public class TestWorkbench {
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().contains("alert")) {
                 processingContext.sendAlert("alert", new AlertMessage(simpleDigitalTwin.getId(), simpleDigitalTwin.getId(), simpleDigitalTwin._stringProp));
+                return ProcessingResult.UpdateDigitalTwin;
+            } else if (simpleDigitalTwin.getId().contains("sleeper")) {
+                if(simpleDigitalTwin._stringProp.compareTo("WakeUp") == 0) {
+                    System.out.println("Model ran after runThisInstance");
+                    simpleDigitalTwin._stringProp = "asleep";
+                }
+                System.out.println("Going to sleep...");
+                controller.delayIndefinitely();
+                return ProcessingResult.UpdateDigitalTwin;
+            } else if (simpleDigitalTwin.getId().contains("waker")) {
+                System.out.println("Waking up sleeper...");
+                processingContext.sendToDigitalTwin(_modelIdToMessage, _instanceIdToMessage, new SimpleMessage("WakeUp", 23));
                 return ProcessingResult.UpdateDigitalTwin;
             }
             long delay = Long.parseLong(simpleDigitalTwin.getId());
@@ -772,6 +797,23 @@ public class TestWorkbench {
             LinkedList<Object> messages = new LinkedList<>();
             messages.add(new SimpleMessage("SharedData", 29));
             workbench.send("Simple", "23", messages);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Test
+    public void TestWorkbenchRunThisInstance() throws Exception {
+        try (Workbench workbench = new Workbench()) {
+            workbench.addSimulationModel("Simple", new SimpleMessageProcessor(), new SimpleSimProcessor("Simple2", "sleeper"), SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addSimulationModel("Simple2", new SimpleMessageProcessor(), new SimpleSimProcessor(false), SimpleDigitalTwin.class, SimpleMessage.class);
+
+            workbench.addInstance("Simple", "waker", new SimpleDigitalTwin("waker"));
+            workbench.addInstance("Simple2", "sleeper", new SimpleDigitalTwin("sleeper"));
+            long startTimeMs = System.currentTimeMillis();
+            long stopTimeMs = startTimeMs + 15000L;
+            long step = 1000L;
+            workbench.runSimulation(startTimeMs, stopTimeMs, 1, step);
         } catch (Exception e) {
             throw e;
         }

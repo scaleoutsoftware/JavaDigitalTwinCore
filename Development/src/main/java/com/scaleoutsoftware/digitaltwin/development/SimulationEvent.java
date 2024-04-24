@@ -49,6 +49,8 @@ abstract class SimulationEvent implements Comparable<SimulationEvent> {
         return _id;
     }
 
+    String getModel() {return _model;}
+
     void setNextSimulationTime(long nextSimulationTime) {
         _nextSimulationTime = nextSimulationTime;
         handleResetNextSimulationTime();

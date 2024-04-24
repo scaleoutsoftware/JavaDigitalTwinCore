@@ -35,9 +35,9 @@ class WorkbenchProcessingContext extends ProcessingContext {
     HashMap<String, byte[]>     _globalData;
     boolean                     _forceSave;
 
-    WorkbenchProcessingContext(TwinExecutionEngine twinExecutionEngine, HashMap<String, byte[]> modelSharedData, HashMap<String, byte[]> globalSharedData) {
+    WorkbenchProcessingContext(TwinExecutionEngine twinExecutionEngine, HashMap<String, byte[]> modelSharedData, HashMap<String, byte[]> globalSharedData, SimulationController simulationController) {
         _twinExecutionEngine = twinExecutionEngine;
-        _controller          = null;
+        _controller          = simulationController;
         _modelData           = modelSharedData;
         _globalData          = globalSharedData;
     }
