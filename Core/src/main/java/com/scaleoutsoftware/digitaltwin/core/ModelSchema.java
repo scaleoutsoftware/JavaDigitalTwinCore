@@ -187,6 +187,7 @@ public class ModelSchema {
                 break;
             case SQLite:
             case SQLServer:
+            case DynamoDb:
                 enablePersistence           = true;
                 azureDigitalTwinModelName   = null;
                 break;
@@ -240,6 +241,7 @@ public class ModelSchema {
                 break;
             case SQLite:
             case SQLServer:
+            case DynamoDb:
                 enablePersistence           = true;
                 azureDigitalTwinModelName   = null;
                 break;
