@@ -20,6 +20,12 @@ package com.scaleoutsoftware.digitaltwin.core;
  * @param <T> the type of the DigitalTwin
  */
 public abstract class MessageProcessorBase<T extends DigitalTwinBase> {
+
+    /**
+     * Default constructor.
+     */
+    public MessageProcessorBase() {}
+
     /**
      * Helper method to ensure proper typing for the user methods.
      * @param context the processing context

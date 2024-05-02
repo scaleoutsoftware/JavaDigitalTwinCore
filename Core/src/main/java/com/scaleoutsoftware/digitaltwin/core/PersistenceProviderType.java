@@ -40,7 +40,7 @@ public enum PersistenceProviderType implements Serializable {
     SQLServer("SQLServer", 3),
 
     /**
-     *
+     * Enum for an unconfigured PersistenceProvider
      */
     Unconfigured("", 0);
 

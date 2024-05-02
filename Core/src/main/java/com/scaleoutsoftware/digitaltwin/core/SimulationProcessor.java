@@ -25,6 +25,11 @@ import java.util.Date;
 public abstract class SimulationProcessor<T extends DigitalTwinBase> implements Serializable {
 
     /**
+     * Default constructor.
+     */
+    public SimulationProcessor() {}
+
+    /**
      * Processes simulation events for a real-time digital twin.
      * @param context the processing context.
      * @param instance the digital twin instance.

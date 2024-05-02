@@ -200,6 +200,9 @@ public class ModelSchema {
     }
 
     /**
+     * Creates a model schema from a digital twin class, a message processor class, a message class,
+     * a simulation processor class, an Azure Digital Twin Model name class, a persistence provider type,
+     * and an alert provider configuration.
      *
      * @param dtClass the digital twin class implementation.
      * @param mpClass the message processor class implementation.
