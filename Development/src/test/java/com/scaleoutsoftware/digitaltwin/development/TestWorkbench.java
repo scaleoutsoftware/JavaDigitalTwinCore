@@ -125,7 +125,7 @@ public class TestWorkbench {
                             SimulationController controller = processingContext.getSimulationController();
                             instance._stringProp = "WakeUp";
                             System.out.println("Calling run this twin...");
-                            controller.runThisTwin();
+                            controller.runThisInstance();
                             break;
                         default:
                             break;

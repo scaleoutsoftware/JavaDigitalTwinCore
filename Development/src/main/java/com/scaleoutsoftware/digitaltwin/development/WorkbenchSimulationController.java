@@ -129,7 +129,7 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public void runThisTwin() {
+    public void runThisInstance() {
         try {
             _scheduler.runThisInstance(_modelName, _id);
             _enqueue = false;
