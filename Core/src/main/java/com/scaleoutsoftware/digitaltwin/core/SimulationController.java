@@ -71,7 +71,7 @@ public interface SimulationController {
      * </p>
      *
      * <p>
-     * Simulation processing will be delayed until this instance is run with {@link SimulationController#runThisTwin()}.
+     * Simulation processing will be delayed until this instance is run with {@link SimulationController#runThisInstance()}.
      * </p>
      *
      * @return {@link SendingResult#Handled} if the delay was processed or {@link SendingResult#NotHandled}
