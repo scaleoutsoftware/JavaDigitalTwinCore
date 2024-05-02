@@ -23,28 +23,34 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 class SimulationWorker implements Callable<SimulationStep> {
     private final Logger                                        _logger = LogManager.getLogger(SimulationWorker.class);
     private final PriorityQueue<SimulationEvent>                _timeOrderedQueue = new PriorityQueue<>();
     private final ConcurrentHashMap<String, SimulationEvent>    _timers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, SimulationEvent>    _events = new ConcurrentHashMap<>();
     private final int                                           _slotId;
     private final String                                        _modelName;
     private final SimulationProcessor                           _simulationProcessor;
     private final TwinExecutionEngine                           _twinExecutionEngine;
+    private final SimulationScheduler                           _simulationScheduler;
     private long                                                _curSimulationTime;
     private long                                                _simulationInterval;
     private long                                                _nextSimulationTime;
+    private boolean                                             _running;
 
     public SimulationWorker(int slotId,
                             String model,
                             SimulationProcessor modelProcessor,
                             Class<? extends DigitalTwinBase> digitalTwinClass,
-                            TwinExecutionEngine engine) {
+                            TwinExecutionEngine engine,
+                            SimulationScheduler scheduler) {
         _slotId                 = slotId;
         _modelName              = model;
         _simulationProcessor    = modelProcessor;
         _twinExecutionEngine    = engine;
+        _simulationScheduler    = scheduler;
     }
 
     public void reset(SimulationStepArgs runSimulationEventArgs) {
@@ -55,38 +61,84 @@ class SimulationWorker implements Callable<SimulationStep> {
 
     public void shutdown() {
         _timeOrderedQueue.clear();
+        _events.clear();
+        _timers.clear();
     }
 
     public void addTwinToQueue(TwinProxy proxy) {
-        SimulationEvent event = new SimulationEventTwinImpl(0, proxy, _simulationProcessor);
+        SimulationEvent event = new SimulationEventTwinImpl(_curSimulationTime, proxy, _simulationProcessor);
         _timeOrderedQueue.add(event);
+        _events.put(String.format("%s%s",event.getModel(),event.getId()), event);
+    }
+
+    public void addTwinToQueue(SimulationEvent event) {
+        _timeOrderedQueue.add(event);
+        _events.put(String.format("%s%s",event.getModel(),event.getId()), event);
     }
 
     public void addTimerToQueue(TwinProxy proxy, String modelName, String id, String timerName, TimerType type, Duration interval, TimerHandler handler) {
         SimulationEvent event = new SimulationEventTimerImpl(modelName, id, interval.toMillis(), timerName, proxy, handler);
         _timers.put(timerName, event);
         _timeOrderedQueue.add(event);
+        _events.put(String.format("%s%s",event.getModel(),event.getId()), event);
     }
 
     public void stopTimer(String model, String id, String timerName) {
         SimulationEvent event = _timers.remove(String.format("%s%s%s",model, id,timerName));
         event.setProxyState(ProxyState.Removed);
+        _events.remove(String.format("%s%s",event.getModel(),event.getId()));
+    }
+
+    public void runThisInstance(String model, String id) throws WorkbenchException {
+        SimulationEvent event = _events.get(String.format("%s%s",model,id));
+        if(event == null) {
+            TwinProxy proxy = _twinExecutionEngine.getTwinProxy(model, id);
+            event = new SimulationEventTwinImpl(_curSimulationTime, proxy, _simulationProcessor);
+        }
+        WorkbenchSimulationController simulationController = new WorkbenchSimulationController(_twinExecutionEngine, _simulationScheduler);
+        WorkbenchProcessingContext processingContext = new WorkbenchProcessingContext(_twinExecutionEngine, simulationController);
+        Date date = new Date();
+        date.setTime(_curSimulationTime);
+        event.processSimulationEvent(processingContext, date);
+        if(simulationController.delayRequested()) {
+            long delay = simulationController.getRequestedDelay();
+            if(delay == 0x0000e677d21fdbffL) {
+                event.setPriority(simulationController.getRequestedDelay());
+                event.setNextSimulationTime(simulationController.getRequestedDelay());
+            } else if (delay == 0L) {
+                event.setPriority(_curSimulationTime);
+                event.setNextSimulationTime(_curSimulationTime);
+            } else {
+                event.setPriority(_curSimulationTime + simulationController.getRequestedDelay());
+                event.setNextSimulationTime(_curSimulationTime + simulationController.getRequestedDelay());
+            }
+        } else {
+            event.setPriority(_curSimulationTime + _simulationInterval);
+            event.setNextSimulationTime(_curSimulationTime + _simulationInterval);
+        }
+        _events.put(String.format("%s%s",model,id), event);
+        _timeOrderedQueue.add(event);
     }
 
     @Override
     public SimulationStep call() throws Exception {
+        synchronized (this) {
+            _running = true;
+        }
         SimulationTime simulationTime = new SimulationTime(_curSimulationTime, _simulationInterval);
         long lowestNextSimulationTime = Long.MAX_VALUE;
         long nextQueueTm = Long.MAX_VALUE;
         boolean keepProcessing = true;
         boolean delayed = false;
+        boolean addToBuffer = true;
         List<SimulationEvent> buffer = new LinkedList<>();
-        WorkbenchSimulationController simulationController = new WorkbenchSimulationController(_twinExecutionEngine);
+        WorkbenchSimulationController simulationController = new WorkbenchSimulationController(_twinExecutionEngine, _simulationScheduler);
         WorkbenchProcessingContext processingContext = new WorkbenchProcessingContext(_twinExecutionEngine, simulationController);
         Date currentTime = new Date();
         currentTime.setTime(_curSimulationTime);
         int processed = 0;
         do {
+            addToBuffer = true;
             SimulationEvent next = _timeOrderedQueue.poll();
             if(next != null) {
                 if(next.getProxyState() == ProxyState.Active) {
@@ -102,10 +154,20 @@ class SimulationWorker implements Callable<SimulationStep> {
                             _logger.error("simulation processor threw an exception.", e);
                             result = ProcessingResult.NoUpdate;
                         }
-                        if(simulationController.getRequestedDelay() != Long.MIN_VALUE && simulationController.getRequestedDelay() != 0) {
+                        if(simulationController.delayRequested()) {
                             delayed = true;
-                            next.setPriority(simulationTime.getCurrentSimulationTime() + simulationController.getRequestedDelay());
-                            next.setNextSimulationTime(simulationTime.getCurrentSimulationTime() + simulationController.getRequestedDelay());
+                            long delay = simulationController.getRequestedDelay();
+                            if(delay == 0x0000e677d21fdbffL) {
+                                next.setPriority(simulationController.getRequestedDelay());
+                                next.setNextSimulationTime(simulationController.getRequestedDelay());
+                            } else if (delay == 0L) {
+                                next.setPriority(_curSimulationTime);
+                                next.setNextSimulationTime(_curSimulationTime);
+                                addToBuffer = false;
+                            } else {
+                                next.setPriority(simulationTime.getCurrentSimulationTime() + simulationController.getRequestedDelay());
+                                next.setNextSimulationTime(simulationTime.getCurrentSimulationTime() + simulationController.getRequestedDelay());
+                            }
                         } else {
                             next.setPriority(simulationTime.getNextSimulationTime());
                             next.setNextSimulationTime(simulationTime.getNextSimulationTime());
@@ -116,15 +178,25 @@ class SimulationWorker implements Callable<SimulationStep> {
                         if(simulationController.deleted()) {
                             result = ProcessingResult.NoUpdate;
                         }
-
+                        if(!simulationController.enqueue()) {
+                            // the user called "runThisInstance" -- the work item has already been reenqued for the
+                            // current time slice.
+                            addToBuffer = false;
+                        }
                     } else {
+                        synchronized (this) {
+                            _running = false;
+                        }
                         keepProcessing = false;
                     }
-                    if(!simulationController.deleted()) {
+                    if(!simulationController.deleted() && addToBuffer) {
                         buffer.add(next);
                     }
                 }
             } else {
+                synchronized (this) {
+                    _running = false;
+                }
                 keepProcessing  = false;
                 nextQueueTm     = Long.MAX_VALUE;
             }

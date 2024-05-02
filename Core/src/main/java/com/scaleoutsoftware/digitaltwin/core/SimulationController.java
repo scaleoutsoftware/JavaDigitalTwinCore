@@ -16,6 +16,7 @@
 package com.scaleoutsoftware.digitaltwin.core;
 
 import java.time.Duration;
+import java.util.Date;
 
 /**
  * The SimulationController interface is used to interact with the  running DigitalTwin simulation.
@@ -63,6 +64,20 @@ public interface SimulationController {
      * if the delay was not processed.
      */
     SendingResult delay(Duration duration);
+
+    /**
+     * <p>
+     * Delay simulation processing for this DigitalTwin instance, indefinitely.
+     * </p>
+     *
+     * <p>
+     * Simulation processing will be delayed until this instance is run with {@link SimulationController#runThisTwin()}.
+     * </p>
+     *
+     * @return {@link SendingResult#Handled} if the delay was processed or {@link SendingResult#NotHandled}
+     * if the delay was not processed.
+     */
+    SendingResult delayIndefinitely();
 
     /**
      * <p>
@@ -145,8 +160,19 @@ public interface SimulationController {
     SendingResult deleteThisInstance();
 
     /**
+     * Run this instance during this simulation step. The instance will be run using the models {@link SimulationProcessor#processModel(ProcessingContext, DigitalTwinBase, Date)}
+     * implementation.
+     *
+     * This will cause the simulation sub-system to run this instance regardless of the instances current
+     * {@link DigitalTwinBase#NextSimulationTime}.
+     */
+    void runThisInstance();
+
+    /**
      * Stop the simulation.
      * @return a {@link SimulationStatus#InstanceRequestedStop}.
      */
     SimulationStatus stopSimulation();
+
+
 }

@@ -24,14 +24,18 @@ import java.util.List;
 
 class WorkbenchSimulationController implements SimulationController {
     TwinExecutionEngine     _engine;
+    SimulationScheduler     _scheduler;
     private long            _requestedDelay;
+    private boolean         _delayRequested;
     private boolean         _deleted;
+    private boolean         _enqueue;
     private String          _modelName;
     private String          _id;
     private SimulationStatus _simulationStatus = SimulationStatus.Running;
 
-    public WorkbenchSimulationController(TwinExecutionEngine engine) {
-        _engine = engine;
+    public WorkbenchSimulationController(TwinExecutionEngine engine, SimulationScheduler scheduler) {
+        _engine     = engine;
+        _scheduler  = scheduler;
     }
 
     @Override
@@ -42,6 +46,14 @@ class WorkbenchSimulationController implements SimulationController {
     @Override
     public SendingResult delay(Duration duration) {
         _requestedDelay = duration.toMillis();
+        _delayRequested = true;
+        return SendingResult.Handled;
+    }
+
+    @Override
+    public SendingResult delayIndefinitely() {
+        _requestedDelay = 0x0000e677d21fdbffL;
+        _delayRequested = true;
         return SendingResult.Handled;
     }
 
@@ -117,16 +129,33 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
+    public void runThisTwin() {
+        try {
+            _scheduler.runThisInstance(_modelName, _id);
+            _enqueue = false;
+        } catch (WorkbenchException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
     public SimulationStatus stopSimulation() {
         _simulationStatus = SimulationStatus.InstanceRequestedStop;
         return _simulationStatus;
+    }
+
+    public boolean delayRequested() {
+        return _delayRequested;
     }
 
     public void reset(String modelName, String id) {
         _modelName      = modelName;
         _id             = id;
         _requestedDelay = Long.MIN_VALUE;
+        _delayRequested = false;
         _deleted        = false;
+        _enqueue        = true;
     }
 
     public long getRequestedDelay() {
@@ -135,6 +164,10 @@ class WorkbenchSimulationController implements SimulationController {
 
     public boolean deleted() {
         return _deleted;
+    }
+
+    public boolean enqueue() {
+        return _enqueue;
     }
 
     public SimulationStatus getSimulationStatus() {
