@@ -31,12 +31,14 @@ public class ModelSchema {
     private final String                            persistenceProvider;
     private final boolean                           enablePersistence;
     private final boolean                           enableSimulationSupport;
+    private final boolean                           enableMessageRecording;
     private final List<AlertProviderConfiguration>  alertProviders;
 
     private ModelSchema() {
         modelType = messageProcessorType = simulationProcessorType = messageType = assemblyName = azureDigitalTwinModelName = persistenceProvider = null;
         enablePersistence       = false;
         enableSimulationSupport = false;
+        enableMessageRecording  = false;
         alertProviders          = null;
     }
 
@@ -69,6 +71,42 @@ public class ModelSchema {
         alertProviders              = null;
         azureDigitalTwinModelName   = null;
         enablePersistence           = false;
+        enableMessageRecording      = false;
+        persistenceProvider         = null;
+    }
+
+    /**
+     * Creates a model schema from a digital twin class, a message processor class, and a message class.
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     * @param emr enable message recording for this model.
+     */
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            boolean emr) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = null;
+        enableSimulationSupport     = false;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        alertProviders              = null;
+        azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        enableMessageRecording      = emr;
         persistenceProvider         = null;
     }
 
@@ -103,6 +141,7 @@ public class ModelSchema {
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         azureDigitalTwinModelName   = null;
         enablePersistence           = false;
+        enableMessageRecording      = false;
         persistenceProvider         = null;
         alertProviders              = alertingProviders;
     }
@@ -136,13 +175,56 @@ public class ModelSchema {
         }
         modelType                   = dtClass;
         messageProcessorType        = mpClass;
-        simulationProcessorType     = null;
-        enableSimulationSupport     = false;
+        simulationProcessorType     = spClass;
+        enableSimulationSupport     = true;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         azureDigitalTwinModelName   = null;
         enablePersistence           = false;
         persistenceProvider         = null;
+        enableMessageRecording      = false;
+        alertProviders              = alertingProviders;
+    }
+
+    /**
+     * Creates a model schema from a digital twin class, a message processor class, a message class, and
+     * alert provider configurations.
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     * @param spClass the simulation processor class implementation.
+     * @param alertingProviders the alerting provider configurations.
+     * @param emr enable message recording for this model.
+     */
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String spClass,
+            List<AlertProviderConfiguration> alertingProviders,
+            boolean emr) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty()) ||
+                (spClass    == null || spClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass),
+                    (spClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = spClass;
+        enableSimulationSupport     = true;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        persistenceProvider         = null;
+        enableMessageRecording      = emr;
         alertProviders              = alertingProviders;
     }
 
@@ -178,6 +260,63 @@ public class ModelSchema {
         simulationProcessorType     = null;
         enableSimulationSupport     = false;
         messageType                 = msgClass;
+        enableMessageRecording      = false;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        persistenceProvider         = persistenceType.name();
+        switch (persistenceType) {
+            case AzureDigitalTwinsService:
+                azureDigitalTwinModelName   = adtName;
+                enablePersistence           = true;
+                break;
+            case SQLite:
+            case SQLServer:
+            case DynamoDb:
+                enablePersistence           = true;
+                azureDigitalTwinModelName   = null;
+                break;
+            default:
+                azureDigitalTwinModelName   = null;
+                enablePersistence           = false;
+                break;
+        }
+        alertProviders              = alertingProviders;
+    }
+
+    /**
+     * Creates a model schema from a digital twin class, a message processor class, a message class, and
+     * alert provider configurations.
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     * @param adtName the Azure Digital Twin model name.
+     * @param persistenceType the persistence provider type.
+     * @param alertingProviders the alerting provider configurations.
+     * @param emr enable message recording for this model.
+     */
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String adtName,
+            PersistenceProviderType persistenceType,
+            List<AlertProviderConfiguration> alertingProviders,
+            boolean emr) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = null;
+        enableSimulationSupport     = false;
+        messageType                 = msgClass;
+        enableMessageRecording      = emr;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         persistenceProvider         = persistenceType.name();
         switch (persistenceType) {
@@ -234,6 +373,67 @@ public class ModelSchema {
         messageProcessorType        = mpClass;
         simulationProcessorType     = simulationProcessorClass;
         enableSimulationSupport     = true;
+        enableMessageRecording      = false;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        persistenceProvider         = persistenceType.name();
+        switch (persistenceType) {
+            case AzureDigitalTwinsService:
+                azureDigitalTwinModelName   = adtName;
+                enablePersistence           = true;
+                break;
+            case SQLite:
+            case SQLServer:
+            case DynamoDb:
+                enablePersistence           = true;
+                azureDigitalTwinModelName   = null;
+                break;
+            default:
+                azureDigitalTwinModelName   = null;
+                enablePersistence           = false;
+                break;
+        }
+        alertProviders              = alertingProviders;
+    }
+
+    /**
+     * Creates a model schema from a digital twin class, a message processor class, a message class,
+     * a simulation processor class, an Azure Digital Twin Model name class, a persistence provider type,
+     * and an alert provider configuration.
+     *
+     * @param dtClass the digital twin class implementation.
+     * @param mpClass the message processor class implementation.
+     * @param msgClass a JSON serializable message class.
+     * @param simulationProcessorClass the simulation processor class implementation.
+     * @param adtName the Azure Digital Twin model name.
+     * @param persistenceType the persistence provider type.
+     * @param alertingProviders the alerting provider configurations.
+     * @param emr enable message recording for this model.
+     */
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String simulationProcessorClass,
+            String adtName,
+            PersistenceProviderType persistenceType,
+            List<AlertProviderConfiguration> alertingProviders,
+            boolean emr) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = simulationProcessorClass;
+        enableSimulationSupport     = true;
+        enableMessageRecording      = emr;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
         persistenceProvider         = persistenceType.name();
@@ -327,4 +527,13 @@ public class ModelSchema {
      * @return the persistence provider type.
      */
     public PersistenceProviderType getPersistenceProvider() { return PersistenceProviderType.fromString(persistenceProvider); }
+
+    /**
+     * Retrieves the message recording enabled status. True if this model should persist messages when message recording is active,
+     * false otherwise.
+     * @return True if message recording is enabled, false otherwise.
+     */
+    public boolean messageRecordingEnabled() {
+        return enableMessageRecording;
+    }
 }
