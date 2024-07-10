@@ -53,7 +53,8 @@ public enum TimerActionResult {
      * Convert an ordinal into a {@link TimerActionResult}.
      *
      * 0 = {@link TimerActionResult#Success}, 1 = {@link TimerActionResult#FailedTooManyTimers},
-     * 2 = {@link TimerActionResult#FailedNoSuchTimer}, 3 = {@link TimerActionResult#FailedInternalError}
+     * 2 = {@link TimerActionResult#FailedNoSuchTimer}, 3 = {@link TimerActionResult#FailedTimerAlreadyExists},
+     * 4 = {@link TimerActionResult#FailedInternalError}
      * @param val the ordinal value.
      * @return the associated {@link TimerActionResult} or throws an IllegalArgumentException for an unexpected
      * ordinal value.
@@ -67,6 +68,8 @@ public enum TimerActionResult {
             case 2:
                 return FailedNoSuchTimer;
             case 3:
+                return FailedTimerAlreadyExists;
+            case 4:
                 return FailedInternalError;
             default:
                 throw new IllegalArgumentException("No known TimerActionResult from value: " + val);
