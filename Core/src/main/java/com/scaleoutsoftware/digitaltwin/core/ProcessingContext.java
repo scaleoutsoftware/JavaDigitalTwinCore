@@ -27,6 +27,11 @@ import java.util.logging.Level;
 public abstract class ProcessingContext implements Serializable {
 
     /**
+     * Default constructor.
+     */
+    public ProcessingContext() {}
+
+    /**
      * <p>
      * Sends a message to a data source. This will route messages through the connector back to the data source.
      * </p>

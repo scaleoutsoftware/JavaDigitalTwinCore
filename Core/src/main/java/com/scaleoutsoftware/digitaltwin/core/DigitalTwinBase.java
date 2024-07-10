@@ -46,6 +46,11 @@ public abstract class DigitalTwinBase {
     public long NextSimulationTime = 0L;
 
     /**
+     * Default constructor.
+     */
+    public DigitalTwinBase() {}
+
+    /**
      * Retrieve the next simulation time in milliseconds.
      * @return the next simulation time in milliseconds.
      */

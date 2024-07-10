@@ -23,6 +23,12 @@ import java.io.Serializable;
  * @param <V> the type of messages processed by the real-time digital twin
  */
 public abstract class MessageProcessor<T extends DigitalTwinBase, V> extends MessageProcessorBase<T> implements Serializable {
+
+    /**
+     * Default constructor.
+     */
+    public MessageProcessor() {}
+
     /**
      * Processes a set of incoming messages and determines whether to update the real-time digital twin.
      * @param context optional context for processing.
