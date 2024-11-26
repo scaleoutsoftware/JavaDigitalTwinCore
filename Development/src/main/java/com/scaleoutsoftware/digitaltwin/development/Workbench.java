@@ -259,6 +259,7 @@ public class Workbench implements AutoCloseable {
     private long _now, _next;
     private SimulationStep _result = null;
     private boolean _simulationStarted = false;
+    private int _numWorkers = Runtime.getRuntime().availableProcessors();
 
 
     /**
@@ -266,6 +267,14 @@ public class Workbench implements AutoCloseable {
      */
     public Workbench() {
         _twinExecutionEngine = new TwinExecutionEngine(this);
+    }
+
+    /**
+     * Instantiate the workbench.
+     */
+    public Workbench(int numSimulationWorkers) {
+        _twinExecutionEngine = new TwinExecutionEngine(this);
+        _numWorkers = numSimulationWorkers;
     }
 
 
@@ -311,7 +320,7 @@ public class Workbench implements AutoCloseable {
         }
 
         validate(digitalTwinMessageProcessor, dtType);
-        _twinExecutionEngine.addDigitalTwin(modelName, digitalTwinMessageProcessor, simulationProcessor, dtType, messageClass);
+        _twinExecutionEngine.addDigitalTwin(modelName, digitalTwinMessageProcessor, simulationProcessor, dtType, messageClass, _numWorkers);
     }
 
     /**
@@ -705,6 +714,14 @@ public class Workbench implements AutoCloseable {
         } catch (Exception e) {
             throw new WorkbenchException("Could not instantiate DigitalTwin instance. Default constructor required.", e);
         }
+    }
+
+    public void addSharedModelData(String modelName, String key, byte[] value) {
+        _twinExecutionEngine.getModelData(modelName).put(key, value);
+    }
+
+    public void addGlobalModelData(String key, byte[] value) {
+        _twinExecutionEngine.getGlobalSharedData().put(key, value);
     }
 
     @Override

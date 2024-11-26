@@ -90,13 +90,16 @@ class SimulationWorker implements Callable<SimulationStep> {
     }
 
     public void runThisInstance(String model, String id) throws WorkbenchException {
-        SimulationEvent event = _events.get(String.format("%s%s",model,id));
+        SimulationEvent event = _events.remove(String.format("%s%s",model,id));
         if(event == null) {
             TwinProxy proxy = _twinExecutionEngine.getTwinProxy(model, id);
             event = new SimulationEventTwinImpl(_curSimulationTime, proxy, _simulationProcessor);
+        } else {
+            _timeOrderedQueue.remove(event);
         }
         WorkbenchSimulationController simulationController = new WorkbenchSimulationController(_twinExecutionEngine, _simulationScheduler);
         WorkbenchProcessingContext processingContext = new WorkbenchProcessingContext(_twinExecutionEngine, simulationController);
+        processingContext.reset(model, id, null);
         Date date = new Date();
         date.setTime(_curSimulationTime);
         event.processSimulationEvent(processingContext, date);
@@ -143,7 +146,7 @@ class SimulationWorker implements Callable<SimulationStep> {
             if(next != null) {
                 if(next.getProxyState() == ProxyState.Active) {
                     processed++;
-                    nextQueueTm                 = next.getPriority();
+                    nextQueueTm = next.getPriority();
                     if(next.getPriority() <= simulationTime.getCurrentSimulationTime()) {
                         simulationController.reset(_modelName, next.getId());
                         processingContext.reset(_modelName, next.getId(), null);
@@ -179,7 +182,7 @@ class SimulationWorker implements Callable<SimulationStep> {
                             result = ProcessingResult.NoUpdate;
                         }
                         if(!simulationController.enqueue()) {
-                            // the user called "runThisInstance" -- the work item has already been reenqued for the
+                            // the user called "runThisInstance" -- the work item has already been re-enqueued for the
                             // current time slice.
                             addToBuffer = false;
                         }

@@ -27,6 +27,7 @@ public class ModelSchema {
     private final String                            simulationProcessorType;
     private final String                            messageType;
     private final String                            assemblyName;
+    private final String                            entryPoint;
     private final String                            azureDigitalTwinModelName;
     private final String                            persistenceProvider;
     private final boolean                           enablePersistence;
@@ -35,7 +36,7 @@ public class ModelSchema {
     private final List<AlertProviderConfiguration>  alertProviders;
 
     private ModelSchema() {
-        modelType = messageProcessorType = simulationProcessorType = messageType = assemblyName = azureDigitalTwinModelName = persistenceProvider = null;
+        modelType = messageProcessorType = simulationProcessorType = messageType = assemblyName = entryPoint = azureDigitalTwinModelName = persistenceProvider = null;
         enablePersistence       = false;
         enableSimulationSupport = false;
         enableMessageRecording  = false;
@@ -68,6 +69,36 @@ public class ModelSchema {
         enableSimulationSupport     = false;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
+        alertProviders              = null;
+        azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        enableMessageRecording      = false;
+        persistenceProvider         = null;
+    }
+
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String ep) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = null;
+        enableSimulationSupport     = false;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = ep;
         alertProviders              = null;
         azureDigitalTwinModelName   = null;
         enablePersistence           = false;
@@ -103,6 +134,7 @@ public class ModelSchema {
         enableSimulationSupport     = false;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
         alertProviders              = null;
         azureDigitalTwinModelName   = null;
         enablePersistence           = false;
@@ -110,6 +142,38 @@ public class ModelSchema {
         persistenceProvider         = null;
     }
 
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String ep,
+            boolean emr) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = null;
+        enableSimulationSupport     = false;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = ep;
+        alertProviders              = null;
+        azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        enableMessageRecording      = emr;
+        persistenceProvider         = null;
+    }
+
+    // TODO
+
     /**
      * Creates a model schema from a digital twin class, a message processor class, a message class, and
      * alert provider configurations.
@@ -139,6 +203,7 @@ public class ModelSchema {
         enableSimulationSupport     = false;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
         azureDigitalTwinModelName   = null;
         enablePersistence           = false;
         enableMessageRecording      = false;
@@ -179,6 +244,40 @@ public class ModelSchema {
         enableSimulationSupport     = true;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
+        azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        persistenceProvider         = null;
+        enableMessageRecording      = false;
+        alertProviders              = alertingProviders;
+    }
+
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String spClass,
+            String ep,
+            List<AlertProviderConfiguration> alertingProviders) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty()) ||
+                (spClass    == null || spClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass),
+                    (spClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = spClass;
+        enableSimulationSupport     = true;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = ep;
         azureDigitalTwinModelName   = null;
         enablePersistence           = false;
         persistenceProvider         = null;
@@ -221,6 +320,41 @@ public class ModelSchema {
         enableSimulationSupport     = true;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
+        azureDigitalTwinModelName   = null;
+        enablePersistence           = false;
+        persistenceProvider         = null;
+        enableMessageRecording      = emr;
+        alertProviders              = alertingProviders;
+    }
+
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String spClass,
+            String ep,
+            List<AlertProviderConfiguration> alertingProviders,
+            boolean emr) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty()) ||
+                (spClass    == null || spClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass),
+                    (spClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = spClass;
+        enableSimulationSupport     = true;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = ep;
         azureDigitalTwinModelName   = null;
         enablePersistence           = false;
         persistenceProvider         = null;
@@ -262,6 +396,7 @@ public class ModelSchema {
         messageType                 = msgClass;
         enableMessageRecording      = false;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
         persistenceProvider         = persistenceType.name();
         switch (persistenceType) {
             case AzureDigitalTwinsService:
@@ -318,6 +453,7 @@ public class ModelSchema {
         messageType                 = msgClass;
         enableMessageRecording      = emr;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
         persistenceProvider         = persistenceType.name();
         switch (persistenceType) {
             case AzureDigitalTwinsService:
@@ -376,6 +512,7 @@ public class ModelSchema {
         enableMessageRecording      = false;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
         persistenceProvider         = persistenceType.name();
         switch (persistenceType) {
             case AzureDigitalTwinsService:
@@ -436,6 +573,56 @@ public class ModelSchema {
         enableMessageRecording      = emr;
         messageType                 = msgClass;
         assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = null;
+        persistenceProvider         = persistenceType.name();
+        switch (persistenceType) {
+            case AzureDigitalTwinsService:
+                azureDigitalTwinModelName   = adtName;
+                enablePersistence           = true;
+                break;
+            case SQLite:
+            case SQLServer:
+            case DynamoDb:
+            case CosmosDb:
+                enablePersistence           = true;
+                azureDigitalTwinModelName   = null;
+                break;
+            default:
+                azureDigitalTwinModelName   = null;
+                enablePersistence           = false;
+                break;
+        }
+        alertProviders              = alertingProviders;
+    }
+
+    public ModelSchema(
+            String dtClass,
+            String mpClass,
+            String msgClass,
+            String simulationProcessorClass,
+            String adtName,
+            String ep,
+            PersistenceProviderType persistenceType,
+            List<AlertProviderConfiguration> alertingProviders,
+            boolean emr) {
+        if( (dtClass    == null || dtClass.isEmpty()) ||
+                (mpClass    == null || mpClass.isEmpty()) ||
+                (msgClass   == null || msgClass.isEmpty())
+        ) {
+            throw new IllegalArgumentException(String.format("Expected value for dtClass, mpClass, and msgClass; actual values: %s, %s, %s",
+                    (dtClass == null ? "null dtClass" : dtClass),
+                    (mpClass == null ? "null mpClass" : mpClass),
+                    (msgClass == null ? "null mpClass" : msgClass)
+            ));
+        }
+        modelType                   = dtClass;
+        messageProcessorType        = mpClass;
+        simulationProcessorType     = simulationProcessorClass;
+        enableSimulationSupport     = true;
+        enableMessageRecording      = emr;
+        messageType                 = msgClass;
+        assemblyName                = "NOT_USED_BY_JAVA_MODELS";
+        entryPoint                  = ep;
         persistenceProvider         = persistenceType.name();
         switch (persistenceType) {
             case AzureDigitalTwinsService:
@@ -535,5 +722,13 @@ public class ModelSchema {
      */
     public boolean messageRecordingEnabled() {
         return enableMessageRecording;
+    }
+
+    /**
+     * Retrieves the packaged model's entry point (fully-qualified class name -- FQCN -- of a Java main) for launching.
+     * @return the entry point for launching.
+     */
+    public String getEntryPoint() {
+        return entryPoint;
     }
 }

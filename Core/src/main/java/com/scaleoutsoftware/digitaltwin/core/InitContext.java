@@ -41,6 +41,18 @@ public abstract class InitContext {
     public abstract <T extends DigitalTwinBase> TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler);
 
     /**
+     * Retrieve a {@link SharedData} accessor for this model's shared data.
+     * @return a {@link SharedData} instance.
+     */
+    public abstract SharedData getSharedModelData();
+
+    /**
+     * Retrieve a {@link SharedData} accessor for globally shared data.
+     * @return a {@link SharedData} instance.
+     */
+    public abstract SharedData getSharedGlobalData();
+
+    /**
      * Get the model-unique Id identifier of the initializing digital twin instance.
      * @return the id identifier.
      */
