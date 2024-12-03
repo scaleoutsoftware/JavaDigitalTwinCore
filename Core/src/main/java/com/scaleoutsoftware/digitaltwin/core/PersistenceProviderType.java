@@ -27,6 +27,11 @@ public enum PersistenceProviderType implements Serializable {
      */
     AzureDigitalTwinsService("AzureDigitalTwinsService", 1),
     /**
+     * Enum for CosmosDB
+     */
+    CosmosDb("Azure Cosmos DB", 6),
+
+    /**
      * Enum for DynamoDB
      */
     DynamoDb("DynamoDB", 5),
@@ -77,6 +82,8 @@ public enum PersistenceProviderType implements Serializable {
                     return SQLServer;
                 case "DynamoDB":
                     return DynamoDb;
+                case "Azure Cosmos DB":
+                    return CosmosDb;
                 default:
                     return null;
             }
@@ -101,6 +108,8 @@ public enum PersistenceProviderType implements Serializable {
                 return SQLite;
             case 5:
                 return DynamoDb;
+            case 6:
+                return CosmosDb;
             default:
                 return null;
         }
