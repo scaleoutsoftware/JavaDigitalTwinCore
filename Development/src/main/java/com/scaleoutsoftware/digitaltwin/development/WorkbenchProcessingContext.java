@@ -53,6 +53,8 @@ class WorkbenchProcessingContext extends ProcessingContext {
         _twinInstance   = instance;
         _forceSave      = false;
         _source         = source;
+        _modelData      = _twinExecutionEngine.getModelData(model);
+        _globalData     = _twinExecutionEngine.getGlobalSharedData();
     }
 
     void reset(String model, String id, String source) {
@@ -112,8 +114,14 @@ class WorkbenchProcessingContext extends ProcessingContext {
     public SendingResult sendToDigitalTwin(String model, String id, Object jsonSerializableMessage) {
         try {
             if(_twinExecutionEngine.getTwinInstance(model, id) != null) {
-                List<Object> jsonSerializableMessages = new LinkedList<>();
-                jsonSerializableMessages.add(jsonSerializableMessage);
+                List<Object> jsonSerializableMessages;
+                if(jsonSerializableMessage instanceof List) {
+                    jsonSerializableMessages = (List<Object>)jsonSerializableMessage;
+                } else {
+                    jsonSerializableMessages = new LinkedList<>();
+                    jsonSerializableMessages.add(jsonSerializableMessage);
+                }
+
                 return _twinExecutionEngine.run(model, id, null, jsonSerializableMessages) != null ? SendingResult.Handled : SendingResult.NotHandled;
             } else {
                 return SendingResult.NotHandled;

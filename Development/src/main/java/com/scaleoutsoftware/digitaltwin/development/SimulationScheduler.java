@@ -29,17 +29,8 @@ class SimulationScheduler {
     static AtomicInteger PROCESSED   = new AtomicInteger(0);
     static AtomicInteger QUEUED      = new AtomicInteger(0);
     static AtomicInteger SENT        = new AtomicInteger(0);
-    private static final int NUM_SIMULATION_WORKERS     = Runtime.getRuntime().availableProcessors();
-    private final List<SimulationWorker> _workers       = new ArrayList<>(NUM_SIMULATION_WORKERS);
-    private final ExecutorService _simulationService    = Executors.newFixedThreadPool(NUM_SIMULATION_WORKERS, new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "SimulationWorker");
-            t.setName(t.getName()+"-"+t.getId());
-            t.setDaemon(true);
-            return t;
-        }
-    });
+    private final List<SimulationWorker>                    _workers;
+    private final ExecutorService                           _simulationService;
     private final String                                    _modelName;
     private final SimulationProcessor                       _simulationProcessor;
     private final Logger                                    _logger     = LogManager.getLogger(SimulationScheduler.class);
@@ -50,10 +41,21 @@ class SimulationScheduler {
     public SimulationScheduler(String modelName,
                      Class digitalTwinClass,
                      SimulationProcessor<? extends DigitalTwinBase> modelProcessor,
-                     TwinExecutionEngine executor) {
+                     TwinExecutionEngine executor,
+                     int numWorkers) {
         _modelName              = modelName;
         _simulationProcessor    = modelProcessor;
-        for(int i = 0; i < NUM_SIMULATION_WORKERS; i++) {
+        _workers                = new ArrayList<>(numWorkers);
+        _simulationService      = Executors.newFixedThreadPool(numWorkers, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r, "SimulationWorker");
+                t.setName(t.getName()+"-"+t.getId());
+                t.setDaemon(true);
+                return t;
+            }
+        });
+        for(int i = 0; i < numWorkers; i++) {
             _workers.add(new SimulationWorker(i, _modelName, _simulationProcessor, digitalTwinClass, executor, this));
         }
     }
@@ -152,7 +154,7 @@ class SimulationScheduler {
     }
 
     private int findSlotId(String id) {
-        return (int)((Constants.getHash(id.getBytes(StandardCharsets.UTF_8))) % (long)NUM_SIMULATION_WORKERS);
+        return (int)((Constants.getHash(id.getBytes(StandardCharsets.UTF_8))) % (long)_workers.size());
     }
 
 

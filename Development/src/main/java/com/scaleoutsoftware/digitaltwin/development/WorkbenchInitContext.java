@@ -38,6 +38,16 @@ class WorkbenchInitContext extends InitContext {
     }
 
     @Override
+    public SharedData getSharedModelData() {
+        return new WorkbenchSharedData(_twinExecutionEngine.getModelData(_model));
+    }
+
+    @Override
+    public SharedData getSharedGlobalData() {
+        return new WorkbenchSharedData(_twinExecutionEngine.getGlobalSharedData());
+    }
+
+    @Override
     public String getId() {
         return _id;
     }

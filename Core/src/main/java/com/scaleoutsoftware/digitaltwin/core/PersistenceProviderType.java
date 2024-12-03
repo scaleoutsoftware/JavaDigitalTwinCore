@@ -49,11 +49,20 @@ public enum PersistenceProviderType implements Serializable {
      */
     Unconfigured("", 0);
 
-    private String _name;
-    private int _value;
+    private final String _name;
+    private final int _value;
     PersistenceProviderType(String name, int ordinal) {
         _name = name;
         _value = ordinal;
+    }
+
+
+    public String getName() {
+        return _name;
+    }
+
+    public int getServiceOrdinalValue() {
+        return _value;
     }
 
     /**

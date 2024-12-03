@@ -69,13 +69,13 @@ class TwinExecutionEngine implements Closeable {
         _messageProcessorValueTypes.put(digitalTwinModelName, messageClass);
     }
 
-    void addDigitalTwin(String digitalTwinModelName, MessageProcessor digitalTwinMessageProcessor, SimulationProcessor simulationProcessor, Class dtType, Class messageClass) {
+    void addDigitalTwin(String digitalTwinModelName, MessageProcessor digitalTwinMessageProcessor, SimulationProcessor simulationProcessor, Class dtType, Class messageClass, int numWorkers) {
         _modelNames.add(digitalTwinModelName);
         _digitalTwins.put(digitalTwinModelName, dtType);
         _messageProcessors.put(digitalTwinModelName, digitalTwinMessageProcessor);
         _simulationProcessors.put(digitalTwinModelName, simulationProcessor);
         _messageProcessorValueTypes.put(digitalTwinModelName, messageClass);
-        _simulationSchedulers.put(digitalTwinModelName, new SimulationScheduler(digitalTwinModelName, dtType, simulationProcessor, this));
+        _simulationSchedulers.put(digitalTwinModelName, new SimulationScheduler(digitalTwinModelName, dtType, simulationProcessor, this, numWorkers));
     }
 
     void addTimer(String modelName, String id, String timerName, TimerType type, Duration interval, TimerHandler handler) {
