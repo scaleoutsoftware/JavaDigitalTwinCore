@@ -16,6 +16,8 @@
 package com.scaleoutsoftware.digitaltwin.development;
 
 enum WorkbenchSimulationFlags {
+    // Start the simulation
+    Start,
     // Run the simulation
     Run,
     // Stop the simulation

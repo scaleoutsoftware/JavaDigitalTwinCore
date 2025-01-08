@@ -107,6 +107,7 @@ public class TestWorkbench {
                             if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
                                 System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
                             }
+                            result = sharedData.put("modelTest", "assert".getBytes(StandardCharsets.UTF_8));
                             sharedData = processingContext.getSharedGlobalData();
                             result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
                             if(result.getStatus() == CacheOperationStatus.ObjectPut) {
@@ -120,6 +121,7 @@ public class TestWorkbench {
                             if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
                                 System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
                             }
+                            result = sharedData.put("globalTest", "assert".getBytes(StandardCharsets.UTF_8));
                             break;
                         case "WakeUp":
                             SimulationController controller = processingContext.getSimulationController();
@@ -282,6 +284,8 @@ public class TestWorkbench {
                 System.out.println("Waking up sleeper...");
                 processingContext.sendToDigitalTwin(_modelIdToMessage, _instanceIdToMessage, new SimpleMessage("WakeUp", 23));
                 return ProcessingResult.UpdateDigitalTwin;
+            } else if (simpleDigitalTwin.getId().compareTo("initSimulation") == 0) {
+                return ProcessingResult.UpdateDigitalTwin;
             }
             long delay = Long.parseLong(simpleDigitalTwin.getId());
             controller.delay(Duration.ofSeconds(delay));
@@ -292,6 +296,15 @@ public class TestWorkbench {
                 SimpleMessage telemetry = new SimpleMessage("SendToSource", 23);
                 controller.emitTelemetry("Simple", telemetry);
             }
+            return ProcessingResult.UpdateDigitalTwin;
+        }
+
+        @Override
+        public ProcessingResult onInitSimulation(InitSimulationContext ctx, SimpleDigitalTwin simpleDigitalTwin, Date date) {
+            if(simpleDigitalTwin.getId().compareTo("initSimulation") == 0) {
+                timesInvoked.set(1000);
+            }
+
             return ProcessingResult.UpdateDigitalTwin;
         }
     }
@@ -785,6 +798,7 @@ public class TestWorkbench {
             workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
             workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
             String schemaAsJson = workbench.generateModelSchema("");
+            Assert.assertNotNull(schemaAsJson);
         } catch (Exception e) {
             throw e;
         }
@@ -797,6 +811,14 @@ public class TestWorkbench {
             LinkedList<Object> messages = new LinkedList<>();
             messages.add(new SimpleMessage("SharedData", 29));
             workbench.send("Simple", "23", messages);
+            CacheResult result = workbench.getSharedModelData("Simple").get("modelTest");
+            Assert.assertEquals(CacheOperationStatus.ObjectRetrieved, result.getStatus());
+            Assert.assertEquals("modelTest", result.getKey());
+            Assert.assertEquals("assert", new String(result.getValue(), StandardCharsets.UTF_8));
+            result = workbench.getSharedGlobalData("Simple").get("globalTest");
+            Assert.assertEquals(CacheOperationStatus.ObjectRetrieved, result.getStatus());
+            Assert.assertEquals("globalTest", result.getKey());
+            Assert.assertEquals("assert", new String(result.getValue(), StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw e;
         }
@@ -814,6 +836,34 @@ public class TestWorkbench {
             long stopTimeMs = startTimeMs + 15000L;
             long step = 1000L;
             workbench.runSimulation(startTimeMs, stopTimeMs, 1, step);
+            SimpleDigitalTwin waker = (SimpleDigitalTwin) workbench.getInstances("Simple").get("waker");
+            SimpleDigitalTwin sleeper = (SimpleDigitalTwin) workbench.getInstances("Simple2").get("sleeper");
+            Assert.assertNotNull(waker);
+            Assert.assertNotNull(sleeper);
+            Assert.assertEquals("awake", waker._stringProp);
+            Assert.assertEquals("messagesent", sleeper._stringProp);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Test
+    public void TestWorkbenchInitSimulation() throws Exception {
+        try (Workbench workbench = new Workbench()) {
+            SimpleSimProcessor processor = new SimpleSimProcessor(false);
+            workbench.addSimulationModel("Simple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+
+            workbench.addInstance("Simple", "initSimulation", new SimpleDigitalTwin("waker"));
+
+            long simRuntimeMs = 15000L;
+            long startTimeMs = System.currentTimeMillis();
+            long stopTimeMs = startTimeMs + simRuntimeMs;
+            int speedup = 1;
+            long step = 1000L;
+            long expectedInvokes = simRuntimeMs/1000L;
+            int initSimExpectedInvokes = 1000;
+            workbench.runSimulation(startTimeMs, stopTimeMs, speedup, step);
+            Assert.assertEquals(expectedInvokes + initSimExpectedInvokes, processor.timesInvoked.get());
         } catch (Exception e) {
             throw e;
         }

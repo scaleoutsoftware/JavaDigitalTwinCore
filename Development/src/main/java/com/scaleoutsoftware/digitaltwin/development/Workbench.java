@@ -372,6 +372,8 @@ public class Workbench implements AutoCloseable {
         SimulationStep ret, result = null;
         SimulationStepArgs args;
         long now, curTime, start, end, deltaTm, delta, wait, numItv;
+        args = new SimulationStepArgs(startTime, interval, WorkbenchSimulationFlags.Start);
+        _twinExecutionEngine.runSimulationStep(args);
         SimulationStatus status = SimulationStatus.Running;
         now = curTime = startTime;
         while(status == SimulationStatus.Running &&
@@ -544,6 +546,18 @@ public class Workbench implements AutoCloseable {
 
         ConcurrentHashMap<String, ConcurrentLinkedQueue<AlertMessage>> perModelMessages = ALERT_MESSAGES.getOrDefault(model, new ConcurrentHashMap<>());
         return Arrays.asList(perModelMessages.get(alertProvider).toArray(new AlertMessage[0]));
+    }
+
+    public SharedData getSharedModelData(String model) throws WorkbenchException {
+        if(_twinExecutionEngine.hasModel(model)) {
+            return new WorkbenchSharedData(_twinExecutionEngine.getModelData(model));
+        } else {
+            throw new WorkbenchException("Workbench does not contain model " + model);
+        }
+    }
+
+    public SharedData getSharedGlobalData(String model) throws WorkbenchException {
+        return new WorkbenchSharedData(_twinExecutionEngine.getGlobalSharedData());
     }
 
     /**

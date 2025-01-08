@@ -66,7 +66,7 @@ class SimulationWorker implements Callable<SimulationStep> {
     }
 
     public void addTwinToQueue(TwinProxy proxy) {
-        SimulationEvent event = new SimulationEventTwinImpl(_curSimulationTime, proxy, _simulationProcessor);
+        SimulationEvent event = new SimulationEventTwinImpl(_curSimulationTime, proxy, _simulationProcessor, new WorkbenchSharedData(_twinExecutionEngine.getGlobalSharedData()), new WorkbenchSharedData(_twinExecutionEngine.getModelData(_modelName)));
         _timeOrderedQueue.add(event);
         _events.put(String.format("%s%s",event.getModel(),event.getId()), event);
     }
@@ -89,11 +89,17 @@ class SimulationWorker implements Callable<SimulationStep> {
         _events.remove(String.format("%s%s",event.getModel(),event.getId()));
     }
 
+    void initSimulation(Date startTime) {
+        for(SimulationEvent event : _events.values()) {
+            event.simulationInit(startTime);
+        }
+    }
+
     public void runThisInstance(String model, String id) throws WorkbenchException {
         SimulationEvent event = _events.remove(String.format("%s%s",model,id));
         if(event == null) {
             TwinProxy proxy = _twinExecutionEngine.getTwinProxy(model, id);
-            event = new SimulationEventTwinImpl(_curSimulationTime, proxy, _simulationProcessor);
+            event = new SimulationEventTwinImpl(_curSimulationTime, proxy, _simulationProcessor, new WorkbenchSharedData(_twinExecutionEngine.getGlobalSharedData()), new WorkbenchSharedData(_twinExecutionEngine.getModelData(_modelName)));
         } else {
             _timeOrderedQueue.remove(event);
         }

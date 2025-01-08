@@ -37,6 +37,10 @@ abstract class SimulationEvent implements Comparable<SimulationEvent> {
 
     abstract void setProxyState(ProxyState newState);
 
+    abstract void handleResetNextSimulationTime();
+
+    abstract void simulationInit(Date simulationStartTime);
+
     long getPriority() {
         return _priority;
     }
@@ -56,7 +60,7 @@ abstract class SimulationEvent implements Comparable<SimulationEvent> {
         handleResetNextSimulationTime();
     }
 
-    abstract void handleResetNextSimulationTime();
+
 
     @Override
     public int compareTo(SimulationEvent other) {

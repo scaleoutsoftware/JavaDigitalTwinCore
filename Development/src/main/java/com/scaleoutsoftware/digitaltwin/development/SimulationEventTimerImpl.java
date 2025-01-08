@@ -55,4 +55,9 @@ class SimulationEventTimerImpl extends SimulationEvent {
     @Override
     void handleResetNextSimulationTime() {
     }
+
+    @Override
+    void simulationInit(Date simulationStartTime) {
+
+    }
 }

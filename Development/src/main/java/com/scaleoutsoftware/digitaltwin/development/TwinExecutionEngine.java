@@ -228,12 +228,12 @@ class TwinExecutionEngine implements Closeable {
     }
 
     SendingResult sendToSource(String source, String model, String id, List<Object> jsonSerializableMessage) throws WorkbenchException {
-        if(_modelNames.contains(source)) {
+        if (_modelNames.contains(source)) {
             run(source, id, null, jsonSerializableMessage);
             return SendingResult.Handled;
         } else {
             String msg = _gson.toJson(jsonSerializableMessage);
-            ConcurrentHashMap<String, List<String>> messagesByModel = _workbench.SOURCE_MESSAGES.getOrDefault(model, new ConcurrentHashMap<String,List<String>>());
+            ConcurrentHashMap<String, List<String>> messagesByModel = _workbench.SOURCE_MESSAGES.getOrDefault(model, new ConcurrentHashMap<String, List<String>>());
             List<String> messages = messagesByModel.getOrDefault(id, new LinkedList<>());
             messages.add(msg);
             messagesByModel.put(id, messages);

@@ -19,6 +19,7 @@ import com.scaleoutsoftware.digitaltwin.core.*;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,6 +42,11 @@ class WorkbenchSimulationController implements SimulationController {
     @Override
     public Duration getSimulationTimeIncrement() {
         return null;
+    }
+
+    @Override
+    public Date getSimulationStartTime() {
+        return _scheduler.getSimulationStartTime();
     }
 
     @Override

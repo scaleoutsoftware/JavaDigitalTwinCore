@@ -32,6 +32,18 @@ public interface SimulationController {
     Duration getSimulationTimeIncrement();
 
     /**
+     *
+     */
+
+    /**
+     * <p>
+     * Retrieves the simulation start time.
+     * </p>
+     * @return the simulation start time.
+     */
+    Date getSimulationStartTime();
+
+    /**
      * <p>
      * Delay simulation processing for this DigitalTwin instance for a duration of time.
      * </p>

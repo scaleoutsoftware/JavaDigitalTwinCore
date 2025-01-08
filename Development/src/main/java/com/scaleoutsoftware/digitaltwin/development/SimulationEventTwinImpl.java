@@ -15,9 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.DigitalTwinBase;
-import com.scaleoutsoftware.digitaltwin.core.ProcessingContext;
-import com.scaleoutsoftware.digitaltwin.core.SimulationProcessor;
+import com.scaleoutsoftware.digitaltwin.core.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -26,11 +24,15 @@ import java.util.Objects;
 class SimulationEventTwinImpl extends SimulationEvent {
     SimulationProcessor _processor;
     TwinProxy           _proxy;
+    SharedData          _modelSharedData;
+    SharedData          _globalSharedData;
 
-    SimulationEventTwinImpl(long priority, TwinProxy proxy, SimulationProcessor processor) {
+    SimulationEventTwinImpl(long priority, TwinProxy proxy, SimulationProcessor processor, SharedData modelSharedData, SharedData globalSharedData) {
         super(proxy.getInstance().Model, proxy.getInstance().Id, priority);
-        _proxy      = proxy;
-        _processor  = processor;
+        _proxy              = proxy;
+        _processor          = processor;
+        _modelSharedData    = modelSharedData;
+        _globalSharedData   = globalSharedData;
     }
 
     @Override
@@ -64,6 +66,16 @@ class SimulationEventTwinImpl extends SimulationEvent {
         DigitalTwinBase base = _proxy.getInstance();
         base.NextSimulationTime = _nextSimulationTime;
         _proxy.setInstance(base);
+    }
+
+    @Override
+    void simulationInit(Date simulationStartTime) {
+        InitSimulationContext context = new WorkbenchInitSimulationContext(_globalSharedData, _modelSharedData);
+        synchronized (_proxy) {
+            DigitalTwinBase base = _proxy.getInstance();
+            _processor.onInitSimulation(context, base, simulationStartTime);
+            _proxy.setInstance(base);
+        }
     }
 
     @Override

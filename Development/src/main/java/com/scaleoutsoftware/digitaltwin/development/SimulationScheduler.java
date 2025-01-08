@@ -35,6 +35,7 @@ class SimulationScheduler {
     private final SimulationProcessor                       _simulationProcessor;
     private final Logger                                    _logger     = LogManager.getLogger(SimulationScheduler.class);
     private long                                            _curSimulationTime;
+    private Date                                            _simulationStartTime;
     private boolean                                         _isActive;
 
 
@@ -60,8 +61,8 @@ class SimulationScheduler {
         }
     }
 
-    // -------------- public methods ----------------
-    public SimulationStep runSimulation(SimulationStepArgs runSimulationEventArgs) {
+    // -------------- package private methods ----------------
+    SimulationStep runSimulation(SimulationStepArgs runSimulationEventArgs) {
         _logger.info("Received run simulation event with args: " + runSimulationEventArgs.getCurSimulationTime() + " iterationSize: " + runSimulationEventArgs.getIterationSize() +  " flags: " + runSimulationEventArgs.getSimulationFlags() );
         long current = System.currentTimeMillis();
         SimulationStep ret;
@@ -73,12 +74,17 @@ class SimulationScheduler {
                 worker.shutdown();
             }
             return new SimulationStep(SimulationStatus.UserRequested,_curSimulationTime);
+        } if(runSimulationEventArgs.getSimulationFlags() == WorkbenchSimulationFlags.Start) {
+            _logger.info("Starting simulation; initializing instances.");
+            for(SimulationWorker worker : _workers) {
+                worker.initSimulation(new Date(runSimulationEventArgs.getCurSimulationTime()));
+            }
+            return new SimulationStep(SimulationStatus.Running,_curSimulationTime);
         } else {
             ret = runSimulationStep(runSimulationEventArgs);
         }
 
         _logger.info(String.format("runSim complete in %s ms... returning next: %s", (System.currentTimeMillis()-current), ret));
-        _logger.info(String.format("Queued: %s Processed: %s Sent: %s", QUEUED.getAndSet(0), PROCESSED.getAndSet(0), SENT.getAndSet(0)));
         return ret;
     }
 
@@ -92,6 +98,16 @@ class SimulationScheduler {
     void setStatus(boolean active) {
         _isActive = active;
     }
+
+    Date getSimulationStartTime() {
+        return _simulationStartTime;
+    }
+
+    void setSimulationStartTime(Date simulationStartTime) {
+        _simulationStartTime = simulationStartTime;
+    }
+
+
 
     // -------------- private methods ----------------
     private SimulationStep runSimulationStep(SimulationStepArgs args) {
