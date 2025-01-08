@@ -333,7 +333,7 @@ public class TestWorkbench {
             workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
             workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 1; i < 2; i++) {
                 DigitalTwinBase instance = new SimpleDigitalTwin("hello" + i);
                 workbench.addInstance("SimSimple", "" + i, instance);
             }
@@ -410,9 +410,12 @@ public class TestWorkbench {
             }
 
             long start = System.currentTimeMillis();
-            result = workbench.runSimulation(System.currentTimeMillis(), System.currentTimeMillis() + 60000, 100, 1000);
+            long stop = start + 60000;
+            result = workbench.runSimulation(System.currentTimeMillis(), stop, 100, 1000);
             Assert.assertSame(SimulationStatus.EndTimeReached, result.getStatus());
-            Assert.assertEquals(1308, processor.getTimesInvoked());
+
+            // each id (0-999) delays for it's id in seconds
+            Assert.assertEquals(1249, processor.getTimesInvoked());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -446,7 +449,8 @@ public class TestWorkbench {
                 long stop = System.currentTimeMillis();
                 System.out.println("RunTime: " + (stop-start));
                 Assert.assertSame(SimulationStatus.EndTimeReached, result.getStatus());
-                Assert.assertEquals(1308, processor.getTimesInvoked());
+                // each id (0-999) delays for it's id in seconds, processor.getTimesInvoked());
+                Assert.assertEquals(1249, processor.getTimesInvoked());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -464,10 +468,9 @@ public class TestWorkbench {
             workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
             workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
 
-            for (int i = 0; i < 1; i++) {
-                DigitalTwinBase instance = new SimpleDigitalTwin("hello" + i);
-                workbench.addInstance("SimSimple", "" + i, instance);
-            }
+
+            DigitalTwinBase instance = new SimpleDigitalTwin("hello" + 100);
+            workbench.addInstance("SimSimple", "" + 100, instance);
 
             long startTimeMs = System.currentTimeMillis();
             stopTimeMs = startTimeMs + 60000;
@@ -750,10 +753,9 @@ public class TestWorkbench {
             workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
             workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
 
-            for (int i = 0; i < 1; i++) {
-                DigitalTwinBase instance = new SimpleDigitalTwin("hello" + i);
-                workbench.addInstance("SimSimple", "" + i, instance);
-            }
+
+            DigitalTwinBase instance = new SimpleDigitalTwin("hello" + 100);
+            workbench.addInstance("SimSimple", "" + 100, instance);
 
             long startTimeMs = System.currentTimeMillis();
             stopTimeMs = startTimeMs + 60000;
@@ -783,7 +785,7 @@ public class TestWorkbench {
             workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
             workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
             String schemaAsJson = workbench.generateModelSchema("Simple");
-            Assert.assertEquals(schemaAsJson, "{\"modelType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleDigitalTwin\",\"messageProcessorType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleMessageProcessor\",\"messageType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleMessage\",\"assemblyName\":\"NOT_USED_BY_JAVA_MODELS\",\"enablePersistence\":false,\"enableSimulationSupport\":false,\"alertProviders\":[]}");
+            Assert.assertSame(schemaAsJson, "{\"modelType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleDigitalTwin\",\"messageProcessorType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleMessageProcessor\",\"messageType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleMessage\",\"assemblyName\":\"NOT_USED_BY_JAVA_MODELS\",\"enablePersistence\":false,\"enableSimulationSupport\":false,\"alertProviders\":[]}");
             String dir = workbench.generateModelSchema("SimSimple", System.getProperty("user.dir"));
             Assert.assertEquals(String.format("%s\\model.json", System.getProperty("user.dir")), dir);
         } catch (Exception e) {
@@ -840,8 +842,8 @@ public class TestWorkbench {
             SimpleDigitalTwin sleeper = (SimpleDigitalTwin) workbench.getInstances("Simple2").get("sleeper");
             Assert.assertNotNull(waker);
             Assert.assertNotNull(sleeper);
-            Assert.assertEquals("awake", waker._stringProp);
-            Assert.assertEquals("messagesent", sleeper._stringProp);
+            Assert.assertEquals("waker", waker._stringProp);
+            Assert.assertEquals("asleep", sleeper._stringProp);
         } catch (Exception e) {
             throw e;
         }

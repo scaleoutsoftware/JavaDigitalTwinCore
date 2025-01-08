@@ -385,7 +385,7 @@ public class Workbench implements AutoCloseable {
             end     = System.currentTimeMillis();
             delta   = result.getTime() - curTime;
             numItv  = delta/interval;
-            numItv  = delta%numItv != 0 ? numItv+1 : numItv;
+            numItv  = numItv > 0 ? delta%numItv != 0 ? numItv+1 : numItv : numItv;
             deltaTm = end-start;
             wait    = deltaTm >= interval ? 0L : (long)((interval-deltaTm)/speedup);
             status  = result.getStatus();
@@ -448,7 +448,7 @@ public class Workbench implements AutoCloseable {
             _result     = _twinExecutionEngine.runSimulationStep(args);
             delta       = _result.getTime() - _curTime;
             numItv      = delta/_interval;
-            numItv      = delta%numItv != 0 ? numItv+1 : numItv;
+            numItv      = numItv > 0 ? delta%numItv != 0 ? numItv+1 : numItv : numItv+1;
             _curTime    = _curTime+(numItv*_interval);
             _next       = _curTime;
             return new SimulationStep(_result.getStatus(), _now);
