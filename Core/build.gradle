@@ -19,8 +19,18 @@ configurations {
     archives
 }
 
-task myJavadocs(type: Javadoc) {
+task createJavadocs(type: Javadoc) {
   source = sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: createJavadocs) {
+    from javadoc.destinationDir
+}
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    setArchiveClassifier('sources')
+    from sourceSets.main.allSource
 }
 
 jar {
@@ -29,5 +39,11 @@ jar {
                 'Implementation-Version': project.version)
     }
 }
+
+task copyRuntime(type: GradleBuild) {
+    tasks = ['copyDependencies', 'copyBuildOutput', 'javadocJar', 'sourcesJar']
+}
+
+build.finalizedBy copyRuntime
 
 
