@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.scaleoutsoftware.digitaltwin'
-version '3.2.1'
+version '3.2.2'
 
 sourceCompatibility = JavaVersion.VERSION_12
 
@@ -19,8 +19,19 @@ configurations {
     archives
 }
 
-task myJavadocs(type: Javadoc) {
+task createJavadocs(type: Javadoc) {
   source = sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: createJavadocs) {
+    setArchiveClassifier('javadoc')
+    from javadoc.destinationDir
+}
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    setArchiveClassifier('sources')
+    from sourceSets.main.allSource
 }
 
 jar {
@@ -29,5 +40,11 @@ jar {
                 'Implementation-Version': project.version)
     }
 }
+
+task copyRuntime(type: GradleBuild) {
+    tasks = ['javadocJar', 'sourcesJar']
+}
+
+build.finalizedBy copyRuntime
 
 
