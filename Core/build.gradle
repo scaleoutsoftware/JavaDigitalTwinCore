@@ -24,6 +24,7 @@ task createJavadocs(type: Javadoc) {
 }
 
 task javadocJar(type: Jar, dependsOn: createJavadocs) {
+    setArchiveClassifier('javadoc')
     from javadoc.destinationDir
 }
 
@@ -41,7 +42,7 @@ jar {
 }
 
 task copyRuntime(type: GradleBuild) {
-    tasks = ['copyDependencies', 'copyBuildOutput', 'javadocJar', 'sourcesJar']
+    tasks = ['javadocJar', 'sourcesJar']
 }
 
 build.finalizedBy copyRuntime

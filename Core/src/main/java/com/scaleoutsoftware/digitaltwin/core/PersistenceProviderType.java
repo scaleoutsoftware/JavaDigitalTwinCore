@@ -92,6 +92,9 @@ public enum PersistenceProviderType implements Serializable {
                     return DynamoDb;
                 case "Azure Cosmos DB":
                     return CosmosDb;
+                case "Default":
+                case "default":
+                    return Unconfigured;
                 default:
                     return null;
             }
@@ -108,6 +111,8 @@ public enum PersistenceProviderType implements Serializable {
      */
     public static PersistenceProviderType fromOrdinal(int ordinal) {
         switch(ordinal) {
+            case 0:
+                return Unconfigured;
             case 1:
                 return AzureDigitalTwinsService;
             case 3:
