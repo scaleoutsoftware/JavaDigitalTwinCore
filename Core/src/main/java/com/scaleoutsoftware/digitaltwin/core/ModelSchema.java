@@ -441,6 +441,7 @@ public class ModelSchema {
             case SQLServer:
             case DynamoDb:
             case CosmosDb:
+            case Warp10:
                 enablePersistence           = true;
                 azureDigitalTwinModelName   = null;
                 break;
@@ -619,6 +620,7 @@ public class ModelSchema {
             case SQLServer:
             case DynamoDb:
             case CosmosDb:
+            case Warp10:
                 enablePersistence           = true;
                 azureDigitalTwinModelName   = null;
                 break;
@@ -683,6 +685,7 @@ public class ModelSchema {
             case SQLServer:
             case DynamoDb:
             case CosmosDb:
+            case Warp10:
                 enablePersistence           = true;
                 azureDigitalTwinModelName   = null;
                 break;
