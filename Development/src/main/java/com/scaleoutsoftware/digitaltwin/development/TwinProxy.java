@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.DigitalTwinBase;
+import com.scaleoutsoftware.digitaltwin.abstractions.DigitalTwinBase;
 
 class TwinProxy {
     private DigitalTwinBase     _instance;

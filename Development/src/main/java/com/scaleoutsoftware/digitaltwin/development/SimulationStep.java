@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.SimulationStatus;
+import com.scaleoutsoftware.digitaltwin.abstractions.SimulationStatus;
 
 /**
  * The simulation step class encases the metadata for a completed interval of a simulation.

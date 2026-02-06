@@ -16,11 +16,12 @@
 package com.scaleoutsoftware.digitaltwin.development;
 
 import com.google.gson.Gson;
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +32,6 @@ class TwinExecutionEngine implements Closeable {
     private ConcurrentHashMap<String, Class<? extends DigitalTwinBase>>                     _digitalTwins;
     private ConcurrentHashMap<String, MessageProcessor>                                     _messageProcessors;
     private ConcurrentHashMap<String, SimulationProcessor>                                  _simulationProcessors;
-    private ConcurrentHashMap<String, Class<?>>                                             _messageProcessorValueTypes;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, TwinProxy>>                 _modelInstances;
     private ConcurrentHashMap<String, ConcurrentHashMap<String,AlertProviderConfiguration>> _alertProviders;
     private ConcurrentHashMap<String, HashMap<String,byte[]>>                               _modelsSharedData;
@@ -52,7 +52,6 @@ class TwinExecutionEngine implements Closeable {
         _digitalTwins                   = new ConcurrentHashMap<>();
         _messageProcessors              = new ConcurrentHashMap<>();
         _simulationProcessors           = new ConcurrentHashMap<>();
-        _messageProcessorValueTypes     = new ConcurrentHashMap<>();
         _modelInstances                 = new ConcurrentHashMap<>();
         _modelsSharedData               = new ConcurrentHashMap<>();
         _globalSharedData               = new HashMap<>();
@@ -62,19 +61,17 @@ class TwinExecutionEngine implements Closeable {
         _gson                           = new Gson();
     }
 
-    void addDigitalTwin(String digitalTwinModelName, MessageProcessor digitalTwinMessageProcessor, Class dtType, Class messageClass) {
+    void addDigitalTwin(String digitalTwinModelName, MessageProcessor digitalTwinMessageProcessor, Class dtType) {
         _modelNames.add(digitalTwinModelName);
         _digitalTwins.put(digitalTwinModelName, dtType);
         _messageProcessors.put(digitalTwinModelName, digitalTwinMessageProcessor);
-        _messageProcessorValueTypes.put(digitalTwinModelName, messageClass);
     }
 
-    void addDigitalTwin(String digitalTwinModelName, MessageProcessor digitalTwinMessageProcessor, SimulationProcessor simulationProcessor, Class dtType, Class messageClass, int numWorkers) {
+    void addDigitalTwin(String digitalTwinModelName, MessageProcessor digitalTwinMessageProcessor, SimulationProcessor simulationProcessor, Class dtType, int numWorkers) {
         _modelNames.add(digitalTwinModelName);
         _digitalTwins.put(digitalTwinModelName, dtType);
         _messageProcessors.put(digitalTwinModelName, digitalTwinMessageProcessor);
         _simulationProcessors.put(digitalTwinModelName, simulationProcessor);
-        _messageProcessorValueTypes.put(digitalTwinModelName, messageClass);
         _simulationSchedulers.put(digitalTwinModelName, new SimulationScheduler(digitalTwinModelName, dtType, simulationProcessor, this, numWorkers));
     }
 
@@ -173,32 +170,6 @@ class TwinExecutionEngine implements Closeable {
         return proxy;
     }
 
-    String generateModelSchema(String model) throws WorkbenchException {
-        if(_digitalTwins.get(model) != null) {
-            ModelSchema schema;
-            if(_simulationProcessors.get(model) != null) {
-                schema = new ModelSchema(
-                        _digitalTwins.get(model).getName(),
-                        _messageProcessors.get(model).getClass().getName(),
-                        _messageProcessorValueTypes.get(model).getName(),
-                        _simulationProcessors.get(model).getClass().getName(),
-                        List.copyOf(_alertProviders.get(model) == null ? Collections.emptyList() : _alertProviders.get(model).values()));
-            } else {
-                schema = new ModelSchema(
-                        _digitalTwins.get(model).getName(),
-                        _messageProcessors.get(model).getClass().getName(),
-                        _messageProcessorValueTypes.get(model).getName(),
-                        List.copyOf(_alertProviders.get(model) == null ? Collections.emptyList() : _alertProviders.get(model).values()));
-            }
-
-            Gson gson = new Gson();
-            String modelSchemaJson = gson.toJson(schema, ModelSchema.class);
-            return modelSchemaJson;
-        } else {
-            throw new WorkbenchException("Model has not been added to this workbench.");
-        }
-    }
-
     boolean hasAlertProviderConfiguration(String model, String alertProviderName) {
         if(hasModel(model)) {
             return _alertProviders.containsKey(model) && _alertProviders.getOrDefault(model, new ConcurrentHashMap<>()).containsKey(alertProviderName);
@@ -212,30 +183,14 @@ class TwinExecutionEngine implements Closeable {
         return _modelNames.contains(modelName);
     }
 
-    SendingResult sendToSource(String source, String model, String id, String msg) throws WorkbenchException {
+    SendingResult sendToSource(String source, String model, String id, byte[] msg) throws WorkbenchException {
         if(_modelNames.contains(source)) {
-            String toSend = String.format("[%s]", msg);
-            run(source, id, null, toSend);
+            run(source, id, null, msg);
             return SendingResult.Handled;
         } else {
             ConcurrentHashMap<String, List<String>> messagesByModel = _workbench.SOURCE_MESSAGES.getOrDefault(model, new ConcurrentHashMap<>());
             List<String> messages = messagesByModel.getOrDefault(id, new LinkedList<>());
-            messages.add(msg);
-            messagesByModel.put(id, messages);
-            _workbench.SOURCE_MESSAGES.put(model, messagesByModel);
-            return SendingResult.Handled;
-        }
-    }
-
-    SendingResult sendToSource(String source, String model, String id, List<Object> jsonSerializableMessage) throws WorkbenchException {
-        if (_modelNames.contains(source)) {
-            run(source, id, null, jsonSerializableMessage);
-            return SendingResult.Handled;
-        } else {
-            String msg = _gson.toJson(jsonSerializableMessage);
-            ConcurrentHashMap<String, List<String>> messagesByModel = _workbench.SOURCE_MESSAGES.getOrDefault(model, new ConcurrentHashMap<String, List<String>>());
-            List<String> messages = messagesByModel.getOrDefault(id, new LinkedList<>());
-            messages.add(msg);
+            messages.add(new String(msg, StandardCharsets.UTF_8));
             messagesByModel.put(id, messages);
             _workbench.SOURCE_MESSAGES.put(model, messagesByModel);
             return SendingResult.Handled;
@@ -315,7 +270,7 @@ class TwinExecutionEngine implements Closeable {
         _modelInstances.put(modelName, modelInstances);
     }
 
-    ProcessingResult run(String model, String id, String source, String serializedList) throws WorkbenchException {
+    ProcessingResult run(String model, String id, String source, byte[] message) throws WorkbenchException {
         try {
             ConcurrentHashMap<String,TwinProxy> twinInstances = _modelInstances.get(model);
             if(twinInstances == null) {
@@ -344,14 +299,18 @@ class TwinExecutionEngine implements Closeable {
             HashMap<String, byte[]> sharedData = _modelsSharedData.get(model);
             if(sharedData == null) sharedData = new HashMap<>();
             _modelsSharedData.put(model, sharedData);
-            SimulationController simulationController = null;
+            WorkbenchSimulationController simulationController = null;
             SimulationScheduler scheduler = _simulationSchedulers.get(model);
             if(scheduler != null) {
                 simulationController = new WorkbenchSimulationController(this, scheduler);
             }
             WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData, simulationController);
             context.reset(model, id, source, instance);
-            ProcessingResult res = mp.processMessages(context, instance, new WorkbenchMessageListFactory(serializedList, _messageProcessorValueTypes.get(model)));
+            if(simulationController != null) {
+                simulationController.reset(model, id);
+            }
+
+            ProcessingResult res = mp.processMessage(context, instance, message);
             if(context.forceSave()) res = ProcessingResult.UpdateDigitalTwin;
             switch(res) {
                 case UpdateDigitalTwin:
@@ -367,62 +326,6 @@ class TwinExecutionEngine implements Closeable {
             return res;
         } catch (Exception e) {
             throw new WorkbenchException("Exception thrown while running message processor.", e);
-        }
-    }
-
-    ProcessingResult run(String model, String id, String source, List<Object> messages) throws WorkbenchException {
-        try {
-            ConcurrentHashMap<String,TwinProxy> twinInstances = _modelInstances.get(model);
-            if(twinInstances == null) {
-                twinInstances = new ConcurrentHashMap<>();
-            }
-            TwinProxy proxy = twinInstances.get(id);
-            DigitalTwinBase instance = null;
-            if(proxy == null) {
-                Class<? extends DigitalTwinBase> dtClazz = _digitalTwins.get(model);
-                if(dtClazz == null) return ProcessingResult.NoUpdate;
-                instance = dtClazz.getConstructor().newInstance();
-                InitContext initContext = new WorkbenchInitContext(this, instance, model, id);
-                instance.init(initContext);
-                proxy = new TwinProxy(instance);
-                SimulationScheduler scheduler = _simulationSchedulers.get(model);
-                if(scheduler != null) {
-                    proxy.setProxyState(ProxyState.Active);
-                    scheduler.addInstance(proxy);
-                }
-            } else {
-                instance = proxy.getInstance();
-            }
-            MessageProcessor mp = _messageProcessors.get(model);
-            HashMap<String, byte[]> sharedData = _modelsSharedData.get(model);
-            if(sharedData == null) sharedData = new HashMap<>();
-            _modelsSharedData.put(model, sharedData);
-            WorkbenchSimulationController simulationController = null;
-            SimulationScheduler scheduler = _simulationSchedulers.get(model);
-            if(scheduler != null) {
-                simulationController = new WorkbenchSimulationController(this, scheduler);
-            }
-            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData, simulationController);
-            context.reset(model, id, source, instance);
-            if(simulationController != null) {
-                simulationController.reset(model, id);
-            }
-            ProcessingResult res = mp.processMessages(context, instance, new WorkbenchMessageListFactory(messages, _messageProcessorValueTypes.get(model)));
-            if(context.forceSave()) res = ProcessingResult.UpdateDigitalTwin;
-            switch(res) {
-                case UpdateDigitalTwin:
-                    proxy.setInstance(instance);
-                    twinInstances.put(id, proxy);
-                    _modelInstances.put(model, twinInstances);
-                    break;
-                case NoUpdate:
-                    break;
-                default:
-                    break;
-            }
-            return res;
-        } catch (Exception e) {
-            throw new WorkbenchException(e.getMessage(), e);
         }
     }
 

@@ -16,7 +16,7 @@
 package com.scaleoutsoftware.digitaltwin.development;
 
 import com.google.gson.Gson;
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,12 +46,12 @@ public class TestWorkbench {
         }
     }
 
-    public static class SimpleMessageProcessor extends MessageProcessor<SimpleDigitalTwin, SimpleMessage> implements Serializable {
+    public static class SimpleMessageProcessor extends MessageProcessor<SimpleDigitalTwin> implements Serializable {
 
         public SimpleMessageProcessor() {}
 
         @Override
-        public ProcessingResult processMessages(ProcessingContext processingContext, SimpleDigitalTwin instance, Iterable<SimpleMessage> messages) {
+        public ProcessingResult processMessage(ProcessingContext processingContext, SimpleDigitalTwin instance, byte[] message) {
             Gson gson = new Gson();
             Date currentTime = processingContext.getCurrentTime();
             PersistenceProvider provider = processingContext.getPersistenceProvider();
@@ -62,76 +62,74 @@ public class TestWorkbench {
                 throw new IllegalStateException(String.format("context.getModel and instance.getModel difer. %s:%s", processingContext.getDigitalTwinModel(), instance.getModel()));
             }
 
+            SimpleMessage msg = gson.fromJson(new String(message, StandardCharsets.UTF_8), SimpleMessage.class);
+
             if(instance.getModel().compareTo("SimSimple") == 0) {// if this is a simulation model...
-                for(SimpleMessage msg : messages) {
-                    System.out.println(msg.stringChange);
-                }
+                System.out.println(msg.stringChange);
             } else {
-                for(SimpleMessage msg : messages) {
-                    switch (msg.stringChange) {
-                        case "SendToSource":
-                            processingContext.sendToDataSource(new SimpleMessage("Hello from data source!", 10));
-                            break;
-                        case "SendToTwin":
-                            String jsonMsg = gson.toJson(msg);
-                            byte[] bytes = jsonMsg.getBytes(StandardCharsets.UTF_8);
-                            processingContext.sendToDigitalTwin(msg.payload == null ? msg.payload : "model", msg.intChange+"",bytes);
-                            break;
-                        case "LogMessage":
-                            processingContext.logMessage(Level.INFO, msg.payload);
-                            break;
-                        case "StartTimer":
-                            processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.Recurring,
-                                    new TimerHandler<DigitalTwinBase>() {
-                                        @Override
-                                        public ProcessingResult onTimedMessage(String s, DigitalTwinBase digitalTwinBase, ProcessingContext processingContext) {
-                                            System.out.println("Hello from real-time timer.");
-                                            return ProcessingResult.UpdateDigitalTwin;
-                                        }
-                                    });
-                            break;
-                        case "StopTimer":
-                            processingContext.stopTimer("timer");
-                            break;
-                        case "SharedData":
-                            SharedData sharedData = processingContext.getSharedModelData();
-                            CacheResult result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
-                            if(result.getStatus() == CacheOperationStatus.ObjectPut) {
-                                System.out.println("Successfully stored object in model storage.");
-                            }
-                            result = sharedData.get("Hello");
-                            if(result.getStatus() == CacheOperationStatus.ObjectRetrieved) {
-                                System.out.println("Successfully retrieved " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
-                            }
-                            result = sharedData.remove("Hello");
-                            if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
-                                System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
-                            }
-                            result = sharedData.put("modelTest", "assert".getBytes(StandardCharsets.UTF_8));
-                            sharedData = processingContext.getSharedGlobalData();
-                            result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
-                            if(result.getStatus() == CacheOperationStatus.ObjectPut) {
-                                System.out.println("Successfully stored object in global storage.");
-                            }
-                            result = sharedData.get("Hello");
-                            if(result.getStatus() == CacheOperationStatus.ObjectRetrieved) {
-                                System.out.println("Successfully retrieved " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
-                            }
-                            result = sharedData.remove("Hello");
-                            if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
-                                System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
-                            }
-                            result = sharedData.put("globalTest", "assert".getBytes(StandardCharsets.UTF_8));
-                            break;
-                        case "WakeUp":
-                            SimulationController controller = processingContext.getSimulationController();
-                            instance._stringProp = "WakeUp";
-                            System.out.println("Calling run this twin...");
-                            controller.runThisInstance();
-                            break;
-                        default:
-                            break;
-                    }
+                switch (msg.stringChange) {
+                    case "SendToSource":
+                        processingContext.sendToDataSource(gson.toJson(new SimpleMessage("Hello from data source!", 10)).getBytes(StandardCharsets.UTF_8));
+                        break;
+                    case "SendToTwin":
+                        String jsonMsg = gson.toJson(msg);
+                        byte[] bytes = jsonMsg.getBytes(StandardCharsets.UTF_8);
+                        processingContext.sendToDigitalTwin(msg.payload == null ? msg.payload : "model", msg.intChange+"",bytes);
+                        break;
+                    case "LogMessage":
+                        processingContext.logMessage(Level.INFO, msg.payload);
+                        break;
+                    case "StartTimer":
+                        processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.Recurring,
+                                new TimerHandler<DigitalTwinBase>() {
+                                    @Override
+                                    public ProcessingResult onTimedMessage(String s, DigitalTwinBase digitalTwinBase, ProcessingContext processingContext) {
+                                        System.out.println("Hello from real-time timer.");
+                                        return ProcessingResult.UpdateDigitalTwin;
+                                    }
+                                });
+                        break;
+                    case "StopTimer":
+                        processingContext.stopTimer("timer");
+                        break;
+                    case "SharedData":
+                        SharedData sharedData = processingContext.getSharedModelData();
+                        CacheResult result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
+                        if(result.getStatus() == CacheOperationStatus.ObjectPut) {
+                            System.out.println("Successfully stored object in model storage.");
+                        }
+                        result = sharedData.get("Hello");
+                        if(result.getStatus() == CacheOperationStatus.ObjectRetrieved) {
+                            System.out.println("Successfully retrieved " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
+                        }
+                        result = sharedData.remove("Hello");
+                        if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
+                            System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
+                        }
+                        result = sharedData.put("modelTest", "assert".getBytes(StandardCharsets.UTF_8));
+                        sharedData = processingContext.getSharedGlobalData();
+                        result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
+                        if(result.getStatus() == CacheOperationStatus.ObjectPut) {
+                            System.out.println("Successfully stored object in global storage.");
+                        }
+                        result = sharedData.get("Hello");
+                        if(result.getStatus() == CacheOperationStatus.ObjectRetrieved) {
+                            System.out.println("Successfully retrieved " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
+                        }
+                        result = sharedData.remove("Hello");
+                        if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
+                            System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
+                        }
+                        result = sharedData.put("globalTest", "assert".getBytes(StandardCharsets.UTF_8));
+                        break;
+                    case "WakeUp":
+                        SimulationController controller = processingContext.getSimulationController();
+                        instance._stringProp = "WakeUp";
+                        System.out.println("Calling run this twin...");
+                        controller.runThisInstance();
+                        break;
+                    default:
+                        break;
                 }
             }
             return ProcessingResult.UpdateDigitalTwin;
@@ -165,16 +163,16 @@ public class TestWorkbench {
         }
     }
 
-    public static class RealTimeCarMessageProcessor extends MessageProcessor<RealTimeCar, TirePressureMessage> implements Serializable {
+    public static class RealTimeCarMessageProcessor extends MessageProcessor<RealTimeCar> implements Serializable {
         final int TIRE_PRESSURE_FULL = 100;
         @Override
-        public ProcessingResult processMessages(ProcessingContext processingContext, RealTimeCar car, Iterable<TirePressureMessage> messages) throws Exception {
+        public ProcessingResult processMessage(ProcessingContext processingContext, RealTimeCar car, byte[] message) throws Exception {
+            Gson gson = new Gson();
+            TirePressureMessage msg = gson.fromJson(new String(message, StandardCharsets.UTF_8), TirePressureMessage.class);
             // apply the updates from the messages
-            for(TirePressureMessage message : messages) {
-                car.incrementTirePressure(message.getPressureChange());
-            }
+            car.incrementTirePressure(msg.getPressureChange());
             if(car.getTirePressure() > TIRE_PRESSURE_FULL) {
-                processingContext.sendToDataSource(new TirePressureMessage(car.getTirePressure()));
+                processingContext.sendToDataSource(gson.toJson(new TirePressureMessage(car.getTirePressure())).getBytes(StandardCharsets.UTF_8));
             }
             return ProcessingResult.UpdateDigitalTwin;
         }
@@ -201,9 +199,9 @@ public class TestWorkbench {
         }
     }
 
-    public static class SimulatedPumpMessageProcessor extends MessageProcessor<SimulationPump, TirePressureMessage> implements Serializable {
+    public static class SimulatedPumpMessageProcessor extends MessageProcessor<SimulationPump> implements Serializable {
         @Override
-        public ProcessingResult processMessages(ProcessingContext processingContext, SimulationPump simCar, Iterable<TirePressureMessage> messages) throws Exception {
+        public ProcessingResult processMessage(ProcessingContext processingContext, SimulationPump simCar, byte[] message) throws Exception {
             // apply the updates from the messages
             simCar.setTirePressureReached();
             return ProcessingResult.UpdateDigitalTwin;
@@ -218,7 +216,8 @@ public class TestWorkbench {
                 controller.deleteThisInstance();
             } else {
                 int change = (int) (100 * simPump.getTirePressureChange());
-                controller.emitTelemetry("RealTimeCar", new TirePressureMessage(change));
+                Gson gson = new Gson();
+                controller.emitTelemetry("RealTimeCar", gson.toJson(new TirePressureMessage(change)).getBytes(StandardCharsets.UTF_8));
             }
             return ProcessingResult.UpdateDigitalTwin;
         }
@@ -227,16 +226,12 @@ public class TestWorkbench {
     public static class SimpleSimProcessor extends SimulationProcessor<SimpleDigitalTwin> implements Serializable {
         private Gson            _gson = new Gson();
         private AtomicInteger   timesInvoked = new AtomicInteger(0);
-        private boolean         _useJson;
         private String          _modelIdToMessage;
         private String          _instanceIdToMessage;
 
-        public SimpleSimProcessor(boolean json) {
-            _useJson = json;
-        }
+        public SimpleSimProcessor() {}
 
         public SimpleSimProcessor(String modelIdToMessage, String instanceIdToMessage) {
-            _useJson                = false;
             _modelIdToMessage       = modelIdToMessage;
             _instanceIdToMessage    = instanceIdToMessage;
         }
@@ -256,9 +251,9 @@ public class TestWorkbench {
                 controller.delay(Duration.ofSeconds(600));
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().contains("timer")) {
-                processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.OneTime, new TimerHandler<>() {
+                processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.OneTime, new TimerHandler<SimpleDigitalTwin>() {
                     @Override
-                    public ProcessingResult onTimedMessage(String s, DigitalTwinBase digitalTwinBase, ProcessingContext processingContext) {
+                    public ProcessingResult onTimedMessage(String s, SimpleDigitalTwin digitalTwinBase, ProcessingContext processingContext) {
                         System.out.println("timer called!");
                         return ProcessingResult.UpdateDigitalTwin;
                     }
@@ -282,20 +277,17 @@ public class TestWorkbench {
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().contains("waker")) {
                 System.out.println("Waking up sleeper...");
-                processingContext.sendToDigitalTwin(_modelIdToMessage, _instanceIdToMessage, new SimpleMessage("WakeUp", 23));
+                Gson gson = new Gson();
+                processingContext.sendToDigitalTwin(_modelIdToMessage, _instanceIdToMessage, gson.toJson(new SimpleMessage("WakeUp", 23)).getBytes(StandardCharsets.UTF_8));
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().compareTo("initSimulation") == 0) {
                 return ProcessingResult.UpdateDigitalTwin;
             }
             long delay = Long.parseLong(simpleDigitalTwin.getId());
             controller.delay(Duration.ofSeconds(delay));
-            if(_useJson) {
-                byte[] msg = _gson.toJson(new SimpleMessage("SendToSource", 23)).getBytes(StandardCharsets.UTF_8);
-                controller.emitTelemetry("Simple", msg);
-            } else {
-                SimpleMessage telemetry = new SimpleMessage("SendToSource", 23);
-                controller.emitTelemetry("Simple", telemetry);
-            }
+            SimpleMessage telemetry = new SimpleMessage("SendToSource", 23);
+            Gson gson = new Gson();
+            controller.emitTelemetry("Simple", gson.toJson(telemetry).getBytes(StandardCharsets.UTF_8));
             return ProcessingResult.UpdateDigitalTwin;
         }
 
@@ -304,7 +296,6 @@ public class TestWorkbench {
             if(simpleDigitalTwin.getId().compareTo("initSimulation") == 0) {
                 timesInvoked.set(1000);
             }
-
             return ProcessingResult.UpdateDigitalTwin;
         }
     }
@@ -314,8 +305,8 @@ public class TestWorkbench {
         Gson gson = new Gson();
         SimulationStep result;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), new SimpleSimProcessor(false), SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), new SimpleSimProcessor(), SimpleDigitalTwin.class);
 
             result = workbench.runSimulation(System.currentTimeMillis(), System.currentTimeMillis() + 60000, 1, 1000);
             Assert.assertSame(SimulationStatus.NoRemainingWork, result.getStatus());
@@ -326,12 +317,12 @@ public class TestWorkbench {
 
     @Test
     public void TestWorkbenchOnlySimulationInstances() throws WorkbenchException {
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         Gson gson = new Gson();
         SimulationStep result;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
             for (int i = 1; i < 2; i++) {
                 DigitalTwinBase instance = new SimpleDigitalTwin("hello" + i);
@@ -353,8 +344,8 @@ public class TestWorkbench {
         long expectedStop;
         SimulationStep step;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("RealTimeCar", new RealTimeCarMessageProcessor(), RealTimeCar.class, TirePressureMessage.class);
-            workbench.addSimulationModel("SimPump", new SimulatedPumpMessageProcessor(), new PumpSimulationProcessor(), SimulationPump.class, TirePressureMessage.class);
+            workbench.addRealTimeModel("RealTimeCar", new RealTimeCarMessageProcessor(), RealTimeCar.class);
+            workbench.addSimulationModel("SimPump", new SimulatedPumpMessageProcessor(), new PumpSimulationProcessor(), SimulationPump.class);
 
             workbench.addInstance("SimPump", "23", new SimulationPump(0.29d));
             long start = System.currentTimeMillis();
@@ -380,8 +371,8 @@ public class TestWorkbench {
         long expectedStop;
         SimulationStep step;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("RealTimeCar", new RealTimeCarMessageProcessor(), RealTimeCar.class, TirePressureMessage.class);
-            workbench.addSimulationModel("SimModel", new SimulatedPumpMessageProcessor(), new PumpSimulationProcessor(), SimulationPump.class, TirePressureMessage.class);
+            workbench.addRealTimeModel("RealTimeCar", new RealTimeCarMessageProcessor(), RealTimeCar.class);
+            workbench.addSimulationModel("SimModel", new SimulatedPumpMessageProcessor(), new PumpSimulationProcessor(), SimulationPump.class);
 
             workbench.addInstance("SimModel", "23", new SimulationPump(0.29d));
             long start = System.currentTimeMillis();
@@ -397,12 +388,12 @@ public class TestWorkbench {
 
     @Test
     public void TestWorkbenchSpeedup() throws WorkbenchException {
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         Gson gson = new Gson();
         SimulationStep result;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
             for (int i = 0; i < 1000; i++) {
                 DigitalTwinBase instance = new SimpleDigitalTwin("hello" + i);
@@ -427,12 +418,12 @@ public class TestWorkbench {
         int numInstance = 10;
         int numItterations = 0;
         for(int i = 0; i < 20; i ++) {
-            SimpleSimProcessor processor = new SimpleSimProcessor(i >= 10);
+            SimpleSimProcessor processor = new SimpleSimProcessor();
             SimulationStep result;
             long start;
             try (Workbench workbench = new Workbench()) {
-                workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-                workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+                workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+                workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
                 for (int twinCount = 0; twinCount < 1000; twinCount++) {
                     DigitalTwinBase instance = new SimpleDigitalTwin("hello" + twinCount);
@@ -460,17 +451,17 @@ public class TestWorkbench {
 
     @Test
     public void testWorkbenchDebugOnlySimulationInstances() throws WorkbenchException {
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         Gson gson = new Gson();
         long stopTimeMs;
         SimulationStep step;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
 
-            DigitalTwinBase instance = new SimpleDigitalTwin("hello" + 100);
-            workbench.addInstance("SimSimple", "" + 100, instance);
+            DigitalTwinBase instance = new SimpleDigitalTwin("hello" + 1);
+            workbench.addInstance("SimSimple", "" + 1, instance);
 
             long startTimeMs = System.currentTimeMillis();
             stopTimeMs = startTimeMs + 60000;
@@ -494,12 +485,12 @@ public class TestWorkbench {
         Gson gson = new Gson();
         int numInstance = 10;
         int numItterations = 0;
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         SimulationStep result;
         long start;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
             for (int twinCount = 0; twinCount < 1000; twinCount++) {
                 DigitalTwinBase instance = new SimpleDigitalTwin("hello" + twinCount);
@@ -527,12 +518,12 @@ public class TestWorkbench {
         Gson gson = new Gson();
         int numInstance = 10;
         int numItterations = 0;
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         SimulationStep result;
         long start;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
             for (int twinCount = 0; twinCount < 1000; twinCount++) {
                 DigitalTwinBase instance = new SimpleDigitalTwin("delay" + twinCount);
@@ -559,12 +550,12 @@ public class TestWorkbench {
         Gson gson = new Gson();
         int numInstance = 10;
         int numItterations = 0;
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         SimulationStep result;
         long start;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
             for (int twinCount = 0; twinCount < 1; twinCount++) {
                 DigitalTwinBase instance = new SimpleDigitalTwin("timer" + twinCount);
@@ -591,23 +582,20 @@ public class TestWorkbench {
         Gson gson = new Gson();
         int numInstance = 10;
         int numItterations = 0;
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
 
             for (int twinCount = 0; twinCount < 1; twinCount++) {
                 DigitalTwinBase instance = new SimpleDigitalTwin("timer" + twinCount);
                 workbench.addInstance("Simple", "timer" + twinCount, instance);
             }
-
-            List<Object> messages = new LinkedList<>();
-            messages.add(new SimpleMessage("StartTimer", 0));
-            workbench.send("Simple", "timer0", messages);
+            byte[] message = gson.toJson(new SimpleMessage("StartTimer", 0)).getBytes(StandardCharsets.UTF_8);
+            workbench.send("Simple", "timer0", message);
 
             Thread.sleep(3000);
-            messages = new LinkedList<>();
-            messages.add(new SimpleMessage("StopTimer", 0));
-            workbench.send("Simple", "timer0", messages);
+            message = gson.toJson(new SimpleMessage("StopTimer", 0)).getBytes(StandardCharsets.UTF_8);
+            workbench.send("Simple", "timer0", message);
             Thread.sleep(2000);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -620,18 +608,16 @@ public class TestWorkbench {
         Gson gson = new Gson();
         int numInstance = 10;
         int numItterations = 0;
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
 
             for(int twinCount = 0; twinCount < 1; twinCount++) {
                 DigitalTwinBase instance = new SimpleDigitalTwin("timer"+twinCount);
                 workbench.addInstance("Simple", "timer" + twinCount, instance);
             }
-
-            List<Object> messages = new LinkedList<>();
-            messages.add(new SimpleMessage("StartTimer", 0));
-            workbench.send("Simple", "timer0", messages);
+            byte[] message = gson.toJson(new SimpleMessage("StartTimer", 0)).getBytes(StandardCharsets.UTF_8);
+            workbench.send("Simple", "timer0", message);
             Thread.sleep(3000);
         } catch (Exception e) {
             Assert.fail();
@@ -641,7 +627,7 @@ public class TestWorkbench {
 
     @Test
     public void TestWorkbenchSimulationLogMessage() throws WorkbenchException {
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         Gson gson = new Gson();
         String logMessageContent;
         long exp;
@@ -649,8 +635,8 @@ public class TestWorkbench {
         long stop;
         List<LogMessage> messages;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
             logMessageContent = "this is a log message";
             for (int i = 0; i < 1; i++) {
@@ -701,12 +687,12 @@ public class TestWorkbench {
 
     @Test
     public void TestWorkbenchSimulationAlertMessage() throws WorkbenchException {
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         Gson gson = new Gson();
         SimulationStep result;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
             workbench.addAlertProvider("SimSimple", new AlertProviderConfiguration("test", "www.url.com", "integrationkey", "routingKey", "alert", "entityId"));
 
             String alertMessageContent = "this is an alert message";
@@ -738,7 +724,7 @@ public class TestWorkbench {
     @Test(expected = WorkbenchException.class)
     public void TestWorkbenchException() throws Exception {
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", null, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", null, SimpleDigitalTwin.class);
         } catch (Exception e) {
             throw e;
         }
@@ -746,16 +732,16 @@ public class TestWorkbench {
 
     @Test
     public void TestWorkbenchPeek() throws Exception {
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
+        SimpleSimProcessor processor = new SimpleSimProcessor();
         long stopTimeMs;
         SimulationStep step;
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
 
-            DigitalTwinBase instance = new SimpleDigitalTwin("hello" + 100);
-            workbench.addInstance("SimSimple", "" + 100, instance);
+            DigitalTwinBase instance = new SimpleDigitalTwin("hello" + 1);
+            workbench.addInstance("SimSimple", "" + 1, instance);
 
             long startTimeMs = System.currentTimeMillis();
             stopTimeMs = startTimeMs + 60000;
@@ -779,45 +765,17 @@ public class TestWorkbench {
     }
 
     @Test
-    public void TestWorkbenchGenerateModelSchema() throws Exception {
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
-        try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
-            String schemaAsJson = workbench.generateModelSchema("Simple");
-            Assert.assertSame(schemaAsJson, "{\"modelType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleDigitalTwin\",\"messageProcessorType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleMessageProcessor\",\"messageType\":\"com.scaleoutsoftware.digitaltwin.development.TestWorkbench$SimpleMessage\",\"assemblyName\":\"NOT_USED_BY_JAVA_MODELS\",\"enablePersistence\":false,\"enableSimulationSupport\":false,\"alertProviders\":[]}");
-            String dir = workbench.generateModelSchema("SimSimple", System.getProperty("user.dir"));
-            Assert.assertEquals(String.format("%s\\model.json", System.getProperty("user.dir")), dir);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test (expected = WorkbenchException.class)
-    public void TestWorkbenchGenerateModelSchemaExceptionally() throws Exception {
-        SimpleSimProcessor processor = new SimpleSimProcessor(false);
-        try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
-            String schemaAsJson = workbench.generateModelSchema("");
-            Assert.assertNotNull(schemaAsJson);
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    @Test
     public void TestWorkbenchSharedData() throws Exception {
+        Gson gson = new Gson();
         try (Workbench workbench = new Workbench()) {
-            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class, SimpleMessage.class);
-            LinkedList<Object> messages = new LinkedList<>();
-            messages.add(new SimpleMessage("SharedData", 29));
-            workbench.send("Simple", "23", messages);
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            byte[] message = gson.toJson(new SimpleMessage("SharedData", 29)).getBytes(StandardCharsets.UTF_8);
+            workbench.send("Simple", "23", message);
             CacheResult result = workbench.getSharedModelData("Simple").get("modelTest");
             Assert.assertEquals(CacheOperationStatus.ObjectRetrieved, result.getStatus());
             Assert.assertEquals("modelTest", result.getKey());
             Assert.assertEquals("assert", new String(result.getValue(), StandardCharsets.UTF_8));
-            result = workbench.getSharedGlobalData("Simple").get("globalTest");
+            result = workbench.getSharedGlobalData().get("globalTest");
             Assert.assertEquals(CacheOperationStatus.ObjectRetrieved, result.getStatus());
             Assert.assertEquals("globalTest", result.getKey());
             Assert.assertEquals("assert", new String(result.getValue(), StandardCharsets.UTF_8));
@@ -829,8 +787,8 @@ public class TestWorkbench {
     @Test
     public void TestWorkbenchRunThisInstance() throws Exception {
         try (Workbench workbench = new Workbench()) {
-            workbench.addSimulationModel("Simple", new SimpleMessageProcessor(), new SimpleSimProcessor("Simple2", "sleeper"), SimpleDigitalTwin.class, SimpleMessage.class);
-            workbench.addSimulationModel("Simple2", new SimpleMessageProcessor(), new SimpleSimProcessor(false), SimpleDigitalTwin.class, SimpleMessage.class);
+            workbench.addSimulationModel("Simple", new SimpleMessageProcessor(), new SimpleSimProcessor("Simple2", "sleeper"), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("Simple2", new SimpleMessageProcessor(), new SimpleSimProcessor(), SimpleDigitalTwin.class);
 
             workbench.addInstance("Simple", "waker", new SimpleDigitalTwin("waker"));
             workbench.addInstance("Simple2", "sleeper", new SimpleDigitalTwin("sleeper"));
@@ -852,8 +810,8 @@ public class TestWorkbench {
     @Test
     public void TestWorkbenchInitSimulation() throws Exception {
         try (Workbench workbench = new Workbench()) {
-            SimpleSimProcessor processor = new SimpleSimProcessor(false);
-            workbench.addSimulationModel("Simple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class, SimpleMessage.class);
+            SimpleSimProcessor processor = new SimpleSimProcessor();
+            workbench.addSimulationModel("Simple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
 
             workbench.addInstance("Simple", "initSimulation", new SimpleDigitalTwin("waker"));
 

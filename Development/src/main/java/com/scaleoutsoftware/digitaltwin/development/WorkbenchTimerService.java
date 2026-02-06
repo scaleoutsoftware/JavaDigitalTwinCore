@@ -15,14 +15,14 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.time.Duration;
 
 class WorkbenchTimerService {
 
     static <T extends DigitalTwinBase> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, T instance, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
-        if(timerName == null || timerName.isBlank() || timerName.isEmpty() || interval == null ||
+        if(timerName == null || timerName.isEmpty() || interval == null ||
                 interval.isZero() || interval.isNegative() || timerType == null || timerHandler == null) {
             String msg = String.format("Empty, blank, zero, or null parameter provided: timerName %s interval %s timerType %s timerHandler %s",
                     timerName, interval, timerType, timerHandler);

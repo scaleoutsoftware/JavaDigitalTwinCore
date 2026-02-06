@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.ProcessingContext;
+import com.scaleoutsoftware.digitaltwin.abstractions.ProcessingContext;
 
 import java.util.Date;
 

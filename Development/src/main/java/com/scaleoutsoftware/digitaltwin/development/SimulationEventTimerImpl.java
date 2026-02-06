@@ -15,9 +15,9 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.DigitalTwinBase;
-import com.scaleoutsoftware.digitaltwin.core.ProcessingContext;
-import com.scaleoutsoftware.digitaltwin.core.TimerHandler;
+import com.scaleoutsoftware.digitaltwin.abstractions.DigitalTwinBase;
+import com.scaleoutsoftware.digitaltwin.abstractions.ProcessingContext;
+import com.scaleoutsoftware.digitaltwin.abstractions.TimerHandler;
 
 import java.util.Date;
 

@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.io.*;
 import java.util.*;
@@ -286,20 +286,19 @@ public class Workbench implements AutoCloseable {
      * @param modelName the name of the model.
      * @param digitalTwinMessageProcessor the model's {@link MessageProcessor} implementation. Must be marked as {@link Serializable}.
      * @param dtType the model's {@link DigitalTwinBase} implementation.
-     * @param messageClass the model's message type.
      * @param <T> the type of the digital twin.
      * @param <V> the type of the message.
      * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the message
      *  processor must be serializable, and the digital twin implementation must have a parameterless constructor).
      */
-    public <T extends DigitalTwinBase,V> void addRealTimeModel(String modelName, MessageProcessor<T, V> digitalTwinMessageProcessor, Class<T> dtType, Class<V> messageClass) throws WorkbenchException {
-        if(modelName == null || modelName.isBlank() || modelName.isEmpty() || digitalTwinMessageProcessor == null || dtType == null || messageClass == null) {
-            String errorMessage = String.format("modelName null: %b messageProcessor null: %b dtType null: %b messageType null: %b",modelName == null, digitalTwinMessageProcessor == null, dtType == null, messageClass == null);
+    public <T extends DigitalTwinBase,V> void addRealTimeModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
+        if(modelName == null || modelName.isEmpty() || digitalTwinMessageProcessor == null || dtType == null) {
+            String errorMessage = String.format("modelName null: %b messageProcessor null: %b dtType null: %b",modelName == null, digitalTwinMessageProcessor == null, dtType == null);
             throw new WorkbenchException(new IllegalArgumentException("All parameters required. Found null parameter.\n" + errorMessage));
         }
 
         validate(digitalTwinMessageProcessor, dtType);
-        _twinExecutionEngine.addDigitalTwin(modelName, digitalTwinMessageProcessor, dtType, messageClass);
+        _twinExecutionEngine.addDigitalTwin(modelName, digitalTwinMessageProcessor, dtType);
     }
 
     /**
@@ -309,20 +308,19 @@ public class Workbench implements AutoCloseable {
      * @param digitalTwinMessageProcessor the model's {@link MessageProcessor} implementation. Must be marked as {@link Serializable}.
      * @param simulationProcessor the model's {@link SimulationProcessor} implementation. Must be marked as {@link Serializable}.
      * @param dtType the model's {@link DigitalTwinBase} implementation.
-     * @param messageClass the model's message type.
      * @param <T> the type of the digital twin.
      * @param <V> the type of the message.
      * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the message
      *  processor must be serializable, and the digital twin implementation must have a parameterless constructor).
      */
-    public <T extends DigitalTwinBase,V> void addSimulationModel(String modelName, MessageProcessor<T, V> digitalTwinMessageProcessor, SimulationProcessor<T> simulationProcessor, Class<T> dtType, Class<V> messageClass) throws WorkbenchException {
-        if(modelName == null || modelName.isBlank() || modelName.isEmpty() || digitalTwinMessageProcessor == null || simulationProcessor == null || dtType == null || messageClass == null) {
-            String errorMessage = String.format("modelName null: %b messageProcessor null: %b simulationProcessor null: %b dtType null: %b messageType null: %b",modelName == null, digitalTwinMessageProcessor == null, simulationProcessor == null, dtType == null, messageClass == null);
+    public <T extends DigitalTwinBase,V> void addSimulationModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, SimulationProcessor<T> simulationProcessor, Class<T> dtType) throws WorkbenchException {
+        if(modelName == null || modelName.isEmpty() || digitalTwinMessageProcessor == null || simulationProcessor == null || dtType == null) {
+            String errorMessage = String.format("modelName null: %b messageProcessor null: %b simulationProcessor null: %b dtType null: %b",modelName == null, digitalTwinMessageProcessor == null, simulationProcessor == null, dtType == null);
             throw new WorkbenchException(new IllegalArgumentException("All parameters required. Found null parameter.\n" + errorMessage));
         }
 
         validate(digitalTwinMessageProcessor, dtType);
-        _twinExecutionEngine.addDigitalTwin(modelName, digitalTwinMessageProcessor, simulationProcessor, dtType, messageClass, _numWorkers);
+        _twinExecutionEngine.addDigitalTwin(modelName, digitalTwinMessageProcessor, simulationProcessor, dtType, _numWorkers);
     }
 
     /**
@@ -574,66 +572,20 @@ public class Workbench implements AutoCloseable {
     }
 
     /**
-     * Generates a ModelSchema for the defined model
-     *
-     * @param modelName the digital twin model's name to generate a schema.
-     * @return a JSON string of the model's schema
-     * @throws WorkbenchException if an exception occurs while generating a model schema.
-     */
-    public String generateModelSchema(String modelName) throws WorkbenchException {
-        if(_twinExecutionEngine.runningModels().contains(modelName)) {
-            return _twinExecutionEngine.generateModelSchema(modelName);
-        }
-        throw new WorkbenchException("Model is not loaded; cannot generate model schema.");
-    }
-
-    /**
-     * Generates a ModelSchema for the parameter modelName and writes the schema to a file on the file system. If the
-     * parameter outputDirectory is null the file will be written to the working directory of the JVM.
-     *
-     * @param modelName the name of the digital twin model
-     * @param outputDirectory the directory to write the file to, or null to write the file to the current working directory.
-     * @return the full file path of the model.json schema file
-     * @throws WorkbenchException if an exception occurs while generating a model schema.
-     */
-    public String generateModelSchema(String modelName, String outputDirectory) throws WorkbenchException {
-        if(modelName == null || modelName.isEmpty()) {
-            throw new WorkbenchException("Required parameters: modelName.", new IllegalArgumentException());
-        }
-
-        outputDirectory = outputDirectory == null ? System.getProperty("user.dir") : outputDirectory;
-
-        if(_twinExecutionEngine.runningModels().contains(modelName)) {
-            try {
-                String filePath = String.format("%s\\model.json", outputDirectory);
-                FileWriter fileWriter = new FileWriter(filePath);
-                fileWriter.write(_twinExecutionEngine.generateModelSchema(modelName));
-                fileWriter.flush();
-                fileWriter.close();
-                return filePath;
-            } catch (IOException e) {
-                throw new WorkbenchException("Could not write file to file system.", e);
-            }
-
-        }
-        throw new WorkbenchException("Model is not loaded; cannot generate model schema.");
-    }
-
-    /**
      * Send a list of messages to a real-time or simulation model.
      * @param modelName The model name.
      * @param id the instance id.
-     * @param messages the messages to send.
+     * @param message the message to send.
      * @return {@link SendingResult#Handled} unless an exception is thrown.
-     * @throws WorkbenchException if model name, id, or messages are null. Also thrown if the model's {@link MessageProcessor#processMessages(ProcessingContext, DigitalTwinBase, Iterable)}
+     * @throws WorkbenchException if model name, id, or messages are null. Also thrown if the model's {@link MessageProcessor#processMessage(ProcessingContext, DigitalTwinBase, byte[])}
      * throws an exception.
      */
-    public SendingResult send(String modelName, String id, List<Object> messages) throws WorkbenchException {
-        if(modelName == null || id == null || messages == null) {
+    public SendingResult send(String modelName, String id, byte[] message) throws WorkbenchException {
+        if(modelName == null || id == null) {
             throw new WorkbenchException("ModelName, Id, and messages are required.");
         }
         if(_twinExecutionEngine.hasModel(modelName) && !_simulationStarted) {
-            _twinExecutionEngine.run(modelName, id, null, messages);
+            _twinExecutionEngine.run(modelName, id, null, message);
         } else {
             String msg = _twinExecutionEngine.hasModel(modelName) ? String.format("Cannot send message to %s. Simulation is active.", modelName) : String.format("Cannot send message to %s. Model does not exist.", modelName);
             throw new WorkbenchException(msg);
@@ -641,92 +593,7 @@ public class Workbench implements AutoCloseable {
         return SendingResult.Handled;
     }
 
-//    /**
-//     * Sends a single JSON serialized UTF-8 string message to a digital twin.
-//     *
-//     * @param modelName the name of the digital twin model
-//     * @param id the ID of the digital twin model
-//     * @param jsonSerializedMessage the serialized JSON UTF-8 string message
-//     * @return the sending result
-//     * @throws WorkbenchException if an exception is thrown by the twin or an error occurs while processing.
-//     */
-//    public SendingResult send(String modelName, String id, String jsonSerializedMessage) throws WorkbenchException {
-//        List<String> msgs = new ArrayList<>();
-//        msgs.add(jsonSerializedMessage);
-//        return send(modelName, id, msgs);
-//    }
-//
-//    /**
-//     *
-//     * @param modelName the name of the digital twin model
-//     * @param id the ID of the digital twin model
-//     * @param jsonSerializedMessages a serialized list of JSON UTF-8 string messages
-//     * @return the sending result
-//     * @throws WorkbenchException if an exception occurs while sending a message
-//     */
-//    public SendingResult send(String modelName, String id, List<String> jsonSerializedMessages) throws WorkbenchException {
-//        return sendMessage(modelName, id, jsonSerializedMessages) != null ? SendingResult.Handled : SendingResult.NotHandled;
-//    }
-
-    ProcessingResult sendMessage(String model, String id, List<String> jsonMessages) throws WorkbenchException {
-        if(_simulationStarted) throw new WorkbenchException("Cannot send message; simulation is active.");
-        StringBuilder serializedListBuilder = new StringBuilder(String.format("[%s", jsonMessages.remove(0)));
-        for(String msg : jsonMessages) {
-            serializedListBuilder.append(",");
-            serializedListBuilder.append(msg);
-
-        }
-        serializedListBuilder.append("]");
-        return _twinExecutionEngine.run(model, id, null, serializedListBuilder.toString());
-    }
-
-
-    static <T extends DigitalTwinBase, V> void validate(MessageProcessor<T, V> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
-        WorkbenchException mee = null;
-
-        ByteArrayOutputStream baos = null;
-        ObjectOutputStream oos = null;
-
-        ByteArrayInputStream bais = null;
-        ObjectInputStream ois = null;
-        boolean serialized = false;
-        try {
-            // serialize MessageProcessor
-            baos = new ByteArrayOutputStream();
-            oos = new ObjectOutputStream(baos);
-            oos.writeObject(digitalTwinMessageProcessor);
-
-            byte[] serializedMP = baos.toByteArray();
-            serialized = true;
-
-            bais = new ByteArrayInputStream(serializedMP);
-            ois = new ObjectInputStream(bais);
-            MessageProcessor<T,V> incoming = (MessageProcessor<T,V>) ois.readObject();
-        } catch (Exception all) {
-            if(serialized)
-                throw new WorkbenchException("Could not deserialize MessageProcessor instance.", all);
-            else
-                throw new WorkbenchException("Could not serialize MessageProcessor instance", all);
-        } finally {
-            try {
-                if(baos != null) {
-                    baos.flush();
-                    baos.close();
-                }
-                if(oos != null) {
-                    oos.flush();
-                    oos.close();
-                }
-
-                if(bais != null) {
-                    bais.close();
-                }
-                if(ois != null) {
-                    ois.close();
-                }
-            } catch(Exception any) {} // best effort to cleanup
-        }
-
+    static <T extends DigitalTwinBase, V> void validate(MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
         try {
             Class<? extends MessageProcessor> mpType = digitalTwinMessageProcessor.getClass();
             // instantiate TwinInstance

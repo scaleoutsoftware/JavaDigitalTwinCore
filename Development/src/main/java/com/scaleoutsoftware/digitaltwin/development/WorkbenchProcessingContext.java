@@ -17,7 +17,7 @@ package com.scaleoutsoftware.digitaltwin.development;
 
 import com.google.gson.Gson;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -75,87 +75,18 @@ class WorkbenchProcessingContext extends ProcessingContext {
     }
 
     @Override
-    public SendingResult sendToDataSource(byte[] bytes) {
+    public SendingResult sendToDataSource(byte[] message) {
         try {
-            return _twinExecutionEngine.sendToSource(_source, _model, _id, new String(bytes, StandardCharsets.UTF_8));
+            return _twinExecutionEngine.sendToSource(_source, _model, _id, message);
         } catch (WorkbenchException e) {
             return SendingResult.NotHandled;
         }
     }
 
     @Override
-    public SendingResult sendToDataSource(Object jsonSerializableMessage) {
+    public SendingResult sendToDigitalTwin(String model, String id, byte[] message) {
         try {
-            List<Object> jsonSerializableMessages = new LinkedList<>();
-            jsonSerializableMessages.add(jsonSerializableMessage);
-            return _twinExecutionEngine.sendToSource(_source, _model, _id, jsonSerializableMessages);
-        } catch (WorkbenchException e) {
-            return SendingResult.NotHandled;
-        }
-    }
-
-    @Override
-    public SendingResult sendToDataSource(List<Object> list) {
-        try {
-            return _twinExecutionEngine.sendToSource(_source, _model, _id, list);
-        } catch (WorkbenchException e) {
-            return SendingResult.NotHandled;
-        }
-    }
-
-    @Override
-    public SendingResult sendToDigitalTwin(String model, String id, byte[] bytes) {
-        List<byte[]> msgs = new LinkedList<>();
-        msgs.add(bytes);
-        return sendToDigitalTwin(model, id, msgs);
-    }
-
-    @Override
-    public SendingResult sendToDigitalTwin(String model, String id, Object jsonSerializableMessage) {
-        try {
-            if(_twinExecutionEngine.getTwinInstance(model, id) != null) {
-                List<Object> jsonSerializableMessages;
-                if(jsonSerializableMessage instanceof List) {
-                    jsonSerializableMessages = (List<Object>)jsonSerializableMessage;
-                } else {
-                    jsonSerializableMessages = new LinkedList<>();
-                    jsonSerializableMessages.add(jsonSerializableMessage);
-                }
-
-                return _twinExecutionEngine.run(model, id, null, jsonSerializableMessages) != null ? SendingResult.Handled : SendingResult.NotHandled;
-            } else {
-                return SendingResult.NotHandled;
-            }
-        } catch (WorkbenchException e) {
-            return SendingResult.NotHandled;
-        }
-    }
-
-    @Override
-    public SendingResult sendToDigitalTwin(String model, String id, String msg) {
-        return sendToDigitalTwin(model, id, msg.getBytes(StandardCharsets.UTF_8));
-    }
-
-    @Override
-    public SendingResult sendToDigitalTwin(String model, String id, List<byte[]> list) {
-        if( (model == null || model.isEmpty()) ||
-            (id == null || id.isEmpty()) ||
-            (list == null || list.isEmpty())) {
-            return SendingResult.NotHandled;
-        }
-        Gson gson = new Gson();
-        List<String> msgs = new LinkedList<>();
-        for(byte[] serialMsg : list) {
-            msgs.add(new String(serialMsg, StandardCharsets.UTF_8));
-        }
-        String json = gson.toJson(msgs);
-        try {
-            if(_twinExecutionEngine.getTwinInstance(model, id) != null) {
-                return _twinExecutionEngine.run(model, id, null, json) != null ? SendingResult.Handled : SendingResult.NotHandled;
-            } else {
-                return SendingResult.NotHandled;
-            }
-
+            return _twinExecutionEngine.run(model, id,null, message) != null ? SendingResult.Handled : SendingResult.NotHandled;
         } catch (WorkbenchException e) {
             return SendingResult.NotHandled;
         }
@@ -163,7 +94,7 @@ class WorkbenchProcessingContext extends ProcessingContext {
 
     @Override
     public SendingResult sendAlert(String alertProviderName, AlertMessage alertMessage) {
-        if(alertProviderName.isBlank() || alertProviderName.isEmpty() || alertMessage == null) return SendingResult.NotHandled;
+        if(alertProviderName.isEmpty() || alertMessage == null) return SendingResult.NotHandled;
         else if (!_twinExecutionEngine.hasAlertProviderConfiguration(_model, alertProviderName)) return SendingResult.NotHandled;
         else {
             if(_twinExecutionEngine.hasAlertProviderConfiguration(_model, alertProviderName)) {

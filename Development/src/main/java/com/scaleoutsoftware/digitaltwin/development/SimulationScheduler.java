@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -74,7 +74,8 @@ class SimulationScheduler {
                 worker.shutdown();
             }
             return new SimulationStep(SimulationStatus.UserRequested,_curSimulationTime);
-        } if(runSimulationEventArgs.getSimulationFlags() == WorkbenchSimulationFlags.Start) {
+        }
+        if(runSimulationEventArgs.getSimulationFlags() == WorkbenchSimulationFlags.Start) {
             _logger.info("Starting simulation; initializing instances.");
             for(SimulationWorker worker : _workers) {
                 worker.initSimulation(new Date(runSimulationEventArgs.getCurSimulationTime()));

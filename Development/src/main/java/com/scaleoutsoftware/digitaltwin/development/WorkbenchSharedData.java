@@ -15,9 +15,9 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.CacheOperationStatus;
-import com.scaleoutsoftware.digitaltwin.core.CacheResult;
-import com.scaleoutsoftware.digitaltwin.core.SharedData;
+import com.scaleoutsoftware.digitaltwin.abstractions.CacheOperationStatus;
+import com.scaleoutsoftware.digitaltwin.abstractions.CacheResult;
+import com.scaleoutsoftware.digitaltwin.abstractions.SharedData;
 
 import java.util.HashMap;
 

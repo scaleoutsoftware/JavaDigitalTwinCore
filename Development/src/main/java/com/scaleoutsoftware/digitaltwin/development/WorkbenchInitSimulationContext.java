@@ -15,8 +15,8 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.InitSimulationContext;
-import com.scaleoutsoftware.digitaltwin.core.SharedData;
+import com.scaleoutsoftware.digitaltwin.abstractions.InitSimulationContext;
+import com.scaleoutsoftware.digitaltwin.abstractions.SharedData;
 
 class WorkbenchInitSimulationContext implements InitSimulationContext {
     SharedData _globalData;

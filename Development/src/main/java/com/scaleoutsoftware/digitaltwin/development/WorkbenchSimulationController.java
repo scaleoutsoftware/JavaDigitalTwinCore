@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -64,28 +64,10 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public SendingResult emitTelemetry(String modelName, byte[] bytes) {
+    public SendingResult emitTelemetry(String modelName, byte[] message) {
         try {
-            _engine.run(modelName, _id, _modelName, String.format("[%s]", new String(bytes, StandardCharsets.UTF_8)));
+            _engine.run(modelName, _id, _modelName, message);
             return SendingResult.Handled;
-        } catch (WorkbenchException e) {
-            e.printStackTrace();
-            return SendingResult.NotHandled;
-        }
-    }
-
-    @Override
-    public SendingResult emitTelemetry(String modelName, Object jsonSerializableMessage) {
-        try {
-            if(_engine.hasModel(modelName)) {
-                List<Object> jsonSerializableMessages = new LinkedList<>();
-                jsonSerializableMessages.add(jsonSerializableMessage);
-                _engine.run(modelName, _id, _modelName, jsonSerializableMessages);
-                return SendingResult.Handled;
-            } else {
-                return SendingResult.NotHandled;
-            }
-
         } catch (WorkbenchException e) {
             e.printStackTrace();
             return SendingResult.NotHandled;
