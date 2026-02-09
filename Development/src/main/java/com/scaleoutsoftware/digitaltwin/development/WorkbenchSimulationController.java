@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 class WorkbenchSimulationController implements SimulationController {
     TwinExecutionEngine     _engine;
@@ -64,29 +65,27 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public SendingResult emitTelemetry(String modelName, byte[] message) {
+    public CompletableFuture<SendingResult> emitTelemetry(String modelName, byte[] message) {
         try {
             _engine.run(modelName, _id, _modelName, message);
-            return SendingResult.Handled;
+            return CompletableFuture.completedFuture(SendingResult.Handled);
         } catch (WorkbenchException e) {
-            e.printStackTrace();
-            return SendingResult.NotHandled;
+            return CompletableFuture.completedFuture(SendingResult.NotHandled);
         }
     }
 
     @Override
-    public <T extends DigitalTwinBase> SendingResult createInstance(String modelName, String id, T instance) {
+    public <T extends DigitalTwinBase> CompletableFuture<SendingResult> createInstance(String modelName, String id, T instance) {
         try {
             _engine.createInstance(modelName, id, instance);
-            return SendingResult.Handled;
+            return CompletableFuture.completedFuture(SendingResult.Handled);
         } catch (Exception e) {
-            e.printStackTrace();
-            return SendingResult.NotHandled;
+            return CompletableFuture.completedFuture(SendingResult.NotHandled);
         }
     }
 
     @Override
-    public SendingResult createInstanceFromPersistenceStore(String modelName, String id) {
+    public CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String modelName, String id) {
         try {
             throw new NoSuchMethodException("Not available on the workbench.");
         } catch (NoSuchMethodException e) {
@@ -95,7 +94,7 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public <T extends DigitalTwinBase> SendingResult createInstanceFromPersistenceStore(String modelName, String id, T defaultInstance) {
+    public <T extends DigitalTwinBase> CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String modelName, String id, T defaultInstance) {
         try {
             throw new NoSuchMethodException("Not available on the workbench.");
         } catch (NoSuchMethodException e) {
@@ -104,16 +103,16 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public SendingResult deleteInstance(String modelName, String id) {
+    public CompletableFuture<SendingResult> deleteInstance(String modelName, String id) {
         _engine.deleteSimulationInstance(modelName, id);
-        return SendingResult.Handled;
+        return CompletableFuture.completedFuture(SendingResult.Handled);
     }
 
     @Override
-    public SendingResult deleteThisInstance() {
+    public CompletableFuture<SendingResult> deleteThisInstance() {
         _engine.deleteSimulationInstance(_modelName, _id);
         _deleted = true;
-        return SendingResult.Handled;
+        return CompletableFuture.completedFuture(SendingResult.Handled);
     }
 
     @Override

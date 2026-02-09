@@ -20,7 +20,6 @@ import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
@@ -48,17 +47,17 @@ class TwinExecutionEngine implements Closeable {
     }
 
     void init(   ) {
-        _modelNames                     = new LinkedList<>();
-        _digitalTwins                   = new ConcurrentHashMap<>();
-        _messageProcessors              = new ConcurrentHashMap<>();
-        _simulationProcessors           = new ConcurrentHashMap<>();
-        _modelInstances                 = new ConcurrentHashMap<>();
-        _modelsSharedData               = new ConcurrentHashMap<>();
-        _globalSharedData               = new HashMap<>();
-        _alertProviders                 = new ConcurrentHashMap<>();
-        _simulationSchedulers           = new ConcurrentHashMap<>();
-        _realTimeTimers                 = new ConcurrentHashMap<>();
-        _gson                           = new Gson();
+        _modelNames             = new LinkedList<>();
+        _digitalTwins           = new ConcurrentHashMap<>();
+        _messageProcessors      = new ConcurrentHashMap<>();
+        _simulationProcessors   = new ConcurrentHashMap<>();
+        _modelInstances         = new ConcurrentHashMap<>();
+        _modelsSharedData       = new ConcurrentHashMap<>();
+        _globalSharedData       = new HashMap<>();
+        _alertProviders         = new ConcurrentHashMap<>();
+        _simulationSchedulers   = new ConcurrentHashMap<>();
+        _realTimeTimers         = new ConcurrentHashMap<>();
+        _gson                   = new Gson();
     }
 
     void addDigitalTwin(String digitalTwinModelName, MessageProcessor digitalTwinMessageProcessor, Class dtType) {

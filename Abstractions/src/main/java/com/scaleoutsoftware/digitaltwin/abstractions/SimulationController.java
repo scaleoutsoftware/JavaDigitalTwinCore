@@ -17,6 +17,7 @@ package com.scaleoutsoftware.digitaltwin.abstractions;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The SimulationController interface is used to interact with the  running DigitalTwin simulation.
@@ -94,14 +95,14 @@ public interface SimulationController {
     /**
      * <p>
      * Asynchronously send a JSON serialized message to a DigitalTwin instance that will be processed by the DigitalTwin
-     * models {@link MessageProcessor#processMessages(ProcessingContext, DigitalTwinBase, Iterable)} method.
+     * models {@link MessageProcessor#processMessage(ProcessingContext, DigitalTwinBase, byte[])} method.
      * </p>
      * @param modelName the model to send the messages too.
      * @param telemetryMessage a blob representing a JSON serialized messages.
      * @return {@link SendingResult#Handled} if the messages were processed, {@link SendingResult#Enqueued} if
      * the messages are in process of being handled, or {@link SendingResult#NotHandled} if the delay was not processed.
      */
-    SendingResult emitTelemetry(String modelName, byte[] telemetryMessage);
+    CompletableFuture<SendingResult> emitTelemetry(String modelName, byte[] telemetryMessage);
 
     /**
      * Create a new digital twin instance for simulation processing.
@@ -112,7 +113,7 @@ public interface SimulationController {
      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
      * @param <T> the type of the digital twin to create.
      */
-    <T extends DigitalTwinBase> SendingResult  createInstance(String modelName, String instanceId, T base);
+    <T extends DigitalTwinBase> CompletableFuture<SendingResult>  createInstance(String modelName, String instanceId, T base);
 
     /**
      * Create a new digital twin instance for simulation processing from a persistence store.
@@ -126,7 +127,7 @@ public interface SimulationController {
      * @return {@link SendingResult#Handled} if the instance was created, {@link SendingResult#Enqueued} if the instance
      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
      */
-    SendingResult createInstanceFromPersistenceStore(String model, String id);
+    CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String model, String id);
 
     /**
      * The twin instance will be loaded via model name and id from a persistence store.
@@ -142,7 +143,7 @@ public interface SimulationController {
      *      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
      * @param <T> the type of the digital twin to create.
      */
-    <T extends DigitalTwinBase> SendingResult createInstanceFromPersistenceStore(String model, String id, T def);
+    <T extends DigitalTwinBase> CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String model, String id, T def);
 
     /**
      * Delete and remove a digital twin instance from simulation processing.
@@ -151,13 +152,13 @@ public interface SimulationController {
      * @return {@link SendingResult#Handled} if the instance was deleted, {@link SendingResult#Enqueued} if the instance
      * is in process of being deleted, or {@link SendingResult#NotHandled} if the instance could not be deleted.
      */
-    SendingResult deleteInstance(String modelName, String instanceId);
+    CompletableFuture<SendingResult> deleteInstance(String modelName, String instanceId);
 
     /**
      * Delete and remove this digital twin instance from simulation processing.
      * @return this local request will always return {@link SendingResult#Handled}.
      */
-    SendingResult deleteThisInstance();
+    CompletableFuture<SendingResult> deleteThisInstance();
 
     /**
      * Run this instance during this simulation step. The instance will be run using the models {@link SimulationProcessor#processModel(ProcessingContext, DigitalTwinBase, Date)}
@@ -173,6 +174,5 @@ public interface SimulationController {
      * @return a {@link SimulationStatus#InstanceRequestedStop}.
      */
     SimulationStatus stopSimulation();
-
 
 }

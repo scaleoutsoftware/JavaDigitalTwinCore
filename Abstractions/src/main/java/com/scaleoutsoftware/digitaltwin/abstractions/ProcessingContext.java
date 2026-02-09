@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 /**
@@ -44,7 +45,7 @@ public abstract class ProcessingContext implements Serializable {
      * @param payload the message (as a serialized JSON string)
      * @return the sending result
      */
-    public abstract SendingResult sendToDataSource(byte[] payload);
+    public abstract CompletableFuture<SendingResult> sendToDataSource(byte[] payload);
 
     /**
      * <p>
@@ -60,7 +61,7 @@ public abstract class ProcessingContext implements Serializable {
      * @param payload the serialized JSON message
      * @return the sending result
      */
-    public abstract SendingResult sendToDigitalTwin(String model, String id, byte[] payload);
+    public abstract CompletableFuture<SendingResult> sendToDigitalTwin(String model, String id, byte[] payload);
 
     /**
      * <p>
@@ -83,7 +84,7 @@ public abstract class ProcessingContext implements Serializable {
      * @param alert the alert message.
      * @return the sending result.
      */
-    public abstract SendingResult sendAlert(String alertingProviderName, AlertMessage alert);
+    public abstract CompletableFuture<SendingResult> sendAlert(String alertingProviderName, AlertMessage alert);
 
     /**
      * Returns the configured persistence provider or null if no persistence provider configuration can be found.
@@ -104,14 +105,14 @@ public abstract class ProcessingContext implements Serializable {
     public abstract String getDigitalTwinModel();
 
     /**
-     * Logs a message to the real-time digital twin cloud service.
+     * Send an Alert to the real-time digital twin UI.
      *
      * Note: the only supported severity levels are: INFO, WARN, and SEVERE
      *
      * @param severity the severity of the log message
      * @param message the message to log
      */
-    public abstract void logMessage(Level severity, String message);
+    public abstract CompletableFuture<Void> sendUIAlert(Level severity, String message);
 
     /**
      * Starts a new timer for the digital twin

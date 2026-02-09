@@ -15,6 +15,8 @@
 */
 package com.scaleoutsoftware.digitaltwin.abstractions;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * SharedData is used to access a model's, or globally, shared cache.
  */
@@ -24,7 +26,7 @@ public interface SharedData {
      * @param key the key mapping to a value.
      * @return A cache result.
      */
-    public CacheResult get(String key);
+    public CompletableFuture<CacheResult> get(String key);
 
     /**
      * Put a new key/value mapping into the cache.
@@ -32,18 +34,18 @@ public interface SharedData {
      * @param value the value.
      * @return a cache result.
      */
-    public CacheResult put(String key, byte[] value);
+    public CompletableFuture<CacheResult> put(String key, byte[] value);
 
     /**
      * Remove a key/value mapping from the cache.
      * @param key the key mapping to a value.
      * @return a cache result.
      */
-    public CacheResult remove(String key);
+    public CompletableFuture<CacheResult> remove(String key);
 
     /**
      * Clear the shared data cache.
      * @return a cache result.
      */
-    public CacheResult clear();
+    public CompletableFuture<CacheResult> clear();
 }

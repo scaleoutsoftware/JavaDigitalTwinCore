@@ -20,6 +20,7 @@ import com.scaleoutsoftware.digitaltwin.abstractions.CacheResult;
 import com.scaleoutsoftware.digitaltwin.abstractions.SharedData;
 
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 class WorkbenchSharedData implements SharedData {
     private final HashMap<String, byte[]> data;
@@ -28,8 +29,8 @@ class WorkbenchSharedData implements SharedData {
         data = shared;
     }
     @Override
-    public CacheResult get(String s) {
-        return new CacheResult() {
+    public CompletableFuture<CacheResult> get(String s) {
+        return CompletableFuture.completedFuture(new CacheResult() {
             @Override
             public String getKey() {
                 return s;
@@ -44,13 +45,14 @@ class WorkbenchSharedData implements SharedData {
             public CacheOperationStatus getStatus() {
                 return data.containsKey(s) ? CacheOperationStatus.ObjectRetrieved : CacheOperationStatus.ObjectDoesNotExist;
             }
-        };
+        });
+
     }
 
     @Override
-    public CacheResult put(String s, byte[] bytes) {
+    public CompletableFuture<CacheResult> put(String s, byte[] bytes) {
         data.put(s, bytes);
-        return new CacheResult() {
+        return CompletableFuture.completedFuture(new CacheResult() {
             @Override
             public String getKey() {
                 return s;
@@ -65,13 +67,13 @@ class WorkbenchSharedData implements SharedData {
             public CacheOperationStatus getStatus() {
                 return CacheOperationStatus.ObjectPut;
             }
-        };
+        });
     }
 
     @Override
-    public CacheResult remove(String s) {
+    public CompletableFuture<CacheResult> remove(String s) {
         byte[] v = data.remove(s);
-        return new CacheResult() {
+        return CompletableFuture.completedFuture(new CacheResult() {
             @Override
             public String getKey() {
                 return s;
@@ -86,13 +88,13 @@ class WorkbenchSharedData implements SharedData {
             public CacheOperationStatus getStatus() {
                 return v == null ? CacheOperationStatus.ObjectDoesNotExist : CacheOperationStatus.ObjectRemoved;
             }
-        };
+        });
     }
 
     @Override
-    public CacheResult clear() {
+    public CompletableFuture<CacheResult> clear() {
         data.clear();
-        return new CacheResult() {
+        return CompletableFuture.completedFuture(new CacheResult() {
             @Override
             public String getKey() {
                 return null;
@@ -107,6 +109,6 @@ class WorkbenchSharedData implements SharedData {
             public CacheOperationStatus getStatus() {
                 return CacheOperationStatus.CacheCleared;
             }
-        };
+        });
     }
 }
