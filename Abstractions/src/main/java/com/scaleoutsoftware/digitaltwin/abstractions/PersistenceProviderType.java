@@ -45,6 +45,11 @@ public enum PersistenceProviderType implements Serializable {
     SQLServer("SQLServer", 3),
 
     /**
+     * Enum for SenX Warp10
+     */
+    Warp10("Warp10", 7),
+
+    /**
      * Enum for an unconfigured PersistenceProvider
      */
     Unconfigured("", 0);
@@ -92,6 +97,8 @@ public enum PersistenceProviderType implements Serializable {
                     return DynamoDb;
                 case "Azure Cosmos DB":
                     return CosmosDb;
+                case "Warp10":
+                    return Warp10;
                 case "Default":
                 case "default":
                     return Unconfigured;
@@ -123,6 +130,8 @@ public enum PersistenceProviderType implements Serializable {
                 return DynamoDb;
             case 6:
                 return CosmosDb;
+            case 7:
+                return Warp10;
             default:
                 return null;
         }
