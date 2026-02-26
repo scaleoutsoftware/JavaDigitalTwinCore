@@ -105,14 +105,14 @@ public abstract class ProcessingContext implements Serializable {
     public abstract String getDigitalTwinModel();
 
     /**
-     * Send an Alert to the real-time digital twin UI.
+     * Log a message to the real-time digital twin UI.
      *
      * Note: the only supported severity levels are: INFO, WARN, and SEVERE
      *
      * @param severity the severity of the log message
      * @param message the message to log
      */
-    public abstract CompletableFuture<Void> sendUIAlert(Level severity, String message);
+    public abstract CompletableFuture<Void> logMessage(Level severity, String message);
 
     /**
      * Starts a new timer for the digital twin
