@@ -36,35 +36,9 @@ public abstract class DigitalTwinBase {
     public String Model = "";
 
     /**
-     * The timer handlers for this twin instance.
-     */
-    public HashMap<String,TimerMetadata> TimerHandlers = new HashMap<>();
-
-    /**
-     * Note: Simulation only. The next time in milliseconds that this Digital Twin instance will be passed to {@link SimulationProcessor#processModel(ProcessingContext, DigitalTwinBase, Date)}.
-     */
-    public long NextSimulationTime = 0L;
-
-    /**
      * Default constructor.
      */
     public DigitalTwinBase() {}
-
-    /**
-     * Retrieve the next simulation time in milliseconds.
-     * @return the next simulation time in milliseconds.
-     */
-    public long getNextSimulationTimeMs() {
-        return NextSimulationTime;
-    }
-
-    /**
-     * Set the next simulation time in milliseconds.
-     * @param nextSimulationTime set the next simulation time.
-     */
-    public void setNextSimulationTime(long nextSimulationTime) {
-        NextSimulationTime = nextSimulationTime;
-    }
 
     /**
      * The identifier of this DigitalTwin.
