@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.scaleoutsoftware.digitaltwin.abstractions;
  * Metadata class for a timer.
  * @param <T> the type of the {@link DigitalTwinBase} implementation.
  */
-public class TimerMetadata<T extends DigitalTwinBase> {
+public class TimerMetadata<T extends DigitalTwinBase<T>> {
     final String      timerHandler;
     final TimerType   timerType;
     final long        timerIntervalMs;

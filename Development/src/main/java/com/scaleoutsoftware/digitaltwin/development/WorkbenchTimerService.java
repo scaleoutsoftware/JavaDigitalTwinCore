@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.time.Duration;
 
 class WorkbenchTimerService {
 
-    static <T extends DigitalTwinBase> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
+    static <T extends DigitalTwinBase<T>> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
         if(timerName == null || timerName.isEmpty() || interval == null ||
                 interval.isZero() || interval.isNegative() || timerType == null || timerHandler == null) {
             String msg = String.format("Empty, blank, zero, or null parameter provided: timerName %s interval %s timerType %s timerHandler %s",

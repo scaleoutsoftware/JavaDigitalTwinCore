@@ -19,7 +19,7 @@ package com.scaleoutsoftware.digitaltwin.development;
  * A Workbench exception indicates that a real-time or simulated twin caused an exception.
  */
 public class WorkbenchException extends Exception {
-
+    private static final long serialVersionUID = 1L;
     /**
      * The string message for this workbench exception.
      */

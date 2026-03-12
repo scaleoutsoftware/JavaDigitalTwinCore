@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import java.util.logging.Level;
  * Context object that allows the user to send a message to a DataSource.
  * <T> the type of the digital twin
  */
-public abstract class ProcessingContext<T extends DigitalTwinBase> implements Serializable {
+public abstract class ProcessingContext<T extends DigitalTwinBase<T>> implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Default constructor.

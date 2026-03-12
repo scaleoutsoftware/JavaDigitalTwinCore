@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import java.util.Date;
  * Processes simulation events for a digital twin.
  * @param <T> the type of the digital twin.
  */
-public abstract class SimulationProcessor<T extends DigitalTwinBase> implements Serializable {
-
+public abstract class SimulationProcessor<T extends DigitalTwinBase<T>> implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * Default constructor.
      */
@@ -37,7 +37,7 @@ public abstract class SimulationProcessor<T extends DigitalTwinBase> implements 
      * @return {@link ProcessingResult#UpdateDigitalTwin} to update the digital twin, or
      * {@link ProcessingResult#NoUpdate} to ignore the changes.
      */
-    public abstract ProcessingResult processModel(ProcessingContext context, T instance, Date epoch);
+    public abstract ProcessingResult processModel(ProcessingContext<T> context, T instance, Date epoch);
 
     /**
      * <p>

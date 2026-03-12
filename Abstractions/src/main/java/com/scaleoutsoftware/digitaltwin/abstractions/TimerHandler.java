@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.scaleoutsoftware.digitaltwin.abstractions;
  * Callback to a handle a timer message for a {@link DigitalTwinBase}.
  * @param <T> the type of the {@link DigitalTwinBase}.
  */
-public interface TimerHandler<T extends DigitalTwinBase> {
+public interface TimerHandler<T extends DigitalTwinBase<T>> {
 
     /**
      * Callback to handle a timer message.
@@ -29,5 +29,5 @@ public interface TimerHandler<T extends DigitalTwinBase> {
      * @return {@link ProcessingResult#UpdateDigitalTwin} to update the digital twin instance or
      * {@link ProcessingResult#NoUpdate} to leave the instance state as is.
      */
-    public ProcessingResult onTimedMessage(String timerName, T instance, ProcessingContext ctx);
+    public ProcessingResult onTimedMessage(String timerName, T instance, ProcessingContext<T> ctx);
 }

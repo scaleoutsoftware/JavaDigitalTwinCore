@@ -105,7 +105,7 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     }
 
     @Override
-    public PersistenceProvider getPersistenceProvider() {
+    public AzureDigitalTwinsProvider getAzureDigitalTwinsProvider() {
         return null;
     }
 

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -55,7 +55,6 @@ public class TestWorkbench {
         public ProcessingResult processMessage(ProcessingContext<SimpleDigitalTwin> processingContext, SimpleDigitalTwin instance, byte[] message) throws ExecutionException, InterruptedException {
             Gson gson = new Gson();
             Date currentTime = processingContext.getCurrentTime();
-            PersistenceProvider provider = processingContext.getPersistenceProvider();
             if(processingContext.getDigitalTwinModel().compareTo(instance.getModel()) != 0) {
                 throw new IllegalStateException(String.format("context.getModel and instance.getModel difer. %s:%s", processingContext.getDigitalTwinModel(), instance.getModel()));
             }
