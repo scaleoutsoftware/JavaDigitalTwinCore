@@ -45,7 +45,7 @@ class WorkbenchTimerTask extends TimerTask {
     public void run() {
         DigitalTwinBase instance = _proxy.getInstance();
         WorkbenchProcessingContext context = new WorkbenchProcessingContext(_engine, null);
-        context.reset(_modelName, _id, null, instance);
+        context.reset(_modelName, _id, null, _proxy);
         ProcessingResult result;
         synchronized (instance) {
              result = _handler.onTimedMessage(_timerName, instance, context);

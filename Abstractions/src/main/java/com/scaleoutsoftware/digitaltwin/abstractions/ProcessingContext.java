@@ -18,14 +18,14 @@ package com.scaleoutsoftware.digitaltwin.abstractions;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 /**
  * Context object that allows the user to send a message to a DataSource.
+ * <T> the type of the digital twin
  */
-public abstract class ProcessingContext implements Serializable {
+public abstract class ProcessingContext<T extends DigitalTwinBase> implements Serializable {
 
     /**
      * Default constructor.
@@ -87,10 +87,10 @@ public abstract class ProcessingContext implements Serializable {
     public abstract CompletableFuture<SendingResult> sendAlert(String alertingProviderName, AlertMessage alert);
 
     /**
-     * Returns the configured persistence provider or null if no persistence provider configuration can be found.
-     * @return a PersistenceProvider .
+     * Returns an {@link AzureDigitalTwinsProvider} or null if no AzureDigitalTwinsProvider configuration can be found.
+     * @return a {@link AzureDigitalTwinsProvider} or null.
      */
-    public abstract PersistenceProvider getPersistenceProvider();
+    public abstract AzureDigitalTwinsProvider getAzureDigitalTwinsProvider();
 
     /**
      * Retrieve the unique Identifier for a DataSource (matches the Device/Datasource/Real-time twin ID)
@@ -120,11 +120,10 @@ public abstract class ProcessingContext implements Serializable {
      * @param interval the timer interval
      * @param timerType the timer type
      * @param timerHandler the time handler callback
-     * @param <T> the type of the digital twin
      * @return returns {@link TimerActionResult#Success} if the timer was started, {@link TimerActionResult#FailedTooManyTimers}
      * if too many timers exist, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
      */
-    public abstract <T extends DigitalTwinBase> TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler);
+    public abstract TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler);
 
     /**
      * Stops the specified timer.

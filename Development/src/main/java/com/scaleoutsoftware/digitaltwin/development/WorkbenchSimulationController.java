@@ -51,17 +51,15 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public SendingResult delay(Duration duration) {
+    public void delay(Duration duration) {
         _requestedDelay = duration.toMillis();
         _delayRequested = true;
-        return SendingResult.Handled;
     }
 
     @Override
-    public SendingResult delayIndefinitely() {
+    public void delayIndefinitely() {
         _requestedDelay = 0x0000e677d21fdbffL;
         _delayRequested = true;
-        return SendingResult.Handled;
     }
 
     @Override
@@ -75,7 +73,7 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public <T extends DigitalTwinBase> CompletableFuture<SendingResult> createInstance(String modelName, String id, T instance) {
+    public <T extends DigitalTwinBase<T>> CompletableFuture<SendingResult> createInstance(String modelName, String id, T instance) {
         try {
             _engine.createInstance(modelName, id, instance);
             return CompletableFuture.completedFuture(SendingResult.Handled);
@@ -94,7 +92,7 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public <T extends DigitalTwinBase> CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String modelName, String id, T defaultInstance) {
+    public <T extends DigitalTwinBase<T>> CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String modelName, String id, T defaultInstance) {
         try {
             throw new NoSuchMethodException("Not available on the workbench.");
         } catch (NoSuchMethodException e) {

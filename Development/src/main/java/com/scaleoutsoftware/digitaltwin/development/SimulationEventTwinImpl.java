@@ -19,7 +19,6 @@ import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.Objects;
 
 class SimulationEventTwinImpl extends SimulationEvent {
     SimulationProcessor _processor;
@@ -41,7 +40,7 @@ class SimulationEventTwinImpl extends SimulationEvent {
             DigitalTwinBase base = _proxy.getInstance();
             synchronized (_proxy) {
                 WorkbenchProcessingContext wpc = (WorkbenchProcessingContext)context;
-                wpc.resetInstance(base);
+                wpc.resetProxy(_proxy);
                 _processor.processModel(wpc, base, currentTime);
                 _proxy.setInstance(base);
             }
@@ -63,9 +62,6 @@ class SimulationEventTwinImpl extends SimulationEvent {
 
     @Override
     void handleResetNextSimulationTime() {
-        DigitalTwinBase base = _proxy.getInstance();
-        base.NextSimulationTime = _nextSimulationTime;
-        _proxy.setInstance(base);
     }
 
     @Override

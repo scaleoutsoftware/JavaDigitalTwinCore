@@ -15,23 +15,19 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.google.gson.Gson;
-
 import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-class WorkbenchProcessingContext extends ProcessingContext {
+class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends ProcessingContext<T> {
     final TwinExecutionEngine   _twinExecutionEngine;
     String                      _model;
     String                      _id;
     String                      _source;
-    DigitalTwinBase             _twinInstance;
+    TwinProxy                   _proxy;
     SimulationController        _controller;
     HashMap<String, byte[]>     _modelData;
     HashMap<String, byte[]>     _globalData;
@@ -49,10 +45,10 @@ class WorkbenchProcessingContext extends ProcessingContext {
         _controller             = controller;
     }
 
-    void reset(String model, String id, String source, DigitalTwinBase instance) {
+    void reset(String model, String id, String source, TwinProxy proxy) {
         _model          = model;
         _id             = id;
-        _twinInstance   = instance;
+        _proxy          = proxy;
         _forceSave      = false;
         _source         = source;
         _modelData      = _twinExecutionEngine.getModelData(model);
@@ -68,8 +64,8 @@ class WorkbenchProcessingContext extends ProcessingContext {
         _globalData     = _twinExecutionEngine.getGlobalSharedData();
     }
 
-    void resetInstance(DigitalTwinBase instance) {
-        _twinInstance = instance;
+    void resetProxy(TwinProxy proxy) {
+        _proxy = proxy;
     }
 
     boolean forceSave() {
@@ -124,14 +120,14 @@ class WorkbenchProcessingContext extends ProcessingContext {
     }
 
     @Override
-    public CompletableFuture<Void> sendUIAlert(Level level, String msg) {
+    public CompletableFuture<Void> logMessage(Level level, String msg) {
         _twinExecutionEngine.logMessage(_model, new LogMessage(level, msg));
         return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public <T extends DigitalTwinBase> TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
-        TimerActionResult ret = WorkbenchTimerService.startTimer(_twinExecutionEngine, (T)_twinInstance, _model, _id, timerName, interval, timerType, timerHandler);
+    public TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
+        TimerActionResult ret = WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, interval, timerType, timerHandler);
         if(ret != TimerActionResult.Success) {
             _forceSave = false;
         } else {
@@ -142,7 +138,7 @@ class WorkbenchProcessingContext extends ProcessingContext {
 
     @Override
     public TimerActionResult stopTimer(String timerName) {
-        TimerActionResult ret = WorkbenchTimerService.stopTimer(_twinExecutionEngine, _twinInstance, _model, _id, timerName);
+        TimerActionResult ret = WorkbenchTimerService.stopTimer(_twinExecutionEngine, _proxy, _model, _id, timerName);
         if(ret != TimerActionResult.Success) {
             _forceSave = false;
         } else {

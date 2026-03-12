@@ -24,11 +24,12 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 public class TestWorkbench {
-    public static class SimpleDigitalTwin extends DigitalTwinBase {
+    public static class SimpleDigitalTwin extends DigitalTwinBase<SimpleDigitalTwin> {
         private String _stringProp;
         public SimpleDigitalTwin() {}
         public SimpleDigitalTwin(String stringProp) {
@@ -51,7 +52,7 @@ public class TestWorkbench {
         public SimpleMessageProcessor() {}
 
         @Override
-        public ProcessingResult processMessage(ProcessingContext processingContext, SimpleDigitalTwin instance, byte[] message) {
+        public ProcessingResult processMessage(ProcessingContext<SimpleDigitalTwin> processingContext, SimpleDigitalTwin instance, byte[] message) throws ExecutionException, InterruptedException {
             Gson gson = new Gson();
             Date currentTime = processingContext.getCurrentTime();
             PersistenceProvider provider = processingContext.getPersistenceProvider();
@@ -81,9 +82,9 @@ public class TestWorkbench {
                         break;
                     case "StartTimer":
                         processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.Recurring,
-                                new TimerHandler<DigitalTwinBase>() {
+                                new TimerHandler<SimpleDigitalTwin>() {
                                     @Override
-                                    public ProcessingResult onTimedMessage(String s, DigitalTwinBase digitalTwinBase, ProcessingContext processingContext) {
+                                    public ProcessingResult onTimedMessage(String s, SimpleDigitalTwin simpleDigitalTwin, ProcessingContext processingContext) {
                                         System.out.println("Hello from real-time timer.");
                                         return ProcessingResult.UpdateDigitalTwin;
                                     }
@@ -94,33 +95,33 @@ public class TestWorkbench {
                         break;
                     case "SharedData":
                         SharedData sharedData = processingContext.getSharedModelData();
-                        CacheResult result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
+                        CacheResult result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8)).get();
                         if(result.getStatus() == CacheOperationStatus.ObjectPut) {
                             System.out.println("Successfully stored object in model storage.");
                         }
-                        result = sharedData.get("Hello");
+                        result = sharedData.get("Hello").get();
                         if(result.getStatus() == CacheOperationStatus.ObjectRetrieved) {
                             System.out.println("Successfully retrieved " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
                         }
-                        result = sharedData.remove("Hello");
+                        result = sharedData.remove("Hello").get();
                         if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
                             System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from model storage.");
                         }
-                        result = sharedData.put("modelTest", "assert".getBytes(StandardCharsets.UTF_8));
+                        result = sharedData.put("modelTest", "assert".getBytes(StandardCharsets.UTF_8)).get();
                         sharedData = processingContext.getSharedGlobalData();
-                        result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8));
+                        result = sharedData.put("Hello", "Some string...".getBytes(StandardCharsets.UTF_8)).get();
                         if(result.getStatus() == CacheOperationStatus.ObjectPut) {
                             System.out.println("Successfully stored object in global storage.");
                         }
-                        result = sharedData.get("Hello");
+                        result = sharedData.get("Hello").get();
                         if(result.getStatus() == CacheOperationStatus.ObjectRetrieved) {
                             System.out.println("Successfully retrieved " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
                         }
-                        result = sharedData.remove("Hello");
+                        result = sharedData.remove("Hello").get();
                         if(result.getStatus() == CacheOperationStatus.ObjectRemoved) {
                             System.out.println("Successfully removed " + new String(result.getValue(), StandardCharsets.UTF_8) + " from global storage.");
                         }
-                        result = sharedData.put("globalTest", "assert".getBytes(StandardCharsets.UTF_8));
+                        result = sharedData.put("globalTest", "assert".getBytes(StandardCharsets.UTF_8)).get();
                         break;
                     case "WakeUp":
                         SimulationController controller = processingContext.getSimulationController();
@@ -136,7 +137,7 @@ public class TestWorkbench {
         }
     }
 
-    public static class RealTimeCar extends DigitalTwinBase {
+    public static class RealTimeCar extends DigitalTwinBase<RealTimeCar> {
         private int _tirePressure;
         public RealTimeCar() { _tirePressure=0; }
         public RealTimeCar(int startingTirePressure) {
@@ -166,7 +167,7 @@ public class TestWorkbench {
     public static class RealTimeCarMessageProcessor extends MessageProcessor<RealTimeCar> implements Serializable {
         final int TIRE_PRESSURE_FULL = 100;
         @Override
-        public ProcessingResult processMessage(ProcessingContext processingContext, RealTimeCar car, byte[] message) throws Exception {
+        public ProcessingResult processMessage(ProcessingContext<RealTimeCar> processingContext, RealTimeCar car, byte[] message) throws Exception {
             Gson gson = new Gson();
             TirePressureMessage msg = gson.fromJson(new String(message, StandardCharsets.UTF_8), TirePressureMessage.class);
             // apply the updates from the messages
@@ -178,7 +179,7 @@ public class TestWorkbench {
         }
     }
 
-    public static class SimulationPump extends DigitalTwinBase {
+    public static class SimulationPump extends DigitalTwinBase<SimulationPump> {
         private double _tirePressureChange;
         private boolean _tirePressureReached = false;
         public SimulationPump() {}
@@ -771,11 +772,11 @@ public class TestWorkbench {
             workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
             byte[] message = gson.toJson(new SimpleMessage("SharedData", 29)).getBytes(StandardCharsets.UTF_8);
             workbench.send("Simple", "23", message);
-            CacheResult result = workbench.getSharedModelData("Simple").get("modelTest");
+            CacheResult result = workbench.getSharedModelData("Simple").get("modelTest").get();
             Assert.assertEquals(CacheOperationStatus.ObjectRetrieved, result.getStatus());
             Assert.assertEquals("modelTest", result.getKey());
             Assert.assertEquals("assert", new String(result.getValue(), StandardCharsets.UTF_8));
-            result = workbench.getSharedGlobalData().get("globalTest");
+            result = workbench.getSharedGlobalData().get("globalTest").get();
             Assert.assertEquals(CacheOperationStatus.ObjectRetrieved, result.getStatus());
             Assert.assertEquals("globalTest", result.getKey());
             Assert.assertEquals("assert", new String(result.getValue(), StandardCharsets.UTF_8));

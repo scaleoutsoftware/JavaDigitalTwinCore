@@ -76,7 +76,7 @@ public interface SimulationController {
      * @return {@link SendingResult#Handled} if the delay was processed or {@link SendingResult#NotHandled}
      * if the delay was not processed.
      */
-    SendingResult delay(Duration duration);
+    void delay(Duration duration);
 
     /**
      * <p>
@@ -90,7 +90,7 @@ public interface SimulationController {
      * @return {@link SendingResult#Handled} if the delay was processed or {@link SendingResult#NotHandled}
      * if the delay was not processed.
      */
-    SendingResult delayIndefinitely();
+    void delayIndefinitely();
 
     /**
      * <p>
@@ -113,7 +113,7 @@ public interface SimulationController {
      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
      * @param <T> the type of the digital twin to create.
      */
-    <T extends DigitalTwinBase> CompletableFuture<SendingResult>  createInstance(String modelName, String instanceId, T base);
+    <T extends DigitalTwinBase<T>> CompletableFuture<SendingResult> createInstance(String modelName, String instanceId, T base);
 
     /**
      * Create a new digital twin instance for simulation processing from a persistence store.
@@ -143,7 +143,7 @@ public interface SimulationController {
      *      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
      * @param <T> the type of the digital twin to create.
      */
-    <T extends DigitalTwinBase> CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String model, String id, T def);
+    <T extends DigitalTwinBase<T>> CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String model, String id, T def);
 
     /**
      * Delete and remove a digital twin instance from simulation processing.
@@ -164,8 +164,7 @@ public interface SimulationController {
      * Run this instance during this simulation step. The instance will be run using the models {@link SimulationProcessor#processModel(ProcessingContext, DigitalTwinBase, Date)}
      * implementation.
      *
-     * This will cause the simulation sub-system to run this instance regardless of the instances current
-     * {@link DigitalTwinBase#NextSimulationTime}.
+     * This will cause the simulation sub-system to run this instance during the current simulation step.
      */
     void runThisInstance();
 

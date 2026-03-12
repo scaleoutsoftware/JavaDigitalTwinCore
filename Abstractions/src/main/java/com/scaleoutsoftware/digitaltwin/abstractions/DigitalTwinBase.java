@@ -22,7 +22,7 @@ import java.util.HashMap;
  * A real-time digital twin of a data source. The implementation of the real-time DigitalTwin should have a parameterless constructor for
  * basic initialization.
  */
-public abstract class DigitalTwinBase {
+public abstract class DigitalTwinBase<T extends DigitalTwinBase<T>> {
 
     /* capitalized to match .NET serialization */
     /**
@@ -62,7 +62,7 @@ public abstract class DigitalTwinBase {
      * @param context the initialization context.
      * @throws IllegalStateException if init is called after initialization.
      */
-    public void init(InitContext context) throws IllegalStateException {
+    public void init(InitContext<T> context) throws IllegalStateException {
         this.Id     = context.getId();
         this.Model  = context.getModel();
     }

@@ -291,7 +291,7 @@ public class Workbench implements AutoCloseable {
      * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the message
      *  processor must be serializable, and the digital twin implementation must have a parameterless constructor).
      */
-    public <T extends DigitalTwinBase,V> void addRealTimeModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
+    public <T extends DigitalTwinBase<T>,V> void addRealTimeModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
         if(modelName == null || modelName.isEmpty() || digitalTwinMessageProcessor == null || dtType == null) {
             String errorMessage = String.format("modelName null: %b messageProcessor null: %b dtType null: %b",modelName == null, digitalTwinMessageProcessor == null, dtType == null);
             throw new WorkbenchException(new IllegalArgumentException("All parameters required. Found null parameter.\n" + errorMessage));
@@ -313,7 +313,7 @@ public class Workbench implements AutoCloseable {
      * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the message
      *  processor must be serializable, and the digital twin implementation must have a parameterless constructor).
      */
-    public <T extends DigitalTwinBase,V> void addSimulationModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, SimulationProcessor<T> simulationProcessor, Class<T> dtType) throws WorkbenchException {
+    public <T extends DigitalTwinBase<T>,V> void addSimulationModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, SimulationProcessor<T> simulationProcessor, Class<T> dtType) throws WorkbenchException {
         if(modelName == null || modelName.isEmpty() || digitalTwinMessageProcessor == null || simulationProcessor == null || dtType == null) {
             String errorMessage = String.format("modelName null: %b messageProcessor null: %b simulationProcessor null: %b dtType null: %b",modelName == null, digitalTwinMessageProcessor == null, simulationProcessor == null, dtType == null);
             throw new WorkbenchException(new IllegalArgumentException("All parameters required. Found null parameter.\n" + errorMessage));
@@ -333,7 +333,7 @@ public class Workbench implements AutoCloseable {
      * @param instance the real-time or simulation instance.
      * @throws WorkbenchException If the model does not exist or if a simulation is already running.
      */
-    public void addInstance(String modelName, String id, DigitalTwinBase instance) throws WorkbenchException {
+    public <V extends DigitalTwinBase<V>> void addInstance(String modelName, String id, V instance) throws WorkbenchException {
         if(_simulationStarted) throw new WorkbenchException("Cannot add new instance while simulation is active.");
         if(!_twinExecutionEngine.hasModel(modelName)) throw new WorkbenchException("The model does not exist on this workbench.");
         _twinExecutionEngine.createInstance(modelName, id, instance);
@@ -593,7 +593,7 @@ public class Workbench implements AutoCloseable {
         return SendingResult.Handled;
     }
 
-    static <T extends DigitalTwinBase, V> void validate(MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
+    static <T extends DigitalTwinBase<T>, V> void validate(MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
         try {
             Class<? extends MessageProcessor> mpType = digitalTwinMessageProcessor.getClass();
             // instantiate TwinInstance
@@ -630,7 +630,11 @@ public class Workbench implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        _twinExecutionEngine.close();
+    public void close() {
+        try {
+            _twinExecutionEngine.close();
+        } catch (Exception e) {
+        }
+
     }
 }

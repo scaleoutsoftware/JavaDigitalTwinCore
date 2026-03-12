@@ -21,7 +21,7 @@ import java.time.Duration;
  * The InitContext is passed as a parameter to the {@link DigitalTwinBase#init(InitContext)} method of an initializing
  * digital twin.
  */
-public abstract class InitContext {
+public abstract class InitContext<T extends DigitalTwinBase<T>> {
 
     /**
      * Default constructor.
@@ -34,11 +34,10 @@ public abstract class InitContext {
      * @param interval the timer interval
      * @param timerType the timer type
      * @param timerHandler the time handler callback
-     * @param <T> the type of the digital twin
      * @return returns {@link TimerActionResult#Success} if the timer was started, {@link TimerActionResult#FailedTooManyTimers}
      * if too many timers exist, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
      */
-    public abstract <T extends DigitalTwinBase> TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler);
+    public abstract TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler);
 
     /**
      * Retrieve a {@link SharedData} accessor for this model's shared data.

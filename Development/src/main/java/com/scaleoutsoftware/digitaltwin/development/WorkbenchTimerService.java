@@ -21,7 +21,7 @@ import java.time.Duration;
 
 class WorkbenchTimerService {
 
-    static <T extends DigitalTwinBase> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, T instance, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
+    static <T extends DigitalTwinBase> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
         if(timerName == null || timerName.isEmpty() || interval == null ||
                 interval.isZero() || interval.isNegative() || timerType == null || timerHandler == null) {
             String msg = String.format("Empty, blank, zero, or null parameter provided: timerName %s interval %s timerType %s timerHandler %s",
@@ -29,16 +29,16 @@ class WorkbenchTimerService {
             throw new IllegalArgumentException(msg);
 
         }
-        if (instance.TimerHandlers.size() >= Constants.MAX_TIMER_COUNT) // all timer slots are occupied
+        if (proxy.getTimerHandlers().size() >= Constants.MAX_TIMER_COUNT) // all timer slots are occupied
             return TimerActionResult.FailedTooManyTimers;
 
-        if(instance.TimerHandlers.containsKey(timerName)) return TimerActionResult.FailedTimerAlreadyExists;
+        if(proxy.getTimerHandlers().containsKey(timerName)) return TimerActionResult.FailedTimerAlreadyExists;
 
         int timerId = -1;
 
         boolean[] taken = new boolean[Constants.MAX_TIMER_COUNT];
         // List of all timer Ids
-        for (TimerMetadata md : instance.TimerHandlers.values()) {
+        for (TimerMetadata md : proxy.getTimerHandlers().values()) {
             taken[md.getTimerId()] = true;
         }
 
@@ -52,13 +52,13 @@ class WorkbenchTimerService {
         twinExecutionEngine.addTimer(model, id, timerName, timerType, interval, timerHandler);
 
         TimerMetadata<T> metadata = new TimerMetadata<>(timerHandler, timerType, interval.toMillis(), timerId);
-        instance.TimerHandlers.put(timerName, metadata);
+        proxy.getTimerHandlers().put(timerName, metadata);
         return TimerActionResult.Success;
     }
 
-    static <T extends DigitalTwinBase> TimerActionResult stopTimer(TwinExecutionEngine twinExecutionEngine, T instance, String model, String id, String timerName) {
+    static <T extends DigitalTwinBase> TimerActionResult stopTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName) {
         twinExecutionEngine.stopTimer(model, id, timerName);
-        instance.TimerHandlers.remove(timerName);
+        proxy.getTimerHandlers().remove(timerName);
         return TimerActionResult.Success;
     }
 

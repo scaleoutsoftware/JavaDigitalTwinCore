@@ -18,7 +18,7 @@ package com.scaleoutsoftware.digitaltwin.abstractions;
 import java.io.Serializable;
 
 /**
- * Available {@link PersistenceProvider} types.
+ * Available PersistenceProvider types configured through the UI.
  */
 public enum PersistenceProviderType implements Serializable {
 

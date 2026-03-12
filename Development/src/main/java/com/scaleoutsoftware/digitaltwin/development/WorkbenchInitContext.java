@@ -19,22 +19,22 @@ import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.time.Duration;
 
-class WorkbenchInitContext extends InitContext {
+class WorkbenchInitContext<T extends DigitalTwinBase<T>> extends InitContext<T> {
     TwinExecutionEngine     _twinExecutionEngine;
-    DigitalTwinBase         _instance;
+    TwinProxy               _proxy;
     String                  _model;
     String                  _id;
 
-    WorkbenchInitContext(TwinExecutionEngine twinExecutionEngine, DigitalTwinBase instance, String model, String id) {
+    WorkbenchInitContext(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id) {
         _twinExecutionEngine    = twinExecutionEngine;
-        _instance               = instance;
+        _proxy                  = proxy;
         _model                  = model;
         _id                     = id;
     }
 
     @Override
-    public <T extends DigitalTwinBase> TimerActionResult startTimer(String timerName, Duration duration, TimerType timerType, TimerHandler<T> timerHandler) {
-        return WorkbenchTimerService.startTimer(_twinExecutionEngine, (T)_instance, _model, _id, timerName, duration, timerType, timerHandler);
+    public TimerActionResult startTimer(String timerName, Duration duration, TimerType timerType, TimerHandler<T> timerHandler) {
+        return WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, duration, timerType, timerHandler);
     }
 
     @Override

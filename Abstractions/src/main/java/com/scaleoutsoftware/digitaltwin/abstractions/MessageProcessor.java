@@ -21,7 +21,7 @@ import java.io.Serializable;
  * Processes messages for a real-time digital twin.
  * @param <T> the real type of the DigitalTwinBase
  */
-public abstract class MessageProcessor<T extends DigitalTwinBase> {
+public abstract class MessageProcessor<T extends DigitalTwinBase<T>> {
 
     /**
      * Default constructor.
@@ -36,6 +36,6 @@ public abstract class MessageProcessor<T extends DigitalTwinBase> {
      * @return processing results for updating the state object.
      * @throws Exception if an exception occurs during processing
      */
-    public abstract ProcessingResult processMessage(ProcessingContext context, T stateObject, byte[] incomingMessage) throws Exception;
+    public abstract ProcessingResult processMessage(ProcessingContext<T> context, T stateObject, byte[] incomingMessage) throws Exception;
 }
 

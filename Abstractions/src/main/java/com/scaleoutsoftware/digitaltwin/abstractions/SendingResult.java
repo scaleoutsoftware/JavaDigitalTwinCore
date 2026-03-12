@@ -16,7 +16,7 @@
 package com.scaleoutsoftware.digitaltwin.abstractions;
 
 /**
- * Marks a message as Delivered or not Delivered
+ * Marks a message as Handled, Enqueued, or Not Handled
  */
 public enum SendingResult {
     /**

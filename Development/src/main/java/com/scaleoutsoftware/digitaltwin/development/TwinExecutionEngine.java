@@ -28,9 +28,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 class TwinExecutionEngine implements Closeable {
     private List<String>                                                                    _modelNames;
-    private ConcurrentHashMap<String, Class<? extends DigitalTwinBase>>                     _digitalTwins;
-    private ConcurrentHashMap<String, MessageProcessor>                                     _messageProcessors;
-    private ConcurrentHashMap<String, SimulationProcessor>                                  _simulationProcessors;
+    private ConcurrentHashMap<String, Class<? extends DigitalTwinBase<?>>>                  _digitalTwins;
+    private ConcurrentHashMap<String, MessageProcessor<?>>                                  _messageProcessors;
+    private ConcurrentHashMap<String, SimulationProcessor<?>>                               _simulationProcessors;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, TwinProxy>>                 _modelInstances;
     private ConcurrentHashMap<String, ConcurrentHashMap<String,AlertProviderConfiguration>> _alertProviders;
     private ConcurrentHashMap<String, HashMap<String,byte[]>>                               _modelsSharedData;
@@ -245,13 +245,13 @@ class TwinExecutionEngine implements Closeable {
     }
 
     public void createInstance(String modelName, String id, DigitalTwinBase instance) {
-        TwinProxy proxy = new TwinProxy(instance);
+        TwinProxy proxy = new TwinProxy(instance, new HashMap<>());
         ConcurrentHashMap<String,TwinProxy> modelInstances = _modelInstances.get(modelName);
         if(modelInstances == null) {
             modelInstances = new ConcurrentHashMap<>();
         }
         modelInstances.put(id, proxy);
-        InitContext initContext = new WorkbenchInitContext(this, instance, modelName, id);
+        InitContext initContext = new WorkbenchInitContext<>(this, proxy, modelName, id);
         instance.init(initContext);
         SimulationScheduler scheduler = _simulationSchedulers.get(modelName);
         if(scheduler != null) {
@@ -283,9 +283,9 @@ class TwinExecutionEngine implements Closeable {
                     throw new WorkbenchException(String.format("DigitalTwin model \"%s\" does not exist on this workbench.", model));
                 }
                 instance = dtClazz.getConstructor().newInstance();
-                InitContext initContext = new WorkbenchInitContext(this, instance, model, id);
+                InitContext initContext = new WorkbenchInitContext(this, proxy, model, id);
                 instance.init(initContext);
-                proxy = new TwinProxy(instance);
+                proxy = new TwinProxy(instance, new HashMap<>());
                 SimulationScheduler scheduler = _simulationSchedulers.get(model);
                 if(scheduler != null) {
                     proxy.setProxyState(ProxyState.Active);
@@ -304,7 +304,7 @@ class TwinExecutionEngine implements Closeable {
                 simulationController = new WorkbenchSimulationController(this, scheduler);
             }
             WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData, simulationController);
-            context.reset(model, id, source, instance);
+            context.reset(model, id, source, proxy);
             if(simulationController != null) {
                 simulationController.reset(model, id);
             }

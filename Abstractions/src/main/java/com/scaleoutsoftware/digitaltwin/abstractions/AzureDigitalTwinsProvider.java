@@ -22,19 +22,13 @@ import java.util.concurrent.CompletableFuture;
 /**
  * An interface that can be used for persisting/retrieving the state of real-time digital twins.
  */
-public interface PersistenceProvider {
+public interface AzureDigitalTwinsProvider {
 
     /**
      * Returns true if this PersistenceProvider is active, false otherwise.
      * @return true if this PersistenceProvider is active, false otherwise.
      */
     public abstract boolean isActive();
-
-    /**
-     * Retrieves this persistence providers type. Currently supported provider types: AzureDigitalTwins.
-     * @return the persistence provider type.
-     */
-    public PersistenceProviderType getProviderType();
 
     /**
      * Retrieves a future that when complete will return the instance IDs stored in a container, or an empty list if no instances exist.
@@ -121,42 +115,4 @@ public interface PersistenceProvider {
      * @return the property or null if the property does not exist.
      */
     public <T> T getProperty(String containerName, String instanceId, String propertyName, Class<T> clazz);
-
-    /**
-     * Retrieves a future that will complete exceptionally or return void if the RTDT's property was successfully updated.
-     * Updates a RTDT property for the provided instance id specified by the property name and property value.
-     * @param instanceId the instance id.
-     * @param propertyName the property name.
-     * @param propertyValue the property value.
-     * @return a future that will complete exceptionally or return void.
-     */
-    public CompletableFuture<Void> updateRtdtPropertyAsync(String instanceId, String propertyName, Object propertyValue);
-
-    /**
-     * Updates a RTDT property for the provided instance id specified by the property name and property value.
-     * @param instanceId the instance id.
-     * @param propertyName the property name.
-     * @param propertyValue the property value.
-     */
-    public void updateRtdtProperty(String instanceId, String propertyName, Object propertyValue);
-
-    /**
-     * Retrieves a future that will return a property value for a RTDT instance or null if the property doesn't exist.
-     * @param instanceId the instance id.
-     * @param propertyName the property name.
-     * @param clazz the class of the property type
-     * @param <T> the type of the property to return.
-     * @return a future that will return a property value for a RTDT instance.
-     */
-    public <T> CompletableFuture<T> getRtdtPropertyAsync(String instanceId, String propertyName, Class<T> clazz);
-
-    /**
-     * Retrieves a property for a RTDT instance or null if the property does not exist.
-     * @param instanceId the instance id.
-     * @param propertyName the property name.
-     * @param clazz the class of the property type.
-     * @param <T> the type of the property to return.
-     * @return the property value.
-     */
-    public <T> T getRtdtProperty(String instanceId, String propertyName, Class<T> clazz);
 }
