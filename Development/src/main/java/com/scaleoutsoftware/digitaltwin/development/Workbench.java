@@ -345,13 +345,13 @@ public class Workbench implements AutoCloseable {
      * {@link Workbench#initializeSimulation(long, long, long)} has been called.
      *
      * @param modelName the instances model.
-     * @param configuration the alert provider configuration.
+     * @param alertProviderName the alert provider configuration.
      * @throws WorkbenchException If the model does not exist or if a simulation is already running.
      */
-    public void addAlertProvider(String modelName, AlertProviderConfiguration configuration) throws WorkbenchException {
+    public void addAlertProvider(String modelName, String alertProviderName) throws WorkbenchException {
         if(_simulationStarted) throw new WorkbenchException("Cannot add new alert provider while simulation is active.");
         if(!_twinExecutionEngine.hasModel(modelName)) throw new WorkbenchException("The model does not exist on this workbench.");
-        _twinExecutionEngine.addAlertProvider(modelName, configuration);
+        _twinExecutionEngine.addAlertProvider(modelName, alertProviderName);
     }
 
     /**

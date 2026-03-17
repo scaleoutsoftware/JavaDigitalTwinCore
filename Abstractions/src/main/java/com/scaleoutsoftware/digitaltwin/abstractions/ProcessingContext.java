@@ -66,26 +66,16 @@ public abstract class ProcessingContext<T extends DigitalTwinBase<T>> implements
 
     /**
      * <p>
-     *     This method sends an alert message to supported systems.
+     *     This method sends an alert message to configured systems.
      * </p>
      *
      * <p>
-     *     When a model is deployed, an optional alerting provider configuration can be supplied. The provider name corresponds
-     *     to the name of the configured alerting provider. For example, if an alerting provider configuration is called
-     *     "SREPod1", then the processing context will send an alert message to the alerting provider configured with the name
-     *     "SREPod1".
+     *     If the message cannot be sent then the returned CompletableFuture will complete exceptionally.
      * </p>
-     *
-     * <p>
-     *     If the message cannot be sent then {@link SendingResult#NotHandled} will be returned. If the message is sent
-     *     and in process of sending then {@link SendingResult#Enqueued} will be returned. Once the message is successfully sent
-     *     then the returned enum will be changed to {@link SendingResult#Handled}.
-     * </p>
-     * @param alertingProviderName the alerting provider name. Note, must match a valid configuration.
      * @param alert the alert message.
      * @return the sending result.
      */
-    public abstract CompletableFuture<SendingResult> sendAlert(String alertingProviderName, AlertMessage alert);
+    public abstract CompletableFuture<Void> sendAlert(AlertMessage alert);
 
     /**
      * Returns an {@link AzureDigitalTwinsProvider} or null if no AzureDigitalTwinsProvider configuration can be found.

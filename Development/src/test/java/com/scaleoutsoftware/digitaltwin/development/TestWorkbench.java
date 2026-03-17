@@ -265,7 +265,7 @@ public class TestWorkbench {
                 processingContext.logMessage(Level.SEVERE, simpleDigitalTwin._stringProp);
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().contains("alert")) {
-                processingContext.sendAlert("alert", new AlertMessage(simpleDigitalTwin.getId(), simpleDigitalTwin.getId(), simpleDigitalTwin._stringProp));
+                processingContext.sendAlert(new AlertMessage(simpleDigitalTwin.getId(), simpleDigitalTwin.getId(), simpleDigitalTwin._stringProp));
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().contains("sleeper")) {
                 if(simpleDigitalTwin._stringProp.compareTo("WakeUp") == 0) {
@@ -693,7 +693,7 @@ public class TestWorkbench {
         try (Workbench workbench = new Workbench()) {
             workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
             workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), processor, SimpleDigitalTwin.class);
-            workbench.addAlertProvider("SimSimple", new AlertProviderConfiguration("test", "www.url.com", "integrationkey", "routingKey", "alert", "entityId"));
+            workbench.addAlertProvider("SimSimple", "test");
 
             String alertMessageContent = "this is an alert message";
             String id = "alert";
@@ -708,7 +708,7 @@ public class TestWorkbench {
             Assert.assertSame(SimulationStatus.EndTimeReached, result.getStatus());
             Assert.assertEquals(stop, result.getTime());
             Assert.assertEquals(exp, processor.getTimesInvoked());
-            List<AlertMessage> messages = workbench.getAlertMessages("SimSimple", "alert");
+            List<AlertMessage> messages = workbench.getAlertMessages("SimSimple", "test");
             Assert.assertEquals(messages.size(), exp);
             for(AlertMessage msg : messages) {
                 Assert.assertSame(msg.getMessage(), alertMessageContent);

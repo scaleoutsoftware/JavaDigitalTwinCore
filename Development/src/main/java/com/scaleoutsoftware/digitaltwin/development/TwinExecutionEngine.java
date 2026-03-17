@@ -32,7 +32,7 @@ class TwinExecutionEngine implements Closeable {
     private ConcurrentHashMap<String, MessageProcessor<?>>                                  _messageProcessors;
     private ConcurrentHashMap<String, SimulationProcessor<?>>                               _simulationProcessors;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, TwinProxy>>                 _modelInstances;
-    private ConcurrentHashMap<String, ConcurrentHashMap<String,AlertProviderConfiguration>> _alertProviders;
+    private ConcurrentHashMap<String, ConcurrentHashMap<String,String>>                     _alertProviders;
     private ConcurrentHashMap<String, HashMap<String,byte[]>>                               _modelsSharedData;
     private HashMap<String,byte[]>                                                          _globalSharedData;
     private Workbench                                                                       _workbench;
@@ -106,9 +106,9 @@ class TwinExecutionEngine implements Closeable {
         }
     }
 
-    void addAlertProvider(String modelName, AlertProviderConfiguration configuration) {
-        ConcurrentHashMap<String,AlertProviderConfiguration> configMap = new ConcurrentHashMap<>();
-        configMap.put(configuration.getName(), configuration);
+    void addAlertProvider(String modelName, String configuration) {
+        ConcurrentHashMap<String,String> configMap = _alertProviders.getOrDefault(modelName, new ConcurrentHashMap<>());
+        configMap.put(configuration, configuration);
         _alertProviders.put(modelName, configMap);
     }
 
