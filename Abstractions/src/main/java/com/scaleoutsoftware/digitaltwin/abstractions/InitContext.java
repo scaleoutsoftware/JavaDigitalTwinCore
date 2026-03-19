@@ -37,7 +37,7 @@ public abstract class InitContext<T extends DigitalTwinBase<T>> {
      * @return returns {@link TimerActionResult#Success} if the timer was started, {@link TimerActionResult#FailedTooManyTimers}
      * if too many timers exist, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
      */
-    public abstract TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler);
+    public abstract TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler, Class<TimerHandler<T>> timerHandlerClass);
 
     /**
      * Retrieve a {@link SharedData} accessor for this model's shared data.
