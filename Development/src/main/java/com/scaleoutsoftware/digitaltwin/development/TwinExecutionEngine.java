@@ -32,7 +32,7 @@ class TwinExecutionEngine implements Closeable {
     private ConcurrentHashMap<String, MessageProcessor<?>>                                  _messageProcessors;
     private ConcurrentHashMap<String, SimulationProcessor<?>>                               _simulationProcessors;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, TwinProxy>>                 _modelInstances;
-    private ConcurrentHashMap<String, ConcurrentHashMap<String,String>>                     _alertProviders;
+    private ConcurrentHashMap<String,String>                                                _alertProviders;
     private ConcurrentHashMap<String, HashMap<String,byte[]>>                               _modelsSharedData;
     private HashMap<String,byte[]>                                                          _globalSharedData;
     private Workbench                                                                       _workbench;
@@ -107,9 +107,7 @@ class TwinExecutionEngine implements Closeable {
     }
 
     void addAlertProvider(String modelName, String configuration) {
-        ConcurrentHashMap<String,String> configMap = _alertProviders.getOrDefault(modelName, new ConcurrentHashMap<>());
-        configMap.put(configuration, configuration);
-        _alertProviders.put(modelName, configMap);
+        _alertProviders.put(modelName, configuration);
     }
 
     void updateTwin(String model, String id, TwinProxy proxy) {
@@ -169,9 +167,9 @@ class TwinExecutionEngine implements Closeable {
         return proxy;
     }
 
-    boolean hasAlertProviderConfiguration(String model, String alertProviderName) {
+    boolean hasAlertProviderConfiguration(String model) {
         if(hasModel(model)) {
-            return _alertProviders.containsKey(model) && _alertProviders.getOrDefault(model, new ConcurrentHashMap<>()).containsKey(alertProviderName);
+            return _alertProviders.containsKey(model);
         } else {
             return false;
         }
@@ -236,11 +234,11 @@ class TwinExecutionEngine implements Closeable {
         _workbench.LOGGED_MESSAGES.put(model, prev);
     }
 
-    public void recordAlertMessage(String model, String alertProvider, AlertMessage message) {
+    public void recordAlertMessage(String model, AlertMessage message) {
         ConcurrentHashMap<String, ConcurrentLinkedQueue<AlertMessage>> perModelMessages = _workbench.ALERT_MESSAGES.getOrDefault(model, new ConcurrentHashMap<>());
-        ConcurrentLinkedQueue<AlertMessage> perApMessages = perModelMessages.getOrDefault(alertProvider, new ConcurrentLinkedQueue<>());
+        ConcurrentLinkedQueue<AlertMessage> perApMessages = perModelMessages.getOrDefault(_alertProviders.get(model), new ConcurrentLinkedQueue<>());
         perApMessages.add(message);
-        perModelMessages.put(alertProvider, perApMessages);
+        perModelMessages.put(_alertProviders.get(model), perApMessages);
         _workbench.ALERT_MESSAGES.put(model, perModelMessages);
     }
 

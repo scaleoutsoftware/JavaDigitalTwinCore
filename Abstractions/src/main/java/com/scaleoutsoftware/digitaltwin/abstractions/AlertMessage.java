@@ -26,7 +26,7 @@ public class AlertMessage {
     private final String                    _message;
     private final HashMap<String,String>    _optionalTwinInstanceProperties;
 
-    private AlertMessage() {_title = _severity = _message = null; _optionalTwinInstanceProperties = null;}
+    private AlertMessage() { _title = _severity = _message = null; _optionalTwinInstanceProperties = null;}
 
     /**
      * Construct an alert message with a title, severity, and custom message.

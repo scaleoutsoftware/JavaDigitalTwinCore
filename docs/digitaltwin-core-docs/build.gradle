@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.scaleout.digitaltwin'
-version '3.0.5'
+version '4.0.0'
 
 repositories {
     mavenCentral()
@@ -31,8 +31,8 @@ artifacts {
 }
 
 
-task copyDTCore(type: Copy) {
-    from "../../Core/src/"
+task copyDTAbstractions(type: Copy) {
+    from "../../Abstractions/src/"
     into "./src"
 }
 
@@ -49,11 +49,11 @@ dependencies {
 }
 
 compileJava {
-    dependsOn 'copyDTCore'
+    dependsOn 'copyDTAbstractions'
     dependsOn 'copyDTDevelopment'
 }
 
 processResources {
-    dependsOn 'copyDTCore'
+    dependsOn 'copyDTAbstractions'
     dependsOn 'copyDTDevelopment'
 }

@@ -542,7 +542,7 @@ public class Workbench implements AutoCloseable {
      */
     public List<AlertMessage> getAlertMessages(String model, String alertProvider) throws WorkbenchException {
         if(!_twinExecutionEngine.hasModel(model)) throw new WorkbenchException(String.format("No registered model with name %s found.", model));
-        if(!_twinExecutionEngine.hasAlertProviderConfiguration(model, alertProvider)) throw new WorkbenchException(String.format("No alert provider configuration, registered for model %s, for %s found.", model, alertProvider));
+        if(!_twinExecutionEngine.hasAlertProviderConfiguration(model)) throw new WorkbenchException(String.format("No alert provider configuration, registered for model %s, for %s found.", model, alertProvider));
 
         ConcurrentHashMap<String, ConcurrentLinkedQueue<AlertMessage>> perModelMessages = ALERT_MESSAGES.getOrDefault(model, new ConcurrentHashMap<>());
         return Arrays.asList(perModelMessages.get(alertProvider).toArray(new AlertMessage[0]));

@@ -80,14 +80,7 @@ public class TestWorkbench {
                         processingContext.logMessage(Level.INFO, msg.payload);
                         break;
                     case "StartTimer":
-                        processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.Recurring,
-                                new TimerHandler<SimpleDigitalTwin>() {
-                                    @Override
-                                    public ProcessingResult onTimedMessage(String s, SimpleDigitalTwin simpleDigitalTwin, ProcessingContext processingContext) {
-                                        System.out.println("Hello from real-time timer.");
-                                        return ProcessingResult.UpdateDigitalTwin;
-                                    }
-                                });
+                        processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.Recurring, new SimpleTimer(), SimpleTimer.class);
                         break;
                     case "StopTimer":
                         processingContext.stopTimer("timer");
@@ -223,6 +216,15 @@ public class TestWorkbench {
         }
     }
 
+    public static class SimpleTimer implements TimerHandler<SimpleDigitalTwin> {
+
+        @Override
+        public ProcessingResult onTimedMessage(String s, SimpleDigitalTwin simpleDigitalTwin, ProcessingContext<SimpleDigitalTwin> processingContext) {
+            System.out.println("timer called!");
+            return ProcessingResult.UpdateDigitalTwin;
+        }
+    }
+
     public static class SimpleSimProcessor extends SimulationProcessor<SimpleDigitalTwin> implements Serializable {
         private Gson            _gson = new Gson();
         private AtomicInteger   timesInvoked = new AtomicInteger(0);
@@ -241,7 +243,7 @@ public class TestWorkbench {
         }
 
         @Override
-        public ProcessingResult processModel(ProcessingContext processingContext, SimpleDigitalTwin simpleDigitalTwin, Date date) {
+        public ProcessingResult processModel(ProcessingContext<SimpleDigitalTwin> processingContext, SimpleDigitalTwin simpleDigitalTwin, Date date) {
             timesInvoked.addAndGet(1);
             SimulationController controller = processingContext.getSimulationController();
             if(simpleDigitalTwin.getId().compareTo("stop") == 0) {
@@ -251,13 +253,8 @@ public class TestWorkbench {
                 controller.delay(Duration.ofSeconds(600));
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().contains("timer")) {
-                processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.OneTime, new TimerHandler<SimpleDigitalTwin>() {
-                    @Override
-                    public ProcessingResult onTimedMessage(String s, SimpleDigitalTwin digitalTwinBase, ProcessingContext processingContext) {
-                        System.out.println("timer called!");
-                        return ProcessingResult.UpdateDigitalTwin;
-                    }
-                });
+                Class<SimpleTimer> timerHandlerClass = SimpleTimer.class;
+                TimerActionResult timer = processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.OneTime, new SimpleTimer(), timerHandlerClass);
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().contains("log")) {
                 processingContext.logMessage(Level.INFO, simpleDigitalTwin._stringProp);

@@ -33,8 +33,8 @@ class WorkbenchInitContext<T extends DigitalTwinBase<T>> extends InitContext<T> 
     }
 
     @Override
-    public TimerActionResult startTimer(String timerName, Duration duration, TimerType timerType, TimerHandler<T> timerHandler) {
-        return WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, duration, timerType, timerHandler);
+    public TimerActionResult startTimer(String timerName, Duration duration, TimerType timerType, TimerHandler<T> timerHandler, Class<? extends TimerHandler<T>> aClass) {
+        return WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, duration, timerType, timerHandler, aClass);
     }
 
     @Override

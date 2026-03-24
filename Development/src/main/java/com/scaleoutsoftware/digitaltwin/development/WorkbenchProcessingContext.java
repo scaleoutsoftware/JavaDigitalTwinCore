@@ -91,16 +91,12 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     }
 
     @Override
-    public CompletableFuture<SendingResult> sendAlert(String alertProviderName, AlertMessage alertMessage) {
-        if(alertProviderName.isEmpty() || alertMessage == null) return CompletableFuture.completedFuture(SendingResult.NotHandled);
-        else if (!_twinExecutionEngine.hasAlertProviderConfiguration(_model, alertProviderName)) return CompletableFuture.completedFuture(SendingResult.NotHandled);
+    public CompletableFuture<Void> sendAlert(AlertMessage alertMessage) {
+        if(alertMessage == null) return Util.failedFuture(new IllegalArgumentException("Alert message was null."));
+        else if (!_twinExecutionEngine.hasAlertProviderConfiguration(_model)) return Util.failedFuture(new IllegalStateException("No alert provider configuration available to model."));
         else {
-            if(_twinExecutionEngine.hasAlertProviderConfiguration(_model, alertProviderName)) {
-                _twinExecutionEngine.recordAlertMessage(_model, alertProviderName, alertMessage);
-                return CompletableFuture.completedFuture(SendingResult.Handled);
-            } else {
-                return CompletableFuture.completedFuture(SendingResult.NotHandled);
-            }
+            _twinExecutionEngine.recordAlertMessage(_model, alertMessage);
+            return CompletableFuture.completedFuture(null);
         }
     }
 
@@ -126,8 +122,8 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     }
 
     @Override
-    public TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
-        TimerActionResult ret = WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, interval, timerType, timerHandler);
+    public TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler, Class<? extends TimerHandler<T>> aClass) {
+        TimerActionResult ret = WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, interval, timerType, timerHandler, aClass);
         if(ret != TimerActionResult.Success) {
             _forceSave = false;
         } else {

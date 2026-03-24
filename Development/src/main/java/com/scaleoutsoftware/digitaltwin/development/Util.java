@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class Util {
     public static <T> List<T> copyOf(Collection<? extends T> source) {
@@ -36,5 +37,11 @@ public class Util {
         }
 
         return Collections.unmodifiableList(copy);
+    }
+
+    public static <T> CompletableFuture<T> failedFuture(Throwable t) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        future.completeExceptionally(t);
+        return future;
     }
 }

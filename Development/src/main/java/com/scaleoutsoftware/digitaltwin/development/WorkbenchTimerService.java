@@ -21,7 +21,7 @@ import java.time.Duration;
 
 class WorkbenchTimerService {
 
-    static <T extends DigitalTwinBase<T>> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
+    static <T extends DigitalTwinBase<T>> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler, Class<? extends TimerHandler<T>> handlerClass) {
         if(timerName == null || timerName.isEmpty() || interval == null ||
                 interval.isZero() || interval.isNegative() || timerType == null || timerHandler == null) {
             String msg = String.format("Empty, blank, zero, or null parameter provided: timerName %s interval %s timerType %s timerHandler %s",
@@ -51,7 +51,7 @@ class WorkbenchTimerService {
 
         twinExecutionEngine.addTimer(model, id, timerName, timerType, interval, timerHandler);
 
-        TimerMetadata<T> metadata = new TimerMetadata<>(timerHandler, timerType, interval.toMillis(), timerId);
+        TimerMetadata<T> metadata = new TimerMetadata<>(timerHandler, handlerClass, timerType, interval.toMillis(), timerId);
         proxy.getTimerHandlers().put(timerName, metadata);
         return TimerActionResult.Success;
     }

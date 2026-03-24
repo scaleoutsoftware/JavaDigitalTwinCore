@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.scaleoutsoftware.digitaltwin</groupId>
-    <artifactId>abstractions</artifactId>
+    <artifactId>digitaltwin-abstractions</artifactId>
     <version>4.0.0</version>
 
     <properties>
