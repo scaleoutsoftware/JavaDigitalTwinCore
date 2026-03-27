@@ -36,6 +36,17 @@ public abstract class DigitalTwinBase<T extends DigitalTwinBase<T>> {
     public String Model = "";
 
     /**
+     * DO NOT MODIFY. This property is managed by the service. Used to send messages to the instances data source.
+     */
+    public int SourceAppIdNamespace;
+
+    /**
+     * DO NOT MODIFY. This property is managed by the service. Used to store the instances next simulation time; managed by the
+     * service in case of load balancing or server failures.
+     */
+    public long NextSimulationTimeUnixMsec;
+
+    /**
      * Default constructor.
      */
     public DigitalTwinBase() {}
@@ -54,6 +65,47 @@ public abstract class DigitalTwinBase<T extends DigitalTwinBase<T>> {
      */
     public String getModel() {
         return Model;
+    }
+
+    /**
+     * INTERNAL: DO NOT MODIFY. This property is managed by the service.
+     *
+     * Used for sending messages back to the instances data source.
+     *
+     * @return the source App ID namespace
+     */
+    public int getSourceAppIdNamespace() {
+        return SourceAppIdNamespace;
+    }
+
+    /**
+     * INTERNAL: DO NOT MODIFY. This property is managed by the service.
+     * @param sourceAppIdNamespace assign this instance a new source app ID namespace.
+     */
+    public void setSourceAppIdNamespace(int sourceAppIdNamespace) {
+        SourceAppIdNamespace = sourceAppIdNamespace;
+    }
+
+    /**
+     * INTERNAL: DO NOT MODIFY. This property is managed by the service.
+     *
+     * Retrieve the next simulation time for this instance.
+     *
+     * @return the next simulation time for this instance.
+     */
+    public long getNextSimulationTimeUnixMsec() {
+        return NextSimulationTimeUnixMsec;
+    }
+
+    /**
+     * INTERNAL: DO NOT MODIFY. This property is managed by the service.
+     *
+     * Assign this instance the next simulation time when the instance will be run.
+     *
+     * @param nextSimulationTimeUnixMsec the next simulation time when the instance will be run.
+     */
+    public void setNextSimulationTimeUnixMsec(long nextSimulationTimeUnixMsec) {
+        NextSimulationTimeUnixMsec = nextSimulationTimeUnixMsec;
     }
 
     /**

@@ -51,12 +51,12 @@ class WorkbenchTimerService {
 
         twinExecutionEngine.addTimer(model, id, timerName, timerType, interval, timerHandler);
 
-        TimerMetadata<T> metadata = new TimerMetadata<>(timerHandler, handlerClass, timerType, interval.toMillis(), timerId);
+        TimerMetadata<T> metadata = new TimerMetadata<>(handlerClass, timerType, interval.toMillis(), timerId);
         proxy.getTimerHandlers().put(timerName, metadata);
         return TimerActionResult.Success;
     }
 
-    static <T extends DigitalTwinBase> TimerActionResult stopTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName) {
+    static <T extends DigitalTwinBase<T>> TimerActionResult stopTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName) {
         twinExecutionEngine.stopTimer(model, id, timerName);
         proxy.getTimerHandlers().remove(timerName);
         return TimerActionResult.Success;
