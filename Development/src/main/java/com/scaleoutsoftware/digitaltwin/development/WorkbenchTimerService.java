@@ -39,7 +39,7 @@ class WorkbenchTimerService {
         boolean[] taken = new boolean[Constants.MAX_TIMER_COUNT];
         // List of all timer Ids
         for (TimerMetadata md : proxy.getTimerHandlers().values()) {
-            taken[md.getTimerId()] = true;
+            taken[md.getTimerSlot()] = true;
         }
 
         for(int i = 0; i < taken.length; i++) {
@@ -51,7 +51,7 @@ class WorkbenchTimerService {
 
         twinExecutionEngine.addTimer(model, id, timerName, timerType, interval, timerHandler);
 
-        TimerMetadata<T> metadata = new TimerMetadata<>(handlerClass, timerType, interval.toMillis(), timerId);
+        TimerMetadata<T> metadata = new TimerMetadata<>(timerHandler, timerType, interval.toMillis(), timerId);
         proxy.getTimerHandlers().put(timerName, metadata);
         return TimerActionResult.Success;
     }

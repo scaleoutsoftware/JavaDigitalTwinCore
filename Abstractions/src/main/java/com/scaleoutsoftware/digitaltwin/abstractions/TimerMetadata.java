@@ -20,23 +20,23 @@ package com.scaleoutsoftware.digitaltwin.abstractions;
  * @param <T> the type of the {@link DigitalTwinBase} implementation.
  */
 public class TimerMetadata<T extends DigitalTwinBase<T>> {
-    final Class<? extends TimerHandler<T>>  handlerClass;
-    final TimerType                         timerType;
-    final long                              timerIntervalMs;
-    final int                               timerId;
+    final TimerHandler<T> handlerClass;
+    final TimerType       timerType;
+    final long            timerIntervalMs;
+    final int             timerSlot;
 
     /**
      * Constructs a timer metadata.
      * @param handlerClass the timer handler.
      * @param timerType the timer type.
      * @param timerIntervalMs the timer interval.
-     * @param timerIdx the timer index.
+     * @param timerSlot the timer index.
      */
-    public TimerMetadata(Class<? extends TimerHandler<T>> handlerClass, TimerType timerType, long timerIntervalMs, int timerIdx) {
+    public TimerMetadata(TimerHandler<T> handlerClass, TimerType timerType, long timerIntervalMs, int timerSlot) {
         this.handlerClass       = handlerClass;
         this.timerType          = timerType;
         this.timerIntervalMs    = timerIntervalMs;
-        this.timerId            = timerIdx;
+        this.timerSlot          = timerSlot;
     }
 
     /**
@@ -59,12 +59,11 @@ public class TimerMetadata<T extends DigitalTwinBase<T>> {
      * Retrieves the timer ID.
      * @return the timer ID.
      */
-    public int getTimerId() {
-        return timerId;
+    public int getTimerSlot() {
+        return timerSlot;
     }
 
-    public Class<? extends TimerHandler<T>> getHandlerClass() {
+    public TimerHandler<T> getHandler() {
         return handlerClass;
     }
-
 }

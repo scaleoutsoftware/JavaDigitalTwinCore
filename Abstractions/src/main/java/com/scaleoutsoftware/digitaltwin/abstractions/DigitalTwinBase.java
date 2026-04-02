@@ -38,7 +38,7 @@ public abstract class DigitalTwinBase<T extends DigitalTwinBase<T>> {
     /**
      * DO NOT MODIFY. This property is managed by the service. Used to send messages to the instances data source.
      */
-    public int SourceAppIdNamespace;
+    public int SourceNamespaceAppId;
 
     /**
      * DO NOT MODIFY. This property is managed by the service. Used to store the instances next simulation time; managed by the
@@ -75,7 +75,7 @@ public abstract class DigitalTwinBase<T extends DigitalTwinBase<T>> {
      * @return the source App ID namespace
      */
     public int getSourceAppIdNamespace() {
-        return SourceAppIdNamespace;
+        return SourceNamespaceAppId;
     }
 
     /**
@@ -83,7 +83,7 @@ public abstract class DigitalTwinBase<T extends DigitalTwinBase<T>> {
      * @param sourceAppIdNamespace assign this instance a new source app ID namespace.
      */
     public void setSourceAppIdNamespace(int sourceAppIdNamespace) {
-        SourceAppIdNamespace = sourceAppIdNamespace;
+        SourceNamespaceAppId = sourceAppIdNamespace;
     }
 
     /**
