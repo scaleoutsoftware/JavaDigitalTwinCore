@@ -16,20 +16,15 @@
 package com.scaleoutsoftware.digitaltwin.abstractions;
 
 /**
- * The result from a message processor which indicates to update the twin instance, not update the twin instance, or
- * remove the twin instance.
+ * Enum indicating the status of a delete operation.
  */
-public enum ProcessingResult {
+public enum DeleteResult {
     /**
-     * Update the digital twin.
+     * The twin instance was successfully deleted.
      */
-    UpdateDigitalTwin,
+    Success,
     /**
-     * Do not update the digital twin.
+     * The target twin instance was not found.
      */
-    NoUpdate,
-    /**
-     * The twin instance should be removed after processing.
-     */
-    Remove
+    NotFound
 }

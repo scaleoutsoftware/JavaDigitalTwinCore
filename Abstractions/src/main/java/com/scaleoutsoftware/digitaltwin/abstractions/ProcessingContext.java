@@ -102,8 +102,18 @@ public abstract class ProcessingContext<T extends DigitalTwinBase<T>> implements
      *
      * @param severity the severity of the log message
      * @param message the message to log
+     * @return A future that will complete successfully with no result or exceptionally.
      */
     public abstract CompletableFuture<Void> logMessage(Level severity, String message);
+
+    /**
+     * Delete the target real-time twin instance.
+     * @param targetTwinModel the model of the real-time twin instance
+     * @param targetTwinId the id of the real-time twin instance.
+     * @return a completable future that will complete with a {@link DeleteResult} indicating the status of the operation, or
+     * exceptionally indicating that an error occurred.
+     */
+    public abstract CompletableFuture<DeleteResult> removeRealTimeTwin(String targetTwinModel, String targetTwinId);
 
     /**
      * Starts a new timer for the digital twin
