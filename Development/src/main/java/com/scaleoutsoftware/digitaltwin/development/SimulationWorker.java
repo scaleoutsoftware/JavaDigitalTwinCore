@@ -125,8 +125,10 @@ class SimulationWorker implements Callable<SimulationStep> {
             event.setPriority(_curSimulationTime + _simulationInterval);
             event.setNextSimulationTime(_curSimulationTime + _simulationInterval);
         }
-        _events.put(String.format("%s%s",model,id), event);
-        _timeOrderedQueue.add(event);
+        if(!simulationController.deleted() && !(event.getProxyState() == ProxyState.Removed)) {
+            _events.put(String.format("%s%s",model,id), event);
+            _timeOrderedQueue.add(event);
+        }
     }
 
     @Override
@@ -198,7 +200,7 @@ class SimulationWorker implements Callable<SimulationStep> {
                         }
                         keepProcessing = false;
                     }
-                    if(!simulationController.deleted() && addToBuffer) {
+                    if(!simulationController.deleted() && addToBuffer && !(next.getProxyState() == ProxyState.Removed)) {
                         buffer.add(next);
                     }
                 }

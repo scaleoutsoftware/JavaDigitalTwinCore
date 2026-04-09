@@ -41,7 +41,10 @@ class SimulationEventTwinImpl extends SimulationEvent {
             synchronized (_proxy) {
                 WorkbenchProcessingContext wpc = (WorkbenchProcessingContext)context;
                 wpc.resetProxy(_proxy);
-                _processor.processModel(wpc, base, currentTime);
+                ProcessingResult result = _processor.processModel(wpc, base, currentTime);
+                if(result == ProcessingResult.Remove) {
+                    _proxy.setProxyState(ProxyState.Removed);
+                }
                 _proxy.setInstance(base);
             }
         } catch (Exception e) {

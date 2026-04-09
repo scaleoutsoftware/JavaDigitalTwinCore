@@ -122,6 +122,11 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     }
 
     @Override
+    public CompletableFuture<DeleteResult> removeRealTimeTwin(String targetModelName, String targetInstanceId) {
+        return _twinExecutionEngine.deleteRealTimeInstance(targetModelName, targetInstanceId);
+    }
+
+    @Override
     public TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler, Class<? extends TimerHandler<T>> aClass) {
         TimerActionResult ret = WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, interval, timerType, timerHandler, aClass);
         if(ret != TimerActionResult.Success) {

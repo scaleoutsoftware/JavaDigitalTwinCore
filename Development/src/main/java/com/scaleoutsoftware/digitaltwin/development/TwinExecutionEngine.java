@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -267,6 +268,14 @@ class TwinExecutionEngine implements Closeable {
         _modelInstances.put(modelName, modelInstances);
     }
 
+    public CompletableFuture<DeleteResult> deleteRealTimeInstance(String modelName, String id) {
+        ConcurrentHashMap<String, TwinProxy> modelInstances = _modelInstances.get(modelName);
+        TwinProxy proxy = modelInstances.remove(id);
+        proxy.setProxyState(ProxyState.Removed);
+        _modelInstances.put(modelName, modelInstances);
+        return CompletableFuture.completedFuture(DeleteResult.Success);
+    }
+
     ProcessingResult run(String model, String id, String source, byte[] message) throws WorkbenchException {
         try {
             ConcurrentHashMap<String,TwinProxy> twinInstances = _modelInstances.get(model);
@@ -317,6 +326,9 @@ class TwinExecutionEngine implements Closeable {
                     break;
                 case NoUpdate:
                     break;
+                case Remove:
+                    twinInstances.remove(id);
+                    _modelInstances.put(model, twinInstances);
                 default:
                     break;
             }
