@@ -22,8 +22,7 @@ import java.util.Date;
  * Processes simulation events for a digital twin.
  * @param <T> the type of the digital twin.
  */
-public abstract class SimulationProcessor<T extends DigitalTwinBase<T>> implements Serializable {
-    private static final long serialVersionUID = 1L;
+public abstract class SimulationProcessor<T extends DigitalTwinBase<T>> {
     /**
      * Default constructor.
      */
