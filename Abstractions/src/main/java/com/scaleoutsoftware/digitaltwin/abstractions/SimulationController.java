@@ -113,37 +113,7 @@ public interface SimulationController {
      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
      * @param <T> the type of the digital twin to create.
      */
-    <T extends DigitalTwinBase<T>> CompletableFuture<SendingResult> createInstance(String modelName, String instanceId, T base);
-
-    /**
-     * Create a new digital twin instance for simulation processing from a persistence store.
-     *
-     * The twin instance will be loaded via model name and id from a persistence store.
-     *
-     * If no instance can be found, then an exception will be thrown and no instance will be created.
-     *
-     * @param model The model name.
-     * @param id the instance id.
-     * @return {@link SendingResult#Handled} if the instance was created, {@link SendingResult#Enqueued} if the instance
-     * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
-     */
-    CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String model, String id);
-
-    /**
-     * The twin instance will be loaded via model name and id from a persistence store.
-     *
-     * The twin instance will be loaded via model name and id from a persistence store.
-     *
-     * If no instance can be found, then the default parameter instance will be used.
-     *
-     * @param model the model name.
-     * @param id the instance id.
-     * @param def the default instance to create.
-     * @return {@link SendingResult#Handled} if the instance was created, {@link SendingResult#Enqueued} if the instance
-     *      * is in process of being created, or {@link SendingResult#NotHandled} if the instance could not be created.
-     * @param <T> the type of the digital twin to create.
-     */
-    <T extends DigitalTwinBase<T>> CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String model, String id, T def);
+    <T extends DigitalTwinBase<T>> CompletableFuture<CreateResult> createInstance(String modelName, String instanceId, T base);
 
     /**
      * Delete and remove a digital twin instance from simulation processing.
@@ -152,13 +122,13 @@ public interface SimulationController {
      * @return {@link SendingResult#Handled} if the instance was deleted, {@link SendingResult#Enqueued} if the instance
      * is in process of being deleted, or {@link SendingResult#NotHandled} if the instance could not be deleted.
      */
-    CompletableFuture<SendingResult> deleteInstance(String modelName, String instanceId);
+    CompletableFuture<DeleteResult> deleteInstance(String modelName, String instanceId);
 
     /**
      * Delete and remove this digital twin instance from simulation processing.
      * @return this local request will always return {@link SendingResult#Handled}.
      */
-    CompletableFuture<SendingResult> deleteThisInstance();
+    CompletableFuture<DeleteResult> deleteThisInstance();
 
     /**
      * Run this instance during this simulation step. The instance will be run using the models {@link SimulationProcessor#processModel(ProcessingContext, DigitalTwinBase, Date)}
