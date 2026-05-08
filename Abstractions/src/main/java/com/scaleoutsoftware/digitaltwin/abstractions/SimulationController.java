@@ -73,7 +73,6 @@ public interface SimulationController {
      * </p>
      *
      * @param duration the duration to delay.
-     * @return {@link SendingResult#Handled} if the delay was processed or {@link SendingResult#NotHandled}
      * if the delay was not processed.
      */
     void delay(Duration duration);
@@ -87,7 +86,6 @@ public interface SimulationController {
      * Simulation processing will be delayed until this instance is run with {@link SimulationController#runThisInstance()}.
      * </p>
      *
-     * @return {@link SendingResult#Handled} if the delay was processed or {@link SendingResult#NotHandled}
      * if the delay was not processed.
      */
     void delayIndefinitely();

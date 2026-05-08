@@ -287,17 +287,14 @@ public class Workbench implements AutoCloseable {
      * @param digitalTwinMessageProcessor the model's {@link MessageProcessor} implementation. Must be marked as {@link Serializable}.
      * @param dtType the model's {@link DigitalTwinBase} implementation.
      * @param <T> the type of the digital twin.
-     * @param <V> the type of the message.
      * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the message
      *  processor must be serializable, and the digital twin implementation must have a parameterless constructor).
      */
-    public <T extends DigitalTwinBase<T>,V> void addRealTimeModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
+    public <T extends DigitalTwinBase<T>> void addRealTimeModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
         if(modelName == null || modelName.isEmpty() || digitalTwinMessageProcessor == null || dtType == null) {
             String errorMessage = String.format("modelName null: %b messageProcessor null: %b dtType null: %b",modelName == null, digitalTwinMessageProcessor == null, dtType == null);
             throw new WorkbenchException(new IllegalArgumentException("All parameters required. Found null parameter.\n" + errorMessage));
         }
-
-        validate(digitalTwinMessageProcessor, dtType);
         _twinExecutionEngine.addDigitalTwin(modelName, digitalTwinMessageProcessor, dtType);
     }
 
@@ -309,17 +306,14 @@ public class Workbench implements AutoCloseable {
      * @param simulationProcessor the model's {@link SimulationProcessor} implementation. Must be marked as {@link Serializable}.
      * @param dtType the model's {@link DigitalTwinBase} implementation.
      * @param <T> the type of the digital twin.
-     * @param <V> the type of the message.
      * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the message
      *  processor must be serializable, and the digital twin implementation must have a parameterless constructor).
      */
-    public <T extends DigitalTwinBase<T>,V> void addSimulationModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, SimulationProcessor<T> simulationProcessor, Class<T> dtType) throws WorkbenchException {
+    public <T extends DigitalTwinBase<T>> void addSimulationModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, SimulationProcessor<T> simulationProcessor, Class<T> dtType) throws WorkbenchException {
         if(modelName == null || modelName.isEmpty() || digitalTwinMessageProcessor == null || simulationProcessor == null || dtType == null) {
             String errorMessage = String.format("modelName null: %b messageProcessor null: %b simulationProcessor null: %b dtType null: %b",modelName == null, digitalTwinMessageProcessor == null, simulationProcessor == null, dtType == null);
             throw new WorkbenchException(new IllegalArgumentException("All parameters required. Found null parameter.\n" + errorMessage));
         }
-
-        validate(digitalTwinMessageProcessor, dtType);
         _twinExecutionEngine.addDigitalTwin(modelName, digitalTwinMessageProcessor, simulationProcessor, dtType, _numWorkers);
     }
 
@@ -331,6 +325,7 @@ public class Workbench implements AutoCloseable {
      * @param modelName the instances model.
      * @param id the instance identifier.
      * @param instance the real-time or simulation instance.
+     * @param <V> the type of the Digital Twin
      * @throws WorkbenchException If the model does not exist or if a simulation is already running.
      */
     public <V extends DigitalTwinBase<V>> void addInstance(String modelName, String id, V instance) throws WorkbenchException {
@@ -491,7 +486,7 @@ public class Workbench implements AutoCloseable {
      * @return the instances associated with the parameter model
      * @throws WorkbenchException if an exception occurs while retrieving digital twin instances for the parameter modelName
      */
-    public HashMap<String, DigitalTwinBase> getInstances(String modelName) throws WorkbenchException {
+    public HashMap<String, DigitalTwinBase<?>> getInstances(String modelName) throws WorkbenchException {
         if(_twinExecutionEngine.getTwinInstances(modelName) == null)
             throw new WorkbenchException(String.format("No instances for model %s.", modelName));
         return _twinExecutionEngine.getTwinInstances(modelName);
@@ -591,23 +586,6 @@ public class Workbench implements AutoCloseable {
             throw new WorkbenchException(msg);
         }
         return SendingResult.Handled;
-    }
-
-    static <T extends DigitalTwinBase<T>, V> void validate(MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
-        try {
-            Class<? extends MessageProcessor> mpType = digitalTwinMessageProcessor.getClass();
-            // instantiate TwinInstance
-            MessageProcessor instance = mpType.getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new WorkbenchException("Could not instantiate MessageProcessor instance. Default constructor required.", e);
-        }
-
-        try {
-            // instantiate TwinInstance
-            DigitalTwinBase instance = dtType.getConstructor().newInstance();
-        } catch (Exception e) {
-            throw new WorkbenchException("Could not instantiate DigitalTwin instance. Default constructor required.", e);
-        }
     }
 
     /**

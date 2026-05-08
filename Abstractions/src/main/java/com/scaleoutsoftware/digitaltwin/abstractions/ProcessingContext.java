@@ -23,7 +23,7 @@ import java.util.logging.Level;
 
 /**
  * Context object that allows the user to send a message to a DataSource.
- * <T> the type of the digital twin
+ * @param <T> the type of the digital twin
  */
 public abstract class ProcessingContext<T extends DigitalTwinBase<T>> implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -109,7 +109,7 @@ public abstract class ProcessingContext<T extends DigitalTwinBase<T>> implements
     /**
      * Delete the target real-time twin instance.
      * @param targetTwinModel the model of the real-time twin instance
-     * @param targetTwinId the id of the real-time twin instance.
+     * @param targetTwinId the id of the real-time twin instance
      * @return a completable future that will complete with a {@link DeleteResult} indicating the status of the operation, or
      * exceptionally indicating that an error occurred.
      */
@@ -121,6 +121,7 @@ public abstract class ProcessingContext<T extends DigitalTwinBase<T>> implements
      * @param interval the timer interval
      * @param timerType the timer type
      * @param timerHandler the time handler callback
+     * @param timerHandlerClass the timer handler callback class
      * @return returns {@link TimerActionResult#Success} if the timer was started, {@link TimerActionResult#FailedTooManyTimers}
      * if too many timers exist, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
      */

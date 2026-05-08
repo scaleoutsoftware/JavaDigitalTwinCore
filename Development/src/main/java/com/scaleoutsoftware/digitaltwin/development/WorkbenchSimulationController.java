@@ -73,44 +73,28 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public <T extends DigitalTwinBase<T>> CompletableFuture<SendingResult> createInstance(String modelName, String id, T instance) {
+    public <T extends DigitalTwinBase<T>> CompletableFuture<CreateResult> createInstance(String modelName, String id, T instance) {
         try {
             _engine.createInstance(modelName, id, instance);
-            return CompletableFuture.completedFuture(SendingResult.Handled);
+            return CompletableFuture.completedFuture(CreateResult.Success);
         } catch (Exception e) {
-            return CompletableFuture.completedFuture(SendingResult.NotHandled);
+            CompletableFuture<CreateResult> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
         }
     }
 
     @Override
-    public CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String modelName, String id) {
-        try {
-            throw new NoSuchMethodException("Not available on the workbench.");
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public <T extends DigitalTwinBase<T>> CompletableFuture<SendingResult> createInstanceFromPersistenceStore(String modelName, String id, T defaultInstance) {
-        try {
-            throw new NoSuchMethodException("Not available on the workbench.");
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public CompletableFuture<SendingResult> deleteInstance(String modelName, String id) {
+    public CompletableFuture<DeleteResult> deleteInstance(String modelName, String id) {
         _engine.deleteSimulationInstance(modelName, id);
-        return CompletableFuture.completedFuture(SendingResult.Handled);
+        return CompletableFuture.completedFuture(DeleteResult.Success);
     }
 
     @Override
-    public CompletableFuture<SendingResult> deleteThisInstance() {
+    public CompletableFuture<DeleteResult> deleteThisInstance() {
         _engine.deleteSimulationInstance(_modelName, _id);
         _deleted = true;
-        return CompletableFuture.completedFuture(SendingResult.Handled);
+        return CompletableFuture.completedFuture(DeleteResult.Success);
     }
 
     @Override

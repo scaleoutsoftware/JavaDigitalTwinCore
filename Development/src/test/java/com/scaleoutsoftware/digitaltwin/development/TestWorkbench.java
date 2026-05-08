@@ -352,7 +352,7 @@ public class TestWorkbench {
 
             while (step.getStatus() == SimulationStatus.Running) {
                 step = workbench.step();
-                HashMap<String, DigitalTwinBase> realTimeCars = workbench.getInstances("RealTimeCar");
+                HashMap<String, DigitalTwinBase<?>> realTimeCars = workbench.getInstances("RealTimeCar");
                 RealTimeCar rtCar = (RealTimeCar) realTimeCars.get("23");
                 System.out.println("rtCar: " + rtCar.getTirePressure());
             }

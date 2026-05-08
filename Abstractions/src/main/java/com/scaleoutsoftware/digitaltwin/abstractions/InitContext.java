@@ -34,6 +34,7 @@ public abstract class InitContext<T extends DigitalTwinBase<T>> {
      * @param interval the timer interval
      * @param timerType the timer type
      * @param timerHandler the time handler callback
+     * @param timerHandlerClass the timer handler callback class
      * @return returns {@link TimerActionResult#Success} if the timer was started, {@link TimerActionResult#FailedTooManyTimers}
      * if too many timers exist, or {@link TimerActionResult#FailedInternalError} if an unexpected error occurs.
      */

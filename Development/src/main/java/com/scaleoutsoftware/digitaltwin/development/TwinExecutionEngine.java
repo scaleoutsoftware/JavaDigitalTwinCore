@@ -135,8 +135,8 @@ class TwinExecutionEngine implements Closeable {
         return _modelNames;
     }
 
-    HashMap<String, DigitalTwinBase> getTwinInstances(String model) {
-        HashMap<String,DigitalTwinBase> ret = new HashMap<>();
+    HashMap<String, DigitalTwinBase<?>> getTwinInstances(String model) {
+        HashMap<String,DigitalTwinBase<?>> ret = new HashMap<>();
         ConcurrentHashMap<String,TwinProxy> instances = _modelInstances.get(model);
         if(instances!= null) {
             for(Map.Entry<String,TwinProxy> entry : instances.entrySet()) {
@@ -146,8 +146,8 @@ class TwinExecutionEngine implements Closeable {
         return ret;
     }
 
-    DigitalTwinBase getTwinInstance(String model, String id) {
-        DigitalTwinBase ret = null;
+    DigitalTwinBase<?> getTwinInstance(String model, String id) {
+        DigitalTwinBase<?> ret = null;
         ConcurrentHashMap<String,TwinProxy> instances = _modelInstances.get(model);
         if(instances != null) {
             TwinProxy proxy = instances.get(id);
