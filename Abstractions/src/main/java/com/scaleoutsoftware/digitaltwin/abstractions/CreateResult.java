@@ -15,6 +15,9 @@
 */
 package com.scaleoutsoftware.digitaltwin.abstractions;
 
+/**
+ * Enum indicating the status of a delete operation.
+ */
 public enum CreateResult {
     /**
      * The twin instance was successfully created.
