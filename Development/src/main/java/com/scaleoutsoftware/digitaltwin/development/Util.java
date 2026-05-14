@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class Util {
+class Util {
     public static <T> List<T> copyOf(Collection<? extends T> source) {
         if (source == null) {
             throw new NullPointerException("source");
