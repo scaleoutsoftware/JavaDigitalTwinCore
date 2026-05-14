@@ -1,8 +1,8 @@
 # ScaleOut Digital Twins&trade; Abstractions Libraries for Java
 
-The open source (Apache 2.0 licensed) project for the Abstractions API:
+The open source (Apache 2.0 licensed) project for the digitaltwin-abstractions API:
 
-- [com.scaleoutsoftware.digitaltwin.abstractions](https://mvnrepository.com/artifact/com.scaleoutsoftware.digitaltwin/core/3.2.2): Abstractions required for building Digital Twin models.
+- [com.scaleoutsoftware.digitaltwin:digitaltwin-abstractions](https://mvnrepository.com/artifact/com.scaleoutsoftware.digitaltwin/digitaltwin-abstractions/3.0.0): Abstract datatypes required for building Digital Twin models.
 
 
 ## Documentation
