@@ -80,3 +80,6 @@ gradlew.bat
 Development/gradle/wrapper/gradle-wrapper.properties
 Core/gradle/wrapper/gradle-wrapper.jar
 Core/gradle/wrapper/gradle-wrapper.jar
+/Development/target
+/Abstractions/target
+/docs/digitaltwin-core-docs/target

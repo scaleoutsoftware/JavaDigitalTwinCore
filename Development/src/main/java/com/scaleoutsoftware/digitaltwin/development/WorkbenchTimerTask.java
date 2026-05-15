@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.time.Duration;
 import java.util.TimerTask;
@@ -45,7 +45,7 @@ class WorkbenchTimerTask extends TimerTask {
     public void run() {
         DigitalTwinBase instance = _proxy.getInstance();
         WorkbenchProcessingContext context = new WorkbenchProcessingContext(_engine, null);
-        context.reset(_modelName, _id, null, instance);
+        context.reset(_modelName, _id, null, _proxy);
         ProcessingResult result;
         synchronized (instance) {
              result = _handler.onTimedMessage(_timerName, instance, context);

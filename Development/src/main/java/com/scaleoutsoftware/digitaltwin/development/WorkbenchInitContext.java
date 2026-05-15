@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,26 +15,26 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.time.Duration;
 
-class WorkbenchInitContext extends InitContext {
+class WorkbenchInitContext<T extends DigitalTwinBase<T>> extends InitContext<T> {
     TwinExecutionEngine     _twinExecutionEngine;
-    DigitalTwinBase         _instance;
+    TwinProxy               _proxy;
     String                  _model;
     String                  _id;
 
-    WorkbenchInitContext(TwinExecutionEngine twinExecutionEngine, DigitalTwinBase instance, String model, String id) {
+    WorkbenchInitContext(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id) {
         _twinExecutionEngine    = twinExecutionEngine;
-        _instance               = instance;
+        _proxy                  = proxy;
         _model                  = model;
         _id                     = id;
     }
 
     @Override
-    public <T extends DigitalTwinBase> TimerActionResult startTimer(String timerName, Duration duration, TimerType timerType, TimerHandler<T> timerHandler) {
-        return WorkbenchTimerService.startTimer(_twinExecutionEngine, (T)_instance, _model, _id, timerName, duration, timerType, timerHandler);
+    public TimerActionResult startTimer(String timerName, Duration duration, TimerType timerType, TimerHandler<T> timerHandler, Class<? extends TimerHandler<T>> aClass) {
+        return WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, duration, timerType, timerHandler, aClass);
     }
 
     @Override

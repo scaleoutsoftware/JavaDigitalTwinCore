@@ -15,21 +15,19 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.google.gson.Gson;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
-
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-class WorkbenchProcessingContext extends ProcessingContext {
+class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends ProcessingContext<T> {
     final TwinExecutionEngine   _twinExecutionEngine;
     String                      _model;
     String                      _id;
     String                      _source;
-    DigitalTwinBase             _twinInstance;
+    TwinProxy                   _proxy;
     SimulationController        _controller;
     HashMap<String, byte[]>     _modelData;
     HashMap<String, byte[]>     _globalData;
@@ -47,10 +45,10 @@ class WorkbenchProcessingContext extends ProcessingContext {
         _controller             = controller;
     }
 
-    void reset(String model, String id, String source, DigitalTwinBase instance) {
+    void reset(String model, String id, String source, TwinProxy proxy) {
         _model          = model;
         _id             = id;
-        _twinInstance   = instance;
+        _proxy          = proxy;
         _forceSave      = false;
         _source         = source;
         _modelData      = _twinExecutionEngine.getModelData(model);
@@ -66,8 +64,8 @@ class WorkbenchProcessingContext extends ProcessingContext {
         _globalData     = _twinExecutionEngine.getGlobalSharedData();
     }
 
-    void resetInstance(DigitalTwinBase instance) {
-        _twinInstance = instance;
+    void resetProxy(TwinProxy proxy) {
+        _proxy = proxy;
     }
 
     boolean forceSave() {
@@ -75,106 +73,35 @@ class WorkbenchProcessingContext extends ProcessingContext {
     }
 
     @Override
-    public SendingResult sendToDataSource(byte[] bytes) {
+    public CompletableFuture<SendingResult> sendToDataSource(byte[] message) {
         try {
-            return _twinExecutionEngine.sendToSource(_source, _model, _id, new String(bytes, StandardCharsets.UTF_8));
+            return CompletableFuture.completedFuture(_twinExecutionEngine.sendToSource(_source, _model, _id, message));
         } catch (WorkbenchException e) {
-            return SendingResult.NotHandled;
+            return CompletableFuture.completedFuture(SendingResult.NotHandled);
         }
     }
 
     @Override
-    public SendingResult sendToDataSource(Object jsonSerializableMessage) {
+    public CompletableFuture<SendingResult> sendToDigitalTwin(String model, String id, byte[] message) {
         try {
-            List<Object> jsonSerializableMessages = new LinkedList<>();
-            jsonSerializableMessages.add(jsonSerializableMessage);
-            return _twinExecutionEngine.sendToSource(_source, _model, _id, jsonSerializableMessages);
+            return CompletableFuture.completedFuture(_twinExecutionEngine.run(model, id,null, message) != null ? SendingResult.Handled : SendingResult.NotHandled);
         } catch (WorkbenchException e) {
-            return SendingResult.NotHandled;
+            return CompletableFuture.completedFuture(SendingResult.NotHandled);
         }
     }
 
     @Override
-    public SendingResult sendToDataSource(List<Object> list) {
-        try {
-            return _twinExecutionEngine.sendToSource(_source, _model, _id, list);
-        } catch (WorkbenchException e) {
-            return SendingResult.NotHandled;
-        }
-    }
-
-    @Override
-    public SendingResult sendToDigitalTwin(String model, String id, byte[] bytes) {
-        List<byte[]> msgs = new LinkedList<>();
-        msgs.add(bytes);
-        return sendToDigitalTwin(model, id, msgs);
-    }
-
-    @Override
-    public SendingResult sendToDigitalTwin(String model, String id, Object jsonSerializableMessage) {
-        try {
-            if(_twinExecutionEngine.getTwinInstance(model, id) != null) {
-                List<Object> jsonSerializableMessages;
-                if(jsonSerializableMessage instanceof List) {
-                    jsonSerializableMessages = (List<Object>)jsonSerializableMessage;
-                } else {
-                    jsonSerializableMessages = new LinkedList<>();
-                    jsonSerializableMessages.add(jsonSerializableMessage);
-                }
-
-                return _twinExecutionEngine.run(model, id, null, jsonSerializableMessages) != null ? SendingResult.Handled : SendingResult.NotHandled;
-            } else {
-                return SendingResult.NotHandled;
-            }
-        } catch (WorkbenchException e) {
-            return SendingResult.NotHandled;
-        }
-    }
-
-    @Override
-    public SendingResult sendToDigitalTwin(String model, String id, String msg) {
-        return sendToDigitalTwin(model, id, msg.getBytes(StandardCharsets.UTF_8));
-    }
-
-    @Override
-    public SendingResult sendToDigitalTwin(String model, String id, List<byte[]> list) {
-        if( (model == null || model.isEmpty()) ||
-            (id == null || id.isEmpty()) ||
-            (list == null || list.isEmpty())) {
-            return SendingResult.NotHandled;
-        }
-        Gson gson = new Gson();
-        List<String> msgs = new LinkedList<>();
-        for(byte[] serialMsg : list) {
-            msgs.add(new String(serialMsg, StandardCharsets.UTF_8));
-        }
-        String json = gson.toJson(msgs);
-        try {
-            if(_twinExecutionEngine.getTwinInstance(model, id) != null) {
-                return _twinExecutionEngine.run(model, id, null, json) != null ? SendingResult.Handled : SendingResult.NotHandled;
-            } else {
-                return SendingResult.NotHandled;
-            }
-
-        } catch (WorkbenchException e) {
-            return SendingResult.NotHandled;
-        }
-    }
-
-    @Override
-    public SendingResult sendAlert(String alertProviderName, AlertMessage alertMessage) {
-        if(alertProviderName.isBlank() || alertProviderName.isEmpty() || alertMessage == null) return SendingResult.NotHandled;
-        else if (!_twinExecutionEngine.hasAlertProviderConfiguration(_model, alertProviderName)) return SendingResult.NotHandled;
+    public CompletableFuture<Void> sendAlert(AlertMessage alertMessage) {
+        if(alertMessage == null) return Util.failedFuture(new IllegalArgumentException("Alert message was null."));
+        else if (!_twinExecutionEngine.hasAlertProviderConfiguration(_model)) return Util.failedFuture(new IllegalStateException("No alert provider configuration available to model."));
         else {
-            if(_twinExecutionEngine.hasAlertProviderConfiguration(_model, alertProviderName)) {
-                _twinExecutionEngine.recordAlertMessage(_model, alertProviderName, alertMessage);
-            }
-            return SendingResult.Handled;
+            _twinExecutionEngine.recordAlertMessage(_model, alertMessage);
+            return CompletableFuture.completedFuture(null);
         }
     }
 
     @Override
-    public PersistenceProvider getPersistenceProvider() {
+    public AzureDigitalTwinsProvider getAzureDigitalTwinsProvider() {
         return null;
     }
 
@@ -189,13 +116,19 @@ class WorkbenchProcessingContext extends ProcessingContext {
     }
 
     @Override
-    public void logMessage(Level level, String msg) {
+    public CompletableFuture<Void> logMessage(Level level, String msg) {
         _twinExecutionEngine.logMessage(_model, new LogMessage(level, msg));
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public <T extends DigitalTwinBase> TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
-        TimerActionResult ret = WorkbenchTimerService.startTimer(_twinExecutionEngine, (T)_twinInstance, _model, _id, timerName, interval, timerType, timerHandler);
+    public CompletableFuture<DeleteResult> removeRealTimeTwin(String targetModelName, String targetInstanceId) {
+        return _twinExecutionEngine.deleteRealTimeInstance(targetModelName, targetInstanceId);
+    }
+
+    @Override
+    public TimerActionResult startTimer(String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler, Class<? extends TimerHandler<T>> aClass) {
+        TimerActionResult ret = WorkbenchTimerService.startTimer(_twinExecutionEngine, _proxy, _model, _id, timerName, interval, timerType, timerHandler, aClass);
         if(ret != TimerActionResult.Success) {
             _forceSave = false;
         } else {
@@ -206,7 +139,7 @@ class WorkbenchProcessingContext extends ProcessingContext {
 
     @Override
     public TimerActionResult stopTimer(String timerName) {
-        TimerActionResult ret = WorkbenchTimerService.stopTimer(_twinExecutionEngine, _twinInstance, _model, _id, timerName);
+        TimerActionResult ret = WorkbenchTimerService.stopTimer(_twinExecutionEngine, _proxy, _model, _id, timerName);
         if(ret != TimerActionResult.Success) {
             _forceSave = false;
         } else {

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,31 +15,31 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.time.Duration;
 
 class WorkbenchTimerService {
 
-    static <T extends DigitalTwinBase> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, T instance, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler) {
-        if(timerName == null || timerName.isBlank() || timerName.isEmpty() || interval == null ||
+    static <T extends DigitalTwinBase<T>> TimerActionResult startTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName, Duration interval, TimerType timerType, TimerHandler<T> timerHandler, Class<? extends TimerHandler<T>> handlerClass) {
+        if(timerName == null || timerName.isEmpty() || interval == null ||
                 interval.isZero() || interval.isNegative() || timerType == null || timerHandler == null) {
             String msg = String.format("Empty, blank, zero, or null parameter provided: timerName %s interval %s timerType %s timerHandler %s",
                     timerName, interval, timerType, timerHandler);
             throw new IllegalArgumentException(msg);
 
         }
-        if (instance.TimerHandlers.size() >= Constants.MAX_TIMER_COUNT) // all timer slots are occupied
+        if (proxy.getTimerHandlers().size() >= Constants.MAX_TIMER_COUNT) // all timer slots are occupied
             return TimerActionResult.FailedTooManyTimers;
 
-        if(instance.TimerHandlers.containsKey(timerName)) return TimerActionResult.FailedTimerAlreadyExists;
+        if(proxy.getTimerHandlers().containsKey(timerName)) return TimerActionResult.FailedTimerAlreadyExists;
 
         int timerId = -1;
 
         boolean[] taken = new boolean[Constants.MAX_TIMER_COUNT];
         // List of all timer Ids
-        for (TimerMetadata md : instance.TimerHandlers.values()) {
-            taken[md.getTimerId()] = true;
+        for (TimerMetadata md : proxy.getTimerHandlers().values()) {
+            taken[md.getTimerSlot()] = true;
         }
 
         for(int i = 0; i < taken.length; i++) {
@@ -52,13 +52,13 @@ class WorkbenchTimerService {
         twinExecutionEngine.addTimer(model, id, timerName, timerType, interval, timerHandler);
 
         TimerMetadata<T> metadata = new TimerMetadata<>(timerHandler, timerType, interval.toMillis(), timerId);
-        instance.TimerHandlers.put(timerName, metadata);
+        proxy.getTimerHandlers().put(timerName, metadata);
         return TimerActionResult.Success;
     }
 
-    static <T extends DigitalTwinBase> TimerActionResult stopTimer(TwinExecutionEngine twinExecutionEngine, T instance, String model, String id, String timerName) {
+    static <T extends DigitalTwinBase<T>> TimerActionResult stopTimer(TwinExecutionEngine twinExecutionEngine, TwinProxy proxy, String model, String id, String timerName) {
         twinExecutionEngine.stopTimer(model, id, timerName);
-        instance.TimerHandlers.remove(timerName);
+        proxy.getTimerHandlers().remove(timerName);
         return TimerActionResult.Success;
     }
 

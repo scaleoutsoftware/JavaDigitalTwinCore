@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.SimulationStatus;
+import com.scaleoutsoftware.digitaltwin.abstractions.SimulationStatus;
 
 /**
  * The simulation step class encases the metadata for a completed interval of a simulation.

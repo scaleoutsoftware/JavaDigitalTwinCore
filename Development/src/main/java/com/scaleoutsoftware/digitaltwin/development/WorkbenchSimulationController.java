@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 class WorkbenchSimulationController implements SimulationController {
     TwinExecutionEngine     _engine;
@@ -50,88 +51,50 @@ class WorkbenchSimulationController implements SimulationController {
     }
 
     @Override
-    public SendingResult delay(Duration duration) {
+    public void delay(Duration duration) {
         _requestedDelay = duration.toMillis();
         _delayRequested = true;
-        return SendingResult.Handled;
     }
 
     @Override
-    public SendingResult delayIndefinitely() {
+    public void delayIndefinitely() {
         _requestedDelay = 0x0000e677d21fdbffL;
         _delayRequested = true;
-        return SendingResult.Handled;
     }
 
     @Override
-    public SendingResult emitTelemetry(String modelName, byte[] bytes) {
+    public CompletableFuture<SendingResult> emitTelemetry(String modelName, byte[] message) {
         try {
-            _engine.run(modelName, _id, _modelName, String.format("[%s]", new String(bytes, StandardCharsets.UTF_8)));
-            return SendingResult.Handled;
+            _engine.run(modelName, _id, _modelName, message);
+            return CompletableFuture.completedFuture(SendingResult.Handled);
         } catch (WorkbenchException e) {
-            e.printStackTrace();
-            return SendingResult.NotHandled;
+            return CompletableFuture.completedFuture(SendingResult.NotHandled);
         }
     }
 
     @Override
-    public SendingResult emitTelemetry(String modelName, Object jsonSerializableMessage) {
-        try {
-            if(_engine.hasModel(modelName)) {
-                List<Object> jsonSerializableMessages = new LinkedList<>();
-                jsonSerializableMessages.add(jsonSerializableMessage);
-                _engine.run(modelName, _id, _modelName, jsonSerializableMessages);
-                return SendingResult.Handled;
-            } else {
-                return SendingResult.NotHandled;
-            }
-
-        } catch (WorkbenchException e) {
-            e.printStackTrace();
-            return SendingResult.NotHandled;
-        }
-    }
-
-    @Override
-    public <T extends DigitalTwinBase> SendingResult createInstance(String modelName, String id, T instance) {
+    public <T extends DigitalTwinBase<T>> CompletableFuture<CreateResult> createInstance(String modelName, String id, T instance) {
         try {
             _engine.createInstance(modelName, id, instance);
-            return SendingResult.Handled;
+            return CompletableFuture.completedFuture(CreateResult.Success);
         } catch (Exception e) {
-            e.printStackTrace();
-            return SendingResult.NotHandled;
+            CompletableFuture<CreateResult> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
         }
     }
 
     @Override
-    public SendingResult createInstanceFromPersistenceStore(String modelName, String id) {
-        try {
-            throw new NoSuchMethodException("Not available on the workbench.");
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public <T extends DigitalTwinBase> SendingResult createInstanceFromPersistenceStore(String modelName, String id, T defaultInstance) {
-        try {
-            throw new NoSuchMethodException("Not available on the workbench.");
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public SendingResult deleteInstance(String modelName, String id) {
+    public CompletableFuture<DeleteResult> deleteInstance(String modelName, String id) {
         _engine.deleteSimulationInstance(modelName, id);
-        return SendingResult.Handled;
+        return CompletableFuture.completedFuture(DeleteResult.Success);
     }
 
     @Override
-    public SendingResult deleteThisInstance() {
+    public CompletableFuture<DeleteResult> deleteThisInstance() {
         _engine.deleteSimulationInstance(_modelName, _id);
         _deleted = true;
-        return SendingResult.Handled;
+        return CompletableFuture.completedFuture(DeleteResult.Success);
     }
 
     @Override

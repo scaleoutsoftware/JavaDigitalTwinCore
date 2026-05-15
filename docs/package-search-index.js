@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.scaleoutsoftware.digitaltwin.core"},{"l":"com.scaleoutsoftware.digitaltwin.development"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.scaleoutsoftware.digitaltwin.abstractions"},{"l":"com.scaleoutsoftware.digitaltwin.development"}];updateSearchResults();

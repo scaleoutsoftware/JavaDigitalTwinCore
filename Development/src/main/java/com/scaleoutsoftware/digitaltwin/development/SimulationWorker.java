@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -125,8 +125,10 @@ class SimulationWorker implements Callable<SimulationStep> {
             event.setPriority(_curSimulationTime + _simulationInterval);
             event.setNextSimulationTime(_curSimulationTime + _simulationInterval);
         }
-        _events.put(String.format("%s%s",model,id), event);
-        _timeOrderedQueue.add(event);
+        if(!simulationController.deleted() && !(event.getProxyState() == ProxyState.Removed)) {
+            _events.put(String.format("%s%s",model,id), event);
+            _timeOrderedQueue.add(event);
+        }
     }
 
     @Override
@@ -198,7 +200,7 @@ class SimulationWorker implements Callable<SimulationStep> {
                         }
                         keepProcessing = false;
                     }
-                    if(!simulationController.deleted() && addToBuffer) {
+                    if(!simulationController.deleted() && addToBuffer && !(next.getProxyState() == ProxyState.Removed)) {
                         buffer.add(next);
                     }
                 }

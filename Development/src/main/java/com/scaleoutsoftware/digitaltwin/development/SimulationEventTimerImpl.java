@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.DigitalTwinBase;
-import com.scaleoutsoftware.digitaltwin.core.ProcessingContext;
-import com.scaleoutsoftware.digitaltwin.core.TimerHandler;
+import com.scaleoutsoftware.digitaltwin.abstractions.DigitalTwinBase;
+import com.scaleoutsoftware.digitaltwin.abstractions.ProcessingContext;
+import com.scaleoutsoftware.digitaltwin.abstractions.TimerHandler;
 
 import java.util.Date;
 

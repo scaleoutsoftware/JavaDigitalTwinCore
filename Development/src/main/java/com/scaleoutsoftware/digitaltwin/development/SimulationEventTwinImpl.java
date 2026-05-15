@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.*;
+import com.scaleoutsoftware.digitaltwin.abstractions.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.Objects;
 
 class SimulationEventTwinImpl extends SimulationEvent {
     SimulationProcessor _processor;
@@ -41,8 +40,11 @@ class SimulationEventTwinImpl extends SimulationEvent {
             DigitalTwinBase base = _proxy.getInstance();
             synchronized (_proxy) {
                 WorkbenchProcessingContext wpc = (WorkbenchProcessingContext)context;
-                wpc.resetInstance(base);
-                _processor.processModel(wpc, base, currentTime);
+                wpc.resetProxy(_proxy);
+                ProcessingResult result = _processor.processModel(wpc, base, currentTime);
+                if(result == ProcessingResult.Remove) {
+                    _proxy.setProxyState(ProxyState.Removed);
+                }
                 _proxy.setInstance(base);
             }
         } catch (Exception e) {
@@ -63,9 +65,6 @@ class SimulationEventTwinImpl extends SimulationEvent {
 
     @Override
     void handleResetNextSimulationTime() {
-        DigitalTwinBase base = _proxy.getInstance();
-        base.NextSimulationTime = _nextSimulationTime;
-        _proxy.setInstance(base);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2025 by ScaleOut Software, Inc.
+ Copyright (c) 2026 by ScaleOut Software, Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,14 +15,21 @@
 */
 package com.scaleoutsoftware.digitaltwin.development;
 
-import com.scaleoutsoftware.digitaltwin.core.DigitalTwinBase;
+import com.scaleoutsoftware.digitaltwin.abstractions.DigitalTwinBase;
+import com.scaleoutsoftware.digitaltwin.abstractions.TimerMetadata;
+
+import java.util.HashMap;
 
 class TwinProxy {
-    private DigitalTwinBase     _instance;
-    private ProxyState          _state;
-    public TwinProxy(DigitalTwinBase instance) {
-        _instance   = instance;
-        _state      = ProxyState.Unspecified;
+    private DigitalTwinBase                                             _instance;
+    private ProxyState                                                  _state;
+    private long                                                        _nextSimulationTime;
+    private HashMap<String, TimerMetadata<? extends DigitalTwinBase>>   _timerHandlers;
+    public TwinProxy(DigitalTwinBase instance, HashMap<String, TimerMetadata<? extends DigitalTwinBase>> timerHandlers) {
+        _instance           = instance;
+        _timerHandlers      = timerHandlers;
+        _state              = ProxyState.Unspecified;
+        _nextSimulationTime = 0L;
     }
 
     void setProxyState(ProxyState state) {
@@ -39,6 +46,10 @@ class TwinProxy {
 
     public void setInstance(DigitalTwinBase instance) {
         _instance = instance;
+    }
+
+    HashMap<String, TimerMetadata<? extends DigitalTwinBase>> getTimerHandlers() {
+        return _timerHandlers;
     }
 
     @Override
