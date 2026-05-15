@@ -7,7 +7,36 @@
     <groupId>com.scaleoutsoftware.digitaltwin</groupId>
     <artifactId>digitaltwin-development</artifactId>
     <version>3.0.0</version>
-
+    <inceptionYear>2021</inceptionYear>
+    <url>https://scaleoutsoftware.com</url>
+    <name>Digital Twin Core API</name>
+    <description>Development/Workbench API for testing ScaleOut real-time and simulated digital twins.</description>
+    <developers>
+	  <developer>
+        <id>scaleoutdev</id>
+        <name>ScaleOut Dev</name>
+        <email>dev@scaleoutsoftware.com</email>
+        <url>https://scaleoutsoftware.com</url>
+        <organization>ScaleOut Software, Inc.</organization>
+        <organizationUrl>https://scaleoutsoftware.com</organizationUrl>
+        <roles>
+          <role>developer</role>
+          <role>engineer</role>
+        </roles>
+        <timezone>America/Los_Angeles</timezone>
+      </developer>
+    </developers>
+    <licenses>
+      <license>
+        <name>Apache License 2.0</name>
+        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+        <comments>Apache License 2.0</comments>
+      </license>
+    </licenses>
+    <scm>
+      <url>https://github.com/scaleoutsoftware/JavaDigitalTwinCore</url>
+    </scm>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
