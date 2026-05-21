@@ -21,6 +21,7 @@ import java.util.HashMap;
 /**
  * A real-time digital twin of a data source. The implementation of the real-time DigitalTwin should have a parameterless constructor for
  * basic initialization.
+ * @param <T> the type of the {@link DigitalTwinBase} implementation.
  */
 public abstract class DigitalTwinBase<T extends DigitalTwinBase<T>> {
 
