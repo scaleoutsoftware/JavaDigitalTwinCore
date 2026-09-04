@@ -19,4 +19,9 @@ package com.scaleoutsoftware.digitaltwin.development;
  * A simulation event result.
  */
 public abstract class SimulationEventResult {
+	/**
+	 * Constructs a SimulationEventResult
+	 */
+	public SimulationEventResult() {
+	}
 }
