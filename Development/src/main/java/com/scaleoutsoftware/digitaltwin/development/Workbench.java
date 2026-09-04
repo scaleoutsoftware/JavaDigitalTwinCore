@@ -103,7 +103,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *     send a message back to the simulated pump.
  * </p>
  * <pre>
- *     public class RealTimeCarMessageProcessor extends MessageProcessor{@literal <}RealTimeCar, TirePressureMessage{@literal >} implements Serializable {
+ *     public class RealTimeCarMessageProcessor extends MessageProcessor{@literal <}RealTimeCar, TirePressureMessage{@literal >} {
  *         final int TIRE_PRESSURE_FULL = 100;
  *         public ProcessingResult processMessages(ProcessingContext processingContext, RealTimeCar car, Iterable{@literal <}TirePressureMessage{@literal >} messages) throws Exception {
  *             // apply the updates from the messages
@@ -158,7 +158,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *     processor will update the state of the simulated pump indicating that the tire is full.
  * </p>
  * <pre>
- *     public class PumpMessageProcessor extends MessageProcessor{@literal <}SimulatedPump, TirePressureMessage{@literal >} implements Serializable {
+ *     public class PumpMessageProcessor extends MessageProcessor{@literal <}SimulatedPump, TirePressureMessage{@literal >} {
  *         public ProcessingResult processMessages(ProcessingContext processingContext, SimulatedPump pump, Iterable{@literal <}TirePressureMessage{@literal >} messages) throws Exception {
  *             // apply the updates from the messages
  *             pump.setTirePressureReached();
@@ -178,7 +178,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *     told to stop, it will continue sending tire pressure changes to the real-time car.
  * </p>
  * <pre>
- *     public class PumpSimulationProcessor extends SimulationProcessor{@literal <}SimulatedPump{@literal >} implements Serializable {
+ *     public class PumpSimulationProcessor extends SimulationProcessor{@literal <}SimulatedPump{@literal >} {
  *         public ProcessingResult processModel(ProcessingContext processingContext, SimulatedPump simPump, Date date) {
  *             SimulationController controller = processingContext.getSimulationController();
  *             if(simPump.isTireFull()) {
@@ -284,11 +284,10 @@ public class Workbench implements AutoCloseable {
      * Adds a real-time digital twin model to the workbench.
      *
      * @param modelName the name of the model.
-     * @param digitalTwinMessageProcessor the model's {@link MessageProcessor} implementation. Must be marked as {@link Serializable}.
+     * @param digitalTwinMessageProcessor the model's {@link MessageProcessor} implementation. 
      * @param dtType the model's {@link DigitalTwinBase} implementation.
      * @param <T> the type of the digital twin.
-     * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the message
-     *  processor must be serializable, and the digital twin implementation must have a parameterless constructor).
+     * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the digital twin implementation must have a parameterless constructor).
      */
     public <T extends DigitalTwinBase<T>> void addRealTimeModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, Class<T> dtType) throws WorkbenchException {
         if(modelName == null || modelName.isEmpty() || digitalTwinMessageProcessor == null || dtType == null) {
@@ -302,12 +301,11 @@ public class Workbench implements AutoCloseable {
      * Adds a simulation digital twin model to the workbench.
      *
      * @param modelName the name of the model.
-     * @param digitalTwinMessageProcessor the model's {@link MessageProcessor} implementation. Must be marked as {@link Serializable}.
-     * @param simulationProcessor the model's {@link SimulationProcessor} implementation. Must be marked as {@link Serializable}.
+     * @param digitalTwinMessageProcessor the model's {@link MessageProcessor} implementation.
+     * @param simulationProcessor the model's {@link SimulationProcessor} implementation. 
      * @param dtType the model's {@link DigitalTwinBase} implementation.
      * @param <T> the type of the digital twin.
-     * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the message
-     *  processor must be serializable, and the digital twin implementation must have a parameterless constructor).
+     * @throws WorkbenchException if any of the parameters are null or the model does not pass validation (the digital twin implementation must have a parameterless constructor).
      */
     public <T extends DigitalTwinBase<T>> void addSimulationModel(String modelName, MessageProcessor<T> digitalTwinMessageProcessor, SimulationProcessor<T> simulationProcessor, Class<T> dtType) throws WorkbenchException {
         if(modelName == null || modelName.isEmpty() || digitalTwinMessageProcessor == null || simulationProcessor == null || dtType == null) {
