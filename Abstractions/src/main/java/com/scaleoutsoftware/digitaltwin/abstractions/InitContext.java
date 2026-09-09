@@ -20,6 +20,7 @@ import java.time.Duration;
 /**
  * The InitContext is passed as a parameter to the {@link DigitalTwinBase#init(InitContext)} method of an initializing
  * digital twin.
+ * @param <T> the type of the {@link DigitalTwinBase} implementation.
  */
 public abstract class InitContext<T extends DigitalTwinBase<T>> {
 

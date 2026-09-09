@@ -63,6 +63,10 @@ public class TimerMetadata<T extends DigitalTwinBase<T>> {
         return timerSlot;
     }
 
+    /**
+     * Retrieves the timer handler.
+     * @return the timer handler.
+     */
     public TimerHandler<T> getHandler() {
         return handlerClass;
     }
