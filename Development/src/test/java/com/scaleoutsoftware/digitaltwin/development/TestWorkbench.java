@@ -47,7 +47,7 @@ public class TestWorkbench {
         }
     }
 
-    public static class SimpleMessageProcessor extends MessageProcessor<SimpleDigitalTwin> implements Serializable {
+    public static class SimpleMessageProcessor extends MessageProcessor<SimpleDigitalTwin> {
 
         public SimpleMessageProcessor() {}
 
@@ -156,7 +156,7 @@ public class TestWorkbench {
         }
     }
 
-    public static class RealTimeCarMessageProcessor extends MessageProcessor<RealTimeCar> implements Serializable {
+    public static class RealTimeCarMessageProcessor extends MessageProcessor<RealTimeCar> {
         final int TIRE_PRESSURE_FULL = 100;
         @Override
         public ProcessingResult processMessage(ProcessingContext<RealTimeCar> processingContext, RealTimeCar car, byte[] message) throws Exception {
@@ -192,7 +192,7 @@ public class TestWorkbench {
         }
     }
 
-    public static class SimulatedPumpMessageProcessor extends MessageProcessor<SimulationPump> implements Serializable {
+    public static class SimulatedPumpMessageProcessor extends MessageProcessor<SimulationPump> {
         @Override
         public ProcessingResult processMessage(ProcessingContext processingContext, SimulationPump simCar, byte[] message) throws Exception {
             // apply the updates from the messages
@@ -225,7 +225,7 @@ public class TestWorkbench {
         }
     }
 
-    public static class SimpleSimProcessor extends SimulationProcessor<SimpleDigitalTwin> implements Serializable {
+    public static class SimpleSimProcessor extends SimulationProcessor<SimpleDigitalTwin> {
         private Gson            _gson = new Gson();
         private AtomicInteger   timesInvoked = new AtomicInteger(0);
         private String          _modelIdToMessage;

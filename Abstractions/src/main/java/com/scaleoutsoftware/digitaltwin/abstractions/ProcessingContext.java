@@ -25,7 +25,7 @@ import java.util.logging.Level;
  * Context object that allows the user to send a message to a DataSource.
  * @param <T> the type of the digital twin
  */
-public abstract class ProcessingContext<T extends DigitalTwinBase<T>> implements Serializable {
+public abstract class ProcessingContext<T extends DigitalTwinBase<T>> {
     private static final long serialVersionUID = 1L;
 
     /**
