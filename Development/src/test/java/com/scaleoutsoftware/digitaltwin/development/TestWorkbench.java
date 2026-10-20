@@ -16,7 +16,12 @@
 package com.scaleoutsoftware.digitaltwin.development;
 
 import com.google.gson.Gson;
+import com.scaleout.client.GridConnection;
 import com.scaleoutsoftware.digitaltwin.abstractions.*;
+import com.scaleoutsoftware.modules.connectors.abstractions.ConsumerRecordFilter;
+import com.scaleoutsoftware.modules.connectors.abstractions.ConsumerRecordFilterMetadata;
+import com.scaleoutsoftware.modules.connectors.abstractions.FilterResult;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -821,6 +826,72 @@ public class TestWorkbench {
             int initSimExpectedInvokes = 1000;
             workbench.runSimulation(startTimeMs, stopTimeMs, speedup, step);
             Assert.assertEquals(expectedInvokes + initSimExpectedInvokes, processor.timesInvoked.get());
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    // ----------------- REQUIRES KAFKA -----------------
+
+    @Test
+    public void TestWorkbenchKafkaConnector() throws Exception {
+        try (Workbench workbench = new Workbench()) {
+            SimpleSimProcessor processor = new SimpleSimProcessor();
+            workbench.addRealTimeModel("RTCar", new RealTimeCarMessageProcessor(), RealTimeCar.class);
+            Map<String,Object> properties = new HashMap<>();
+            properties.put("bootstrap.servers", "localhost:9092");
+            properties.put("group.id","kafkatest1");
+            workbench.addKafkaConnector(properties, "modelc", "RTCar");
+            // wait for events to come in
+            Thread.sleep(60000);
+            // some basic validation...
+            System.out.println("size: " + workbench.getInstances("RTCar").size());
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public static class TestFilter extends ConsumerRecordFilter {
+
+        public TestFilter(GridConnection connection) {
+            super(connection);
+        }
+
+        @Override
+        public ConsumerRecordFilterMetadata filter(ConsumerRecord<String, byte[]> consumerRecord) {
+            return new ConsumerRecordFilterMetadata() {
+                @Override
+                public FilterResult getFilterResult() {
+                    return FilterResult.ForwardMessage;
+                }
+
+                @Override
+                public String getId() {
+                    return consumerRecord.key();
+                }
+
+                @Override
+                public List<byte[]> getPayload() {
+                    return Collections.singletonList(consumerRecord.value());
+                }
+            };
+        }
+    }
+
+
+    @Test
+    public void TestWorkbenchKafkaConnectorMessageFilter() throws Exception {
+        try (Workbench workbench = new Workbench()) {
+            SimpleSimProcessor processor = new SimpleSimProcessor();
+            workbench.addRealTimeModel("RTCar", new RealTimeCarMessageProcessor(), RealTimeCar.class);
+            Map<String,Object> properties = new HashMap<>();
+            properties.put("bootstrap.servers", "localhost:9092");
+            properties.put("group.id","kafkatest1");
+            workbench.addKafkaConnector(properties, "modelc", "RTCar", new TestFilter(null));
+            // wait for events to come in
+            Thread.sleep(60000);
+            // some basic validation...
+            System.out.println("size: " + workbench.getInstances("RTCar").size());
         } catch (Exception e) {
             throw e;
         }

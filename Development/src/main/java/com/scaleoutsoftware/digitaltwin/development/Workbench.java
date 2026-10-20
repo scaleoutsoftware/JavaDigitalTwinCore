@@ -16,11 +16,11 @@
 package com.scaleoutsoftware.digitaltwin.development;
 
 import com.scaleoutsoftware.digitaltwin.abstractions.*;
+import com.scaleoutsoftware.modules.connectors.abstractions.ConsumerRecordFilter;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 
 /**
  * The Workbench is used to represent an environment where developers can test real-time and simulated digital twins.
@@ -260,6 +260,15 @@ public class Workbench implements AutoCloseable {
     private SimulationStep _result = null;
     private boolean _simulationStarted = false;
     private int _numWorkers = Runtime.getRuntime().availableProcessors();
+    private ExecutorService _kafkaService = Executors.newFixedThreadPool(_numWorkers/2, new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        }
+    });
+    private KafkaConsumerRunnable _kafkaConsumerRunnable = null;
 
 
     /**
@@ -345,6 +354,22 @@ public class Workbench implements AutoCloseable {
         if(_simulationStarted) throw new WorkbenchException("Cannot add new alert provider while simulation is active.");
         if(!_twinExecutionEngine.hasModel(modelName)) throw new WorkbenchException("The model does not exist on this workbench.");
         _twinExecutionEngine.addAlertProvider(modelName, alertProviderName);
+    }
+
+    public void addKafkaConnector(Map<String,Object> serverProperties, String consumeTopic, String modelName) throws WorkbenchException {
+        addKafkaConnector(serverProperties, consumeTopic, modelName, null);
+    }
+
+    public void addKafkaConnector(Map<String,Object> serverProperties, String consumeTopic, String modelName, ConsumerRecordFilter consumerRecordFilter) throws WorkbenchException {
+        if(serverProperties == null) throw new WorkbenchException("Kafka connector requires server.properties.");
+        if(consumeTopic == null || consumeTopic.isEmpty()) throw new WorkbenchException("topic to consume messages from was null or empty.");
+        if(modelName == null || modelName.isEmpty()) throw new WorkbenchException("modelName required.");
+        // consumer only deals with blobs
+        serverProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        serverProperties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        serverProperties.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
+        serverProperties.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+        _kafkaService.submit(new KafkaConsumerRunnable(serverProperties, consumeTopic, modelName, consumerRecordFilter, _twinExecutionEngine));
     }
 
     /**
