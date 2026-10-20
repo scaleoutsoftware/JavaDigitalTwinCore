@@ -34,6 +34,16 @@
         <comments>Apache License 2.0</comments>
       </license>
     </licenses>
+    <repositories>
+        <repository>
+            <id>scaleout-repo</id>
+            <url>https://packages.scaleoutsoftware.com/repository/scaleout-release/</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+    </repositories>
     <scm>
       <url>https://github.com/scaleoutsoftware/JavaDigitalTwinCore</url>
     </scm>
@@ -61,7 +71,22 @@
         <dependency>
             <groupId>com.scaleoutsoftware.digitaltwin</groupId>
             <artifactId>digitaltwin-abstractions</artifactId>
-            <version>3.1.1</version>
+            <version>3.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.scaleoutsoftware.modules.connectors</groupId>
+            <artifactId>connectors-abstractions</artifactId>
+            <version>3.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.13</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>connect-runtime</artifactId>
+            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
