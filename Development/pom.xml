@@ -6,7 +6,7 @@
 
     <groupId>com.scaleoutsoftware.digitaltwin</groupId>
     <artifactId>digitaltwin-development</artifactId>
-    <version>3.1.3</version>
+    <version>3.1.4</version>
     <inceptionYear>2021</inceptionYear>
     <url>https://scaleoutsoftware.com</url>
     <name>Digital Twin Core API</name>
@@ -71,12 +71,12 @@
         <dependency>
             <groupId>com.scaleoutsoftware.digitaltwin</groupId>
             <artifactId>digitaltwin-abstractions</artifactId>
-            <version>3.1.3</version>
+            <version>3.1.4</version>
         </dependency>
         <dependency>
             <groupId>com.scaleoutsoftware.modules.connectors</groupId>
             <artifactId>connectors-abstractions</artifactId>
-            <version>3.1.3</version>
+            <version>3.1.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
