@@ -36,6 +36,7 @@ class SimulationScheduler {
     private final Logger                                    _logger     = LogManager.getLogger(SimulationScheduler.class);
     private long                                            _curSimulationTime;
     private Date                                            _simulationStartTime;
+    private Duration                                        _simulationTimeIncrement;
     private boolean                                         _isActive;
 
 
@@ -67,6 +68,7 @@ class SimulationScheduler {
         long current = System.currentTimeMillis();
         SimulationStep ret;
         _curSimulationTime = runSimulationEventArgs.getCurSimulationTime();
+        _simulationTimeIncrement = Duration.ofMillis(runSimulationEventArgs.getIterationSize());
 
         if (runSimulationEventArgs.getSimulationFlags() == WorkbenchSimulationFlags.Stop) {
             _logger.info("Stopping simulation; shutting down workers.");
@@ -102,6 +104,10 @@ class SimulationScheduler {
 
     Date getSimulationStartTime() {
         return _simulationStartTime;
+    }
+
+    Duration getSimulationIncrement() {
+        return _simulationTimeIncrement;
     }
 
     void setSimulationStartTime(Date simulationStartTime) {

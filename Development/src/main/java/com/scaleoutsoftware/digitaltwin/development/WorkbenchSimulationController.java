@@ -42,7 +42,7 @@ class WorkbenchSimulationController implements SimulationController {
 
     @Override
     public Duration getSimulationTimeIncrement() {
-        return null;
+        return _scheduler.getSimulationIncrement();
     }
 
     @Override
