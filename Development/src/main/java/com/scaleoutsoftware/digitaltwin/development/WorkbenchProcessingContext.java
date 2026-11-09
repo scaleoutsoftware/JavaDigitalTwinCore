@@ -32,13 +32,8 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     HashMap<String, byte[]>     _modelData;
     HashMap<String, byte[]>     _globalData;
     boolean                     _forceSave;
-
-    WorkbenchProcessingContext(TwinExecutionEngine twinExecutionEngine, HashMap<String, byte[]> modelSharedData, HashMap<String, byte[]> globalSharedData, SimulationController simulationController) {
-        _twinExecutionEngine = twinExecutionEngine;
-        _controller          = simulationController;
-        _modelData           = modelSharedData;
-        _globalData          = globalSharedData;
-    }
+    HashMap<String, Object>     _scenarioParameters;
+    long                        _scenarioTimestampMs;
 
     WorkbenchProcessingContext(TwinExecutionEngine twinExecutionEngine, SimulationController controller) {
         _twinExecutionEngine    = twinExecutionEngine;
@@ -46,13 +41,15 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     }
 
     void reset(String model, String id, String source, TwinProxy proxy) {
-        _model          = model;
-        _id             = id;
-        _proxy          = proxy;
-        _forceSave      = false;
-        _source         = source;
-        _modelData      = _twinExecutionEngine.getModelData(model);
-        _globalData     = _twinExecutionEngine.getGlobalSharedData();
+        _model                  = model;
+        _id                     = id;
+        _proxy                  = proxy;
+        _forceSave              = false;
+        _source                 = source;
+        _modelData              = _twinExecutionEngine.getModelData(model);
+        _globalData             = _twinExecutionEngine.getGlobalSharedData();
+        _scenarioParameters     = _twinExecutionEngine.getScenarioParameters();
+        _scenarioTimestampMs    = _twinExecutionEngine.getScenarioTimestampMs();
     }
 
     void reset(String model, String id, String source) {
@@ -166,5 +163,15 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     @Override
     public SharedData getSharedGlobalData() {
         return new WorkbenchSharedData(_globalData);
+    }
+
+    @Override
+    public long getScenarioTimestampMs() {
+        return _scenarioTimestampMs;
+    }
+
+    @Override
+    public HashMap<String, Object> getScenarioParameters() {
+        return _scenarioParameters;
     }
 }

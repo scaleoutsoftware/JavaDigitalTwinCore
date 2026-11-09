@@ -18,6 +18,7 @@ package com.scaleoutsoftware.digitaltwin.abstractions;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -26,7 +27,6 @@ import java.util.logging.Level;
  * @param <T> the type of the digital twin
  */
 public abstract class ProcessingContext<T extends DigitalTwinBase<T>> {
-    private static final long serialVersionUID = 1L;
 
     /**
      * Default constructor.
@@ -160,5 +160,18 @@ public abstract class ProcessingContext<T extends DigitalTwinBase<T>> {
      * @return a {@link SharedData} instance.
      */
     public abstract SharedData getSharedGlobalData();
+
+    /**
+     * Retrieve the current scenario timestamp in milliseconds.
+     * @return the current scenario timestamp in milliseconds.
+     * Returns -1 if no scenario parameters have been set.
+     */
+    public abstract long getScenarioTimestampMs();
+
+    /**
+     * Retrieve the current scenario parameters.
+     * @return the current scenario parameters or null if no scenario parameters exist.
+     */
+    public abstract HashMap<String, Object> getScenarioParameters();
 
 }

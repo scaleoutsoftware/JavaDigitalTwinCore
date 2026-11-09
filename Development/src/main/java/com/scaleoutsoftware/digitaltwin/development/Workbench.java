@@ -372,6 +372,11 @@ public class Workbench implements AutoCloseable {
         _kafkaService.submit(new KafkaConsumerRunnable(serverProperties, consumeTopic, modelName, consumerRecordFilter, _twinExecutionEngine));
     }
 
+    public void loadScenarioParameters(HashMap<String,Object> scenarioParameters) throws WorkbenchException {
+        if(scenarioParameters == null) throw new WorkbenchException("Supplied ScenarioParameters were null");
+        _twinExecutionEngine.addScenarioParameters(scenarioParameters);
+    }
+
     /**
      * Runs a simulation from the given startTime until the given endTime OR there is no more work to do.
      * A simulation has reached the end time when the time to run the next interval is greater than the end time or

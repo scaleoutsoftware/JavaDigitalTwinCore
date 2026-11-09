@@ -40,6 +40,8 @@ class TwinExecutionEngine implements Closeable {
     private ConcurrentHashMap<String, SimulationScheduler>                                  _simulationSchedulers;
     private ConcurrentHashMap<String, WorkbenchTimerTask>                                   _realTimeTimers;
     private Gson                                                                            _gson;
+    private HashMap<String,Object>                                                          _scenarioParameters;
+    private long                                                                            _scenarioTimestampMs;
 
 
     TwinExecutionEngine(Workbench workbench) {
@@ -105,6 +107,10 @@ class TwinExecutionEngine implements Closeable {
             WorkbenchTimerTask task = _realTimeTimers.get(String.format("%s%s%s",modelName, id,timerName));
             task.cancel();
         }
+    }
+
+    void addScenarioParameter(HashMap<String,Object> scenarioParameters) {
+        _scenarioParameters = scenarioParameters;
     }
 
     void addAlertProvider(String modelName, String configuration) {
@@ -198,7 +204,8 @@ class TwinExecutionEngine implements Closeable {
     SimulationStep runSimulationStep(SimulationStepArgs args) {
         SimulationStep status = null;
         for(Map.Entry<String,SimulationScheduler> entry : _simulationSchedulers.entrySet()) {
-            SimulationStep next = entry.getValue().runSimulation(args);
+            SimulationScheduler scheduler = entry.getValue();
+            SimulationStep next = scheduler.runSimulation(args);
             if(status == null) {
                 status = next;
             } else {
@@ -213,6 +220,24 @@ class TwinExecutionEngine implements Closeable {
         if(sharedData == null) sharedData = new HashMap<>();
         _modelsSharedData.put(model, sharedData);
         return sharedData;
+    }
+
+    void addScenarioParameters(HashMap<String,Object> scenarioParameters) {
+        _scenarioParameters = scenarioParameters;
+        long curTime = System.currentTimeMillis();
+        for(SimulationScheduler scheduler : _simulationSchedulers.values()) {
+            curTime = scheduler.getCurrentTime();
+            break;
+        }
+        _scenarioTimestampMs = curTime;
+    }
+
+    HashMap<String,Object> getScenarioParameters() {
+        return _scenarioParameters;
+    }
+
+    long getScenarioTimestampMs() {
+        return _scenarioTimestampMs;
     }
 
     HashMap<String, byte[]> getGlobalSharedData() {
@@ -310,7 +335,7 @@ class TwinExecutionEngine implements Closeable {
             if(scheduler != null) {
                 simulationController = new WorkbenchSimulationController(this, scheduler);
             }
-            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, sharedData, _globalSharedData, simulationController);
+            WorkbenchProcessingContext context = new WorkbenchProcessingContext(_workbench._twinExecutionEngine, simulationController);
             context.reset(model, id, source, proxy);
             if(simulationController != null) {
                 simulationController.reset(model, id);
