@@ -288,6 +288,10 @@ public class TestWorkbench {
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().compareTo("initSimulation") == 0) {
                 return ProcessingResult.UpdateDigitalTwin;
+            } else if (simpleDigitalTwin.getId().compareTo("Scenario") == 0) {
+                HashMap<String,Object> scenario = processingContext.getScenarioParameters();
+                processingContext.logMessage(Level.INFO, scenario.get(simpleDigitalTwin._stringProp).toString());
+                return ProcessingResult.UpdateDigitalTwin;
             }
             long delay = Long.parseLong(simpleDigitalTwin.getId());
             controller.delay(Duration.ofSeconds(delay));
@@ -854,6 +858,34 @@ public class TestWorkbench {
             byte[] message = gson.toJson(new SimpleMessage("Scenario", 10)).getBytes(StandardCharsets.UTF_8);
             workbench.send("Simple", "0", message);
             List<LogMessage> logMessages = workbench.getLoggedMessages("Simple", 0);
+            Assert.assertEquals(1, logMessages.size());
+            for(LogMessage logMessage : logMessages) {
+                Assert.assertEquals(scenario.get("Scenario"), logMessage.getMessage());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void TestWorkbenchLoadScenarioSimulation() throws WorkbenchException{
+        Gson gson = new Gson();
+        int numInstance = 10;
+        int numItterations = 0;
+        try (Workbench workbench = new Workbench()) {
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+            workbench.addSimulationModel("SimSimple", new SimpleMessageProcessor(), new SimpleSimProcessor(), SimpleDigitalTwin.class);
+            for (int twinCount = 0; twinCount < 1; twinCount++) {
+                DigitalTwinBase instance = new SimpleDigitalTwin("Scenario");
+                workbench.addInstance("SimSimple", "Scenario", instance);
+            }
+            HashMap<String,Object> scenario = new HashMap<>();
+            scenario.put("Scenario", "Hello, World.");
+
+            workbench.loadScenarioParameters(scenario);
+            workbench.initializeSimulation(1000, 2000, 1000);
+            workbench.step();
+            List<LogMessage> logMessages = workbench.getLoggedMessages("SimSimple", 0);
             Assert.assertEquals(1, logMessages.size());
             for(LogMessage logMessage : logMessages) {
                 Assert.assertEquals(scenario.get("Scenario"), logMessage.getMessage());

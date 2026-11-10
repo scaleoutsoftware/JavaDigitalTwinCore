@@ -53,12 +53,14 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     }
 
     void reset(String model, String id, String source) {
-        _model          = model;
-        _id             = id;
-        _forceSave      = false;
-        _source         = source;
-        _modelData      = _twinExecutionEngine.getModelData(model);
-        _globalData     = _twinExecutionEngine.getGlobalSharedData();
+        _model                  = model;
+        _id                     = id;
+        _forceSave              = false;
+        _source                 = source;
+        _modelData              = _twinExecutionEngine.getModelData(model);
+        _globalData             = _twinExecutionEngine.getGlobalSharedData();
+        _scenarioParameters     = _twinExecutionEngine.getScenarioParameters();
+        _scenarioTimestampMs    = _twinExecutionEngine.getScenarioTimestampMs();
     }
 
     void resetProxy(TwinProxy proxy) {
