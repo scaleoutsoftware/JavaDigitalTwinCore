@@ -84,6 +84,10 @@ public class TestWorkbench {
                     case "LogMessage":
                         processingContext.logMessage(Level.INFO, msg.payload);
                         break;
+                    case "Scenario":
+                        HashMap<String,Object> scenario = processingContext.getScenarioParameters();
+                        processingContext.logMessage(Level.INFO, scenario.get(msg.stringChange).toString());
+                        break;
                     case "StartTimer":
                         processingContext.startTimer("timer", Duration.ofMillis(1000), TimerType.Recurring, new SimpleTimer(), SimpleTimer.class);
                         break;
@@ -828,6 +832,34 @@ public class TestWorkbench {
             Assert.assertEquals(expectedInvokes + initSimExpectedInvokes, processor.timesInvoked.get());
         } catch (Exception e) {
             throw e;
+        }
+    }
+
+    @Test
+    public void TestWorkbenchLoadScenario() throws WorkbenchException{
+        Gson gson = new Gson();
+        int numInstance = 10;
+        int numItterations = 0;
+        try (Workbench workbench = new Workbench()) {
+            workbench.addRealTimeModel("Simple", new SimpleMessageProcessor(), SimpleDigitalTwin.class);
+
+            for (int twinCount = 0; twinCount < 1; twinCount++) {
+                DigitalTwinBase instance = new SimpleDigitalTwin("hello" + twinCount);
+                workbench.addInstance("Simple", "" + twinCount, instance);
+            }
+            HashMap<String,Object> scenario = new HashMap<>();
+            scenario.put("Scenario", "Hello, World.");
+
+            workbench.loadScenarioParameters(scenario);
+            byte[] message = gson.toJson(new SimpleMessage("Scenario", 10)).getBytes(StandardCharsets.UTF_8);
+            workbench.send("Simple", "0", message);
+            List<LogMessage> logMessages = workbench.getLoggedMessages("Simple", 0);
+            Assert.assertEquals(1, logMessages.size());
+            for(LogMessage logMessage : logMessages) {
+                Assert.assertEquals(scenario.get("Scenario"), logMessage.getMessage());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
