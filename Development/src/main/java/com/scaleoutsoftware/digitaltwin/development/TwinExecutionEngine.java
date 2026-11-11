@@ -40,7 +40,7 @@ class TwinExecutionEngine implements Closeable {
     private ConcurrentHashMap<String, SimulationScheduler>                                  _simulationSchedulers;
     private ConcurrentHashMap<String, WorkbenchTimerTask>                                   _realTimeTimers;
     private Gson                                                                            _gson;
-    private HashMap<String,Object>                                                          _scenarioParameters;
+    private Map<String,Object>                                                              _scenarioParameters;
     private long                                                                            _scenarioTimestampMs;
 
 
@@ -222,7 +222,7 @@ class TwinExecutionEngine implements Closeable {
         return sharedData;
     }
 
-    void addScenarioParameters(HashMap<String,Object> scenarioParameters) {
+    void addScenarioParameters(Map<String,Object> scenarioParameters) {
         _scenarioParameters = scenarioParameters;
         long curTime = System.currentTimeMillis();
         for(SimulationScheduler scheduler : _simulationSchedulers.values()) {
@@ -232,7 +232,7 @@ class TwinExecutionEngine implements Closeable {
         _scenarioTimestampMs = curTime;
     }
 
-    HashMap<String,Object> getScenarioParameters() {
+    Map<String,Object> getScenarioParameters() {
         return _scenarioParameters;
     }
 

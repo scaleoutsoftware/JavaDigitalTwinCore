@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -172,6 +173,6 @@ public abstract class ProcessingContext<T extends DigitalTwinBase<T>> {
      * Retrieve the current scenario parameters.
      * @return the current scenario parameters or null if no scenario parameters exist.
      */
-    public abstract HashMap<String, Object> getScenarioParameters();
+    public abstract Map<String, Object> getScenarioParameters();
 
 }

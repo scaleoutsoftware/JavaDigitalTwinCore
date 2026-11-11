@@ -372,7 +372,7 @@ public class Workbench implements AutoCloseable {
         _kafkaService.submit(new KafkaConsumerRunnable(serverProperties, consumeTopic, modelName, consumerRecordFilter, _twinExecutionEngine));
     }
 
-    public void loadScenarioParameters(HashMap<String,Object> scenarioParameters) throws WorkbenchException {
+    public void loadScenarioParameters(Map<String,Object> scenarioParameters) throws WorkbenchException {
         if(scenarioParameters == null) throw new WorkbenchException("Supplied ScenarioParameters were null");
         _twinExecutionEngine.addScenarioParameters(scenarioParameters);
     }

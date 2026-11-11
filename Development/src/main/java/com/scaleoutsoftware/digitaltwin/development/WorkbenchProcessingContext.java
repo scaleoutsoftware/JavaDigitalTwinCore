@@ -32,7 +32,7 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     HashMap<String, byte[]>     _modelData;
     HashMap<String, byte[]>     _globalData;
     boolean                     _forceSave;
-    HashMap<String, Object>     _scenarioParameters;
+    Map<String, Object>         _scenarioParameters;
     long                        _scenarioTimestampMs;
 
     WorkbenchProcessingContext(TwinExecutionEngine twinExecutionEngine, SimulationController controller) {
@@ -173,7 +173,7 @@ class WorkbenchProcessingContext<T extends DigitalTwinBase<T>> extends Processin
     }
 
     @Override
-    public HashMap<String, Object> getScenarioParameters() {
+    public Map<String, Object> getScenarioParameters() {
         return _scenarioParameters;
     }
 }

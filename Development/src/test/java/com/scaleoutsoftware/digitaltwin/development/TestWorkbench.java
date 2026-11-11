@@ -85,7 +85,7 @@ public class TestWorkbench {
                         processingContext.logMessage(Level.INFO, msg.payload);
                         break;
                     case "Scenario":
-                        HashMap<String,Object> scenario = processingContext.getScenarioParameters();
+                        Map<String,Object> scenario = processingContext.getScenarioParameters();
                         processingContext.logMessage(Level.INFO, scenario.get(msg.stringChange).toString());
                         break;
                     case "StartTimer":
@@ -289,7 +289,7 @@ public class TestWorkbench {
             } else if (simpleDigitalTwin.getId().compareTo("initSimulation") == 0) {
                 return ProcessingResult.UpdateDigitalTwin;
             } else if (simpleDigitalTwin.getId().compareTo("Scenario") == 0) {
-                HashMap<String,Object> scenario = processingContext.getScenarioParameters();
+                Map<String,Object> scenario = processingContext.getScenarioParameters();
                 processingContext.logMessage(Level.INFO, scenario.get(simpleDigitalTwin._stringProp).toString());
                 return ProcessingResult.UpdateDigitalTwin;
             }
